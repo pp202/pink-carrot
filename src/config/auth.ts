@@ -1,0 +1,38 @@
+import { createUserIfNew, getUser } from "@/backend/user";
+import { log } from "console";
+import type { NextAuthOptions } from "next-auth";
+import FacebookProvider from "next-auth/providers/facebook";
+import GoogleProvider from "next-auth/providers/google";
+
+export const authOptions: NextAuthOptions = {
+  pages: {
+    signIn: "/login",
+  },
+  session: {
+    strategy: "jwt",
+  },
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_ID as string,
+      clientSecret: process.env.FACEBOOK_SECRET as string,
+    }),
+  ],
+  secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async signIn({ user }) {
+      if (user.email){
+        await createUserIfNew(user.email)
+        const userProfile = await getUser(user.email)
+        log("User logged in, ID:", userProfile?.id)
+      }
+      else
+        return false;
+      
+      return true;
+    }
+  }
+};
