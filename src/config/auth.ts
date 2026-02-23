@@ -1,5 +1,4 @@
 import { createUserIfNew, getUser } from "@/backend/user";
-import { log } from "console";
 import NextAuth from "next-auth";
 import type { NextAuthConfig } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
@@ -23,7 +22,7 @@ export const authConfig = {
       if (user.email) {
         await createUserIfNew(user.email);
         const userProfile = await getUser(user.email);
-        log("User logged in, ID:", userProfile?.id);
+        console.log("User logged in, ID:", userProfile?.id);
         return true;
       }
 
