@@ -22,7 +22,13 @@ const NavBar = () => {
             <ul className='flex gap-4 grow'>
                 {navItems.map(item => navItem(item.href, item.name, path))}
             </ul>
-            <button className='flex origin-top-right' onClick={() => signOut()}><IoLogOut size='25'/></button>
+            <button
+                type='button'
+                className='flex origin-top-right'
+                onClick={() => signOut({ callbackUrl: '/login' })}
+            >
+                <IoLogOut size='25'/>
+            </button>
         </nav>
     )
 }
@@ -39,4 +45,3 @@ export const navItem = (href: string, name: string, path: string) => {
         <li key={href}><Link href={href} className={className}>{name}</Link></li>
     )
 }
-
