@@ -1,4 +1,3 @@
-import { log } from 'console'
 import prisma from '../config/prisma'
 import { loggedUser } from './user';
 
@@ -28,13 +27,10 @@ export async function getList(id: number) {
 
 export async function deleteList(id: number) {
     const user = await loggedUser();
-    return prisma.list.delete({
+    return prisma.list.deleteMany({
         where: {
-            id: id,            
-            AND : {
-                userId: user.id,
-            },
+            id,
+            userId: user.id,
         },
     })
 }
-
