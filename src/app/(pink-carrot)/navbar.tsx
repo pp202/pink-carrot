@@ -17,12 +17,12 @@ const NavBar = () => {
     ]
 
     return (
-        <nav className='flex space-x-4 border-b mb-2 px-3 h-12 items-center'>
+        <nav className='flex gap-4 border-b mb-2 px-3 h-12 items-center'>
             <Link href="/"><GiCarrot /></Link>
-            <ul className='flex space-x-4 grow'>
+            <ul className='flex gap-4 grow'>
                 {navItems.map(item => navItem(item.href, item.name, path))}
             </ul>
-            <button className='flex space-x-4 origin-top-right' onClick={() => signOut()}><IoLogOut size='25'/></button>
+            <button className='flex origin-top-right' onClick={() => signOut()}><IoLogOut size='25'/></button>
         </nav>
     )
 }

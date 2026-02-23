@@ -1,5 +1,5 @@
 import prisma from "../config/prisma";
-import { auth } from "@/config/auth";
+import { auth } from "../../auth";
 
 
 export async function loggedUser() {
