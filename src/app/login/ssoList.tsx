@@ -31,20 +31,6 @@ export const SSOList = () => {
         />
         Continue with Google
       </a>
-      <a
-        className={className}
-        style={{ backgroundColor: "#000000" }}
-        onClick={() => signIn("facebook", { callbackUrl })}
-        role="button"
-      >
-        <img
-          className="pr-2"
-          src="/images/facebook.png"
-          alt=""
-          style={{ height: "2.2rem" }}
-        />
-        Continue with Facebook
-      </a>
     </section>
   );
 };
