@@ -1,7 +1,6 @@
 import { createUserIfNew, getUser } from "@/backend/user";
 import { log } from "console";
 import type { NextAuthOptions } from "next-auth";
-import FacebookProvider from "next-auth/providers/facebook";
 import GoogleProvider from "next-auth/providers/google";
 
 export const authOptions: NextAuthOptions = {
