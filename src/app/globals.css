@@ -1,6 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-ct-blue-600: #3b82f6;
+}
 
 :root {
   --foreground-rgb: 0, 0, 0;
