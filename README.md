@@ -1,5 +1,13 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Prerequisites
+
+- Node.js **22.x or newer** (project enforces `engines.node: >=22.0.0`).
+
+## Upgrade Notes
+
+- See `NEXT_UPGRADE.md` for a safe migration path to the latest Next.js major version.
+
 ## Getting Started
 
 First, run the development server:
