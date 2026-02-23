@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import prisma from "@/config/prisma"
+import { prisma}  from "@/config/prisma"
 import { loggedUser } from "@/backend/user"
 import { createListSchema } from "../../schema/createListSchema"
-import { NextApiRequest } from "next"
 import { getLists } from "@/backend/lists"
 
 export async function POST(request: NextRequest) {
