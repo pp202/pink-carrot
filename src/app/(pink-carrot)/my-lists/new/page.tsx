@@ -36,9 +36,7 @@ const NewListPage = () => {
                 }
 
             })}>
-                <TextField.Root>
-                    <TextField.Input placeholder='Title' {...register('name')}></TextField.Input>
-                </TextField.Root>
+                <TextField.Root placeholder='Title' {...register('name')} />
                 <TextErrorMessage>{errors.name?.message}</TextErrorMessage>
                 <Button disabled={isSubmitting}>Create List {isSubmitting && <Spinner/>}</Button>
             </form>

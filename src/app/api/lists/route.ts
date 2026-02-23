@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const user = await loggedUser();
     const validation = createListSchema.safeParse(body)
     if (!validation.success)
-        return NextResponse.json(validation.error.errors, { status: 400 })
+        return NextResponse.json(validation.error.issues, { status: 400 })
     const newList = await prisma.list.create({
         data: {
             name: body.name,

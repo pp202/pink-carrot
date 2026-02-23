@@ -1,4 +1,3 @@
-import { log } from "console";
 import prisma from "../config/prisma";
 import { auth } from "@/config/auth";
 
@@ -23,7 +22,7 @@ export async function createUserIfNew(username: string) {
         username: lcUsername,
       },
     });
-    log("New user registered, ID:", newUser.id);
+    console.log("New user registered, ID:", newUser.id);
   }
 }
 
