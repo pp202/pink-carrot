@@ -5,31 +5,31 @@ import { useSearchParams } from "next/navigation";
 import classNames from "classnames";
 
 const className = classNames({
-  "flex px-7 py-2 justify-center items-center": true,
-  "text-white font-medium text-sm uppercase": true,
+  "w-full flex px-7 py-3 justify-center items-center gap-3": true,
+  "rounded-xl border border-slate-200 bg-white text-slate-800": true,
+  "font-medium text-sm transition-colors duration-200": true,
+  "hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500":
+    true,
 });
-
 
 export const SSOList = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   return (
-    <section>
-      <a
+    <section aria-label="Single sign-on providers">
+      <button
+        type="button"
         className={className}
-        style={{ backgroundColor: "#000000" }}
         onClick={() => signIn("google", { callbackUrl })}
-        role="button"
       >
         <img
-          className="pr-2"
+          className="h-6 w-6"
           src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-          alt=""
-          style={{ height: "2rem" }}
+          alt="Google logo"
         />
         Continue with Google
-      </a>
+      </button>
     </section>
   );
 };
