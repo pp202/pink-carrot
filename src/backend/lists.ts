@@ -1,4 +1,4 @@
-import prisma from '../config/prisma'
+import { prisma } from '@/config/prisma'
 import { loggedUser } from './user';
 
 export async function getLists() {
