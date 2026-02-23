@@ -1,9 +1,10 @@
 import { createUserIfNew, getUser } from "@/backend/user";
 import { log } from "console";
-import type { NextAuthOptions } from "next-auth";
+import NextAuth from "next-auth";
+import type { NextAuthConfig } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
-export const authOptions: NextAuthOptions = {
+export const authConfig = {
   pages: {
     signIn: "/login",
   },
@@ -19,15 +20,16 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async signIn({ user }) {
-      if (user.email){
-        await createUserIfNew(user.email)
-        const userProfile = await getUser(user.email)
-        log("User logged in, ID:", userProfile?.id)
+      if (user.email) {
+        await createUserIfNew(user.email);
+        const userProfile = await getUser(user.email);
+        log("User logged in, ID:", userProfile?.id);
+        return true;
       }
-      else
-        return false;
-      
-      return true;
-    }
-  }
-};
+
+      return false;
+    },
+  },
+} satisfies NextAuthConfig;
+
+export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);
