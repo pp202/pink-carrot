@@ -22,7 +22,7 @@ const NavBar = () => {
             <ul className='flex space-x-4 grow'>
                 {navItems.map(item => navItem(item.href, item.name, path))}
             </ul>
-            <button className='flex space-x-4 origin-top-right'onClick={() => signOut()}><IoLogOut size='25'/></button>
+            <button className='flex space-x-4 origin-top-right' onClick={() => signOut()}><IoLogOut size='25'/></button>
         </nav>
     )
 }
