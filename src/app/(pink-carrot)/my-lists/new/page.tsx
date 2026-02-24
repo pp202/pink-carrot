@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button, Callout, TextField } from '@radix-ui/themes'
 import axios from 'axios'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createListSchema } from '@/app/schema/createListSchema'
 import { z } from 'zod'
@@ -15,11 +15,14 @@ type NewListForm = z.infer<typeof createListSchema>
 
 const NewListPage = () => {
     const router = useRouter()
+    const searchParams = useSearchParams()
     const { register, handleSubmit, formState: { errors } } = useForm<NewListForm>({
         resolver: zodResolver(createListSchema)
     })
     const [error, setError] = useState('');
     const [isSubmitting, setSubmitting] = useState(false)
+
+    const cancelPath = searchParams.get('from') === 'dashboard' ? '/dashboard' : '/my-lists'
     return (
         <section className="min-h-[calc(100vh-5rem)] bg-zinc-950">
             <div className="container mx-auto flex min-h-[calc(100vh-5rem)] items-center justify-center px-6 py-12">
@@ -50,7 +53,18 @@ const NewListPage = () => {
                     >
                         <TextField.Root placeholder='Title' {...register('name')} />
                         <TextErrorMessage>{errors.name?.message}</TextErrorMessage>
-                        <Button disabled={isSubmitting}>Create List {isSubmitting && <Spinner />}</Button>
+                        <div className='flex gap-3'>
+                            <Button disabled={isSubmitting}>Create List {isSubmitting && <Spinner />}</Button>
+                            <Button
+                                type='button'
+                                variant='soft'
+                                color='gray'
+                                disabled={isSubmitting}
+                                onClick={() => router.push(cancelPath)}
+                            >
+                                Cancel
+                            </Button>
+                        </div>
                     </form>
                 </div>
             </div>
