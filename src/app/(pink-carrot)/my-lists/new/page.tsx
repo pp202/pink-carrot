@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { Suspense, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button, Callout, TextField } from '@radix-ui/themes'
 import axios from 'axios'
@@ -13,7 +13,7 @@ import Spinner from '@/app/components/Spinner'
 
 type NewListForm = z.infer<typeof createListSchema>
 
-const NewListPage = () => {
+const NewListForm = () => {
     const router = useRouter()
     const searchParams = useSearchParams()
     const { register, handleSubmit, formState: { errors } } = useForm<NewListForm>({
@@ -71,5 +71,11 @@ const NewListPage = () => {
         </section>
     )
 }
+
+const NewListPage = () => (
+    <Suspense fallback={<div className="min-h-[calc(100vh-5rem)] bg-zinc-950" />}>
+        <NewListForm />
+    </Suspense>
+)
 
 export default NewListPage
