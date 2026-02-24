@@ -6,9 +6,9 @@ import classNames from "classnames";
 
 const className = classNames({
   "w-full flex px-7 py-3 justify-center items-center gap-3": true,
-  "rounded-xl border border-slate-200 bg-white text-slate-800": true,
+  "rounded-xl border border-zinc-500/40 bg-zinc-700 text-zinc-100": true,
   "font-medium text-sm transition-colors duration-200": true,
-  "hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500":
+  "hover:bg-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-200":
     true,
 });
 
