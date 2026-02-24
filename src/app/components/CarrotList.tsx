@@ -1,6 +1,6 @@
 'use client';
 
-import { List } from '@prisma/client';
+import { List } from '@/app/generated/prisma/client';
 import { Box, Flex, IconButton, Tooltip, Text } from '@radix-ui/themes'
 import axios from 'axios';
 import Link from 'next/link';
