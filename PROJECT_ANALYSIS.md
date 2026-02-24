@@ -69,7 +69,7 @@ Pink Carrot is a small Next.js 13 App Router application for authenticated, per-
 - `README.md` still contains create-next-app template content.
 - Missing environment setup for:
   - OAuth keys (`GOOGLE_*`, `FACEBOOK_*`, `NEXTAUTH_SECRET`)
-  - Database URLs (`POSTGRES_PRISMA_URL`)
+  - Database URLs (`DATABASE_URL`)
   - Prisma migration workflow
 
 ### P2 — Code hygiene

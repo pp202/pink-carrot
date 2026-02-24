@@ -10,6 +10,15 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
+## Environment Variables
+
+Set these in `.env` or `.env.local` before running the app:
+
+- DATABASE_URL
+- NEXTAUTH_SECRET
+- GOOGLE_CLIENT_ID
+- GOOGLE_CLIENT_SECRET
+
 First, run the development server:
 
 ```bash
