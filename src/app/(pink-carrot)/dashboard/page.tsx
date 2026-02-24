@@ -4,7 +4,7 @@ const actionItems = [
   {
     name: "Create new list",
     description: "Start a fresh grocery list in seconds.",
-    href: "/my-lists/new",
+    href: "/my-lists/new?from=dashboard",
   },
   {
     name: "Go to my lists",
