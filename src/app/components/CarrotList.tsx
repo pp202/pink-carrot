@@ -1,13 +1,13 @@
 'use client';
 
-import { List } from '@/app/generated/prisma/client';
+import { Chest } from '@/app/generated/prisma/client';
 import { Box, Flex, IconButton, Tooltip, Text } from '@radix-ui/themes';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { FaArchive } from 'react-icons/fa';
 
 const CarrotList = () => {
-  const [state, setState] = useState<List[]>([]);
+  const [state, setState] = useState<Chest[]>([]);
 
   useEffect(() => {
     fetch('/api/lists', { cache: 'no-cache' })
@@ -29,7 +29,7 @@ const Carrots = ({
   carrotList,
   onRemove,
 }: {
-  carrotList: List[];
+  carrotList: Chest[];
   onRemove: (id: number) => void;
 }) => {
   if (carrotList.length === 0) {

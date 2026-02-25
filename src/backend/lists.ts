@@ -3,7 +3,7 @@ import { loggedUser } from './user';
 
 export async function getLists() {
     const user = await loggedUser();
-    return prisma.list.findMany({
+    return prisma.chest.findMany({
         where: {
             userId: user.id
         },
@@ -15,7 +15,7 @@ export async function getLists() {
 
 export async function getList(id: number) {
     const user = await loggedUser();
-    return prisma.list.findFirst({
+    return prisma.chest.findFirst({
         where: {
             id: id,            
             AND : {
@@ -27,7 +27,7 @@ export async function getList(id: number) {
 
 export async function deleteList(id: number) {
     const user = await loggedUser();
-    return prisma.list.deleteMany({
+    return prisma.chest.deleteMany({
         where: {
             id,
             userId: user.id,
