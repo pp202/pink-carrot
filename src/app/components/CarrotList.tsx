@@ -45,7 +45,7 @@ const Carrots = ({
         >
           <Flex className="items-center gap-2">
             <Box className="grow">
-              <Text className="text-sm font-medium text-zinc-100">{item.name}</Text>
+              <Text className="text-sm font-medium text-zinc-100">{item.label}</Text>
             </Box>
             <Box>
               <Tooltip content="Archive">
