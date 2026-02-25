@@ -13,10 +13,10 @@ datasource db {
 model User {
   id       Int    @id @default(autoincrement())
   username String @db.VarChar(250)
-  List     List[]
+  chests   Chest[]
 }
 
-model List {
+model Chest {
   id        Int      @id @default(autoincrement())
   name      String   @db.VarChar(100)
   status    Status   @default(NEW)
@@ -25,14 +25,16 @@ model List {
 
   userId Int
   user   User @relation(fields: [userId], references: [id])
+
+  @@map("List")
 }
 
 model Carrot {
   id    BigInt @id @default(autoincrement())
   label String @db.VarChar(255)
 
-  listId Int
-  list   List @relation(fields: [listId], references: [id])
+  chestId Int   @map("listId")
+  chest   Chest @relation(fields: [chestId], references: [id])
 }
 
 enum Status {
