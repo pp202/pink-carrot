@@ -1,7 +1,7 @@
 import { prisma } from '@/config/prisma'
 import { loggedUser } from './user';
 
-export async function getLists() {
+export async function getChests() {
     const user = await loggedUser();
     return prisma.chest.findMany({
         where: {
@@ -13,7 +13,7 @@ export async function getLists() {
     })
 }
 
-export async function getList(id: number) {
+export async function getChest(id: number) {
     const user = await loggedUser();
     return prisma.chest.findFirst({
         where: {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma}  from "@/config/prisma"
 import { loggedUser } from "@/backend/user"
 import { createListSchema } from "../../schema/createListSchema"
-import { getLists } from "@/backend/lists"
+import { getChests } from "@/backend/lists"
 
 export async function POST(request: NextRequest) {
     const body = await request.json()
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(validation.error.issues, { status: 400 })
     const newList = await prisma.chest.create({
         data: {
-            name: body.name,
+            label: body.name,
             userId: user.id
         }
     })
@@ -20,6 +20,6 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {  
-  return NextResponse.json(await getLists(), { status: 200 })
+  return NextResponse.json(await getChests(), { status: 200 })
 }
 
