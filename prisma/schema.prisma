@@ -21,9 +21,18 @@ model List {
   name      String   @db.VarChar(100)
   status    Status   @default(NEW)
   createdAt DateTime @default(now())
+  carrots   Carrot[]
 
   userId Int
   user   User @relation(fields: [userId], references: [id])
+}
+
+model Carrot {
+  id    BigInt @id @default(autoincrement())
+  label String @db.VarChar(255)
+
+  listId Int
+  list   List @relation(fields: [listId], references: [id])
 }
 
 enum Status {
