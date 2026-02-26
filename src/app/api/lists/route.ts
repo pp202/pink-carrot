@@ -10,10 +10,16 @@ export async function POST(request: NextRequest) {
     const validation = createListSchema.safeParse(body)
     if (!validation.success)
         return NextResponse.json(validation.error.issues, { status: 400 })
+
     const newList = await prisma.chest.create({
         data: {
-            label: body.name,
-            userId: user.id
+            label: validation.data.name,
+            userId: user.id,
+            carrots: {
+                create: validation.data.carrots.map((carrot) => ({
+                    label: carrot.label,
+                })),
+            },
         }
     })
     return NextResponse.json(newList, { status: 201 })
