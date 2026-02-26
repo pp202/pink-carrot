@@ -21,6 +21,7 @@ model Chest {
   label     String   @db.VarChar(100)
   status    Status   @default(NEW)
   createdAt DateTime @default(now())
+  pinned    Boolean  @default(false)
   carrots   Carrot[]
 
   userId Int
