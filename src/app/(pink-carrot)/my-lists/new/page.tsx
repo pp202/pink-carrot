@@ -11,7 +11,7 @@ import { z } from 'zod'
 import TextErrorMessage from '@/app/components/TextErrorMessage'
 import Spinner from '@/app/components/Spinner'
 
-type NewListForm = z.infer<typeof createListSchema>
+type NewListForm = z.input<typeof createListSchema>
 
 const NewListForm = () => {
     const router = useRouter()
