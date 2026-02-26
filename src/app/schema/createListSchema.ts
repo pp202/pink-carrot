@@ -12,4 +12,5 @@ export const createListSchema = z.object({
       })
     )
     .default([]),
+  pinned: z.boolean().optional().default(false),
 });
