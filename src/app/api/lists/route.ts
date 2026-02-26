@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
         data: {
             label: validation.data.name,
             userId: user.id,
+            pinned: validation.data.pinned,
             carrots: {
                 create: validation.data.carrots.map((carrot) => ({
                     label: carrot.label,

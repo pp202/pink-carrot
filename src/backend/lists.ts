@@ -13,6 +13,26 @@ export async function getChests() {
     })
 }
 
+export async function getPinnedChestsWithCarrots() {
+    const user = await loggedUser();
+    return prisma.chest.findMany({
+        where: {
+            userId: user.id,
+            pinned: true,
+        },
+        include: {
+            carrots: {
+                orderBy: {
+                    id: 'asc',
+                },
+            },
+        },
+        orderBy: {
+            createdAt: 'desc',
+        },
+    })
+}
+
 export async function getChest(id: number) {
     const user = await loggedUser();
     return prisma.chest.findFirst({
