@@ -17,7 +17,7 @@ export default async function DashboardPage() {
             </p>
           </header>
 
-          <div className="flex-1 space-y-4">
+          <div className="space-y-4">
             {pinnedChests.length === 0 ? (
               <p className="rounded-xl border border-zinc-600/40 bg-zinc-900/60 px-4 py-6 text-center text-sm text-zinc-400">
                 No pinned chests yet. Create one with the plus button.
@@ -43,7 +43,7 @@ export default async function DashboardPage() {
             )}
           </div>
 
-          <div className="mt-8 flex justify-end">
+          <div className="mt-8 flex justify-center">
             <Link
               href="/my-lists/new?from=dashboard"
               aria-label="Add a new chest"
