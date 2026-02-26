@@ -4,7 +4,7 @@ import { Chest } from '@/app/generated/prisma/client';
 import { Box, Flex, IconButton, Tooltip, Text } from '@radix-ui/themes';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { FaArchive } from 'react-icons/fa';
+import { FaArchive, FaThumbtack } from 'react-icons/fa';
 
 const CarrotList = () => {
   const [state, setState] = useState<Chest[]>([]);
@@ -22,15 +22,37 @@ const CarrotList = () => {
     });
   }
 
-  return <Carrots carrotList={state} onRemove={handleRemove} />;
+  function handlePinnedToggle(id: number, pinned: boolean): void {
+    setState((previous) =>
+      previous.map((item) => (item.id === id ? { ...item, pinned } : item))
+    );
+
+    axios.patch(`/api/lists/${id}`, { pinned }).catch(() => {
+      setState((previous) =>
+        previous.map((item) =>
+          item.id === id ? { ...item, pinned: !pinned } : item
+        )
+      );
+    });
+  }
+
+  return (
+    <Carrots
+      carrotList={state}
+      onRemove={handleRemove}
+      onPinnedToggle={handlePinnedToggle}
+    />
+  );
 };
 
 const Carrots = ({
   carrotList,
   onRemove,
+  onPinnedToggle,
 }: {
   carrotList: Chest[];
   onRemove: (id: number) => void;
+  onPinnedToggle: (id: number, pinned: boolean) => void;
 }) => {
   if (carrotList.length === 0) {
     return <p className="text-center text-sm text-zinc-400">No lists yet.</p>;
@@ -46,6 +68,18 @@ const Carrots = ({
           <Flex className="items-center gap-2">
             <Box className="grow">
               <Text className="text-sm font-medium text-zinc-100">{item.label}</Text>
+            </Box>
+            <Box>
+              <Tooltip content={item.pinned ? 'Unpin' : 'Pin'}>
+                <IconButton
+                  size="1"
+                  variant="ghost"
+                  className={item.pinned ? 'text-red-500' : 'text-zinc-400'}
+                  onClick={() => onPinnedToggle(item.id, !item.pinned)}
+                >
+                  <FaThumbtack />
+                </IconButton>
+              </Tooltip>
             </Box>
             <Box>
               <Tooltip content="Archive">

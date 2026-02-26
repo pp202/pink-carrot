@@ -34,3 +34,16 @@ export async function deleteList(id: number) {
         },
     })
 }
+
+export async function setPinned(id: number, pinned: boolean) {
+    const user = await loggedUser();
+    return prisma.chest.updateMany({
+        where: {
+            id,
+            userId: user.id,
+        },
+        data: {
+            pinned,
+        },
+    })
+}
