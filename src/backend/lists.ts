@@ -47,12 +47,34 @@ export async function getChest(id: number) {
 
 export async function deleteList(id: number) {
     const user = await loggedUser();
-    return prisma.chest.deleteMany({
+    const chest = await prisma.chest.findFirst({
         where: {
             id,
             userId: user.id,
         },
-    })
+        select: {
+            id: true,
+        },
+    });
+
+    if (!chest) {
+        return { count: 0 };
+    }
+
+    const [, deletedChests] = await prisma.$transaction([
+        prisma.carrot.deleteMany({
+            where: {
+                chestId: chest.id,
+            },
+        }),
+        prisma.chest.deleteMany({
+            where: {
+                id: chest.id,
+            },
+        }),
+    ]);
+
+    return deletedChests;
 }
 
 export async function setPinned(id: number, pinned: boolean) {
