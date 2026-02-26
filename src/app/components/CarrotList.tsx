@@ -74,7 +74,7 @@ const Carrots = ({
                 <IconButton
                   size="1"
                   variant="ghost"
-                  className={item.pinned ? 'text-red-500' : 'text-zinc-400'}
+                  className={item.pinned ? '!text-red-500 hover:!text-red-400' : '!text-zinc-400 hover:!text-zinc-300'}
                   onClick={() => onPinnedToggle(item.id, !item.pinned)}
                 >
                   <FaThumbtack />
