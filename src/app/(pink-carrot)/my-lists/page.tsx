@@ -17,12 +17,13 @@ const MyCarrotsPage = async () => {
             <CarrotList />
           </div>
 
-          <div className="mt-6 text-center">
+          <div className="mt-8 flex justify-center">
             <Link
               href="/my-lists/new?from=my-lists"
-              className="inline-block rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-4 py-2 text-sm font-medium text-zinc-100 transition hover:border-zinc-500 hover:bg-zinc-900"
+              aria-label="Add a new chest"
+              className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-zinc-500/60 bg-zinc-900 text-2xl leading-none text-zinc-100 transition hover:border-zinc-400 hover:bg-zinc-800"
             >
-              Create new list
+              +
             </Link>
           </div>
         </div>
