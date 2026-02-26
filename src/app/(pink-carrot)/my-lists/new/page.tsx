@@ -1,7 +1,7 @@
 'use client'
 
 import React, { Suspense, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useFieldArray, useForm } from 'react-hook-form'
 import { Button, Callout, TextField } from '@radix-ui/themes'
 import axios from 'axios'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -16,8 +16,16 @@ type NewListForm = z.infer<typeof createListSchema>
 const NewListForm = () => {
     const router = useRouter()
     const searchParams = useSearchParams()
-    const { register, handleSubmit, formState: { errors } } = useForm<NewListForm>({
-        resolver: zodResolver(createListSchema)
+    const { register, control, handleSubmit, formState: { errors } } = useForm<NewListForm>({
+        resolver: zodResolver(createListSchema),
+        defaultValues: {
+            name: '',
+            carrots: []
+        }
+    })
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: 'carrots'
     })
     const [error, setError] = useState('');
     const [isSubmitting, setSubmitting] = useState(false)
@@ -53,6 +61,37 @@ const NewListForm = () => {
                     >
                         <TextField.Root placeholder='Title' {...register('name')} />
                         <TextErrorMessage>{errors.name?.message}</TextErrorMessage>
+                        <div className='space-y-2'>
+                            {fields.map((field, index) => (
+                                <div key={field.id} className='space-y-1'>
+                                    <div className='flex gap-2'>
+                                        <TextField.Root
+                                            className='grow'
+                                            placeholder={`Carrot item ${index + 1}`}
+                                            {...register(`carrots.${index}.label`)}
+                                        />
+                                        <Button
+                                            type='button'
+                                            variant='soft'
+                                            color='red'
+                                            onClick={() => remove(index)}
+                                        >
+                                            Remove
+                                        </Button>
+                                    </div>
+                                    <TextErrorMessage>{errors.carrots?.[index]?.label?.message}</TextErrorMessage>
+                                </div>
+                            ))}
+
+                            <Button
+                                type='button'
+                                variant='soft'
+                                color='gray'
+                                onClick={() => append({ label: '' })}
+                            >
+                                Add carrot item
+                            </Button>
+                        </div>
                         <div className='flex gap-3'>
                             <Button disabled={isSubmitting}>Create List {isSubmitting && <Spinner />}</Button>
                             <Button
