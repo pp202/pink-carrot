@@ -1,6 +1,7 @@
 'use client';
 
 import { Chest } from '@/app/generated/prisma/client';
+import Spinner from '@/app/components/Spinner';
 import { Box, Flex, IconButton, Tooltip, Text } from '@radix-ui/themes';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
@@ -8,11 +9,13 @@ import { FaArchive, FaThumbtack } from 'react-icons/fa';
 
 const CarrotList = () => {
   const [state, setState] = useState<Chest[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/lists', { cache: 'no-cache' })
       .then((res) => res.json())
-      .then((data) => setState(data));
+      .then((data) => setState(data))
+      .finally(() => setIsLoading(false));
   }, []);
 
   function handleRemove(id: number): void {
@@ -39,6 +42,7 @@ const CarrotList = () => {
   return (
     <Carrots
       carrotList={state}
+      isLoading={isLoading}
       onRemove={handleRemove}
       onPinnedToggle={handlePinnedToggle}
     />
@@ -47,13 +51,24 @@ const CarrotList = () => {
 
 const Carrots = ({
   carrotList,
+  isLoading,
   onRemove,
   onPinnedToggle,
 }: {
   carrotList: Chest[];
+  isLoading: boolean;
   onRemove: (id: number) => void;
   onPinnedToggle: (id: number, pinned: boolean) => void;
 }) => {
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center gap-2 text-sm text-zinc-300">
+        <Spinner />
+        <span>Loading lists...</span>
+      </div>
+    );
+  }
+
   if (carrotList.length === 0) {
     return <p className="text-center text-sm text-zinc-400">No lists yet.</p>;
   }
