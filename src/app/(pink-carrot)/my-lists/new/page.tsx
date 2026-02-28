@@ -11,7 +11,7 @@ import { z } from 'zod'
 import TextErrorMessage from '@/app/components/TextErrorMessage'
 import Spinner from '@/app/components/Spinner'
 import { GiCarrot } from 'react-icons/gi'
-import { IoAdd } from 'react-icons/io5'
+import { IoAdd, IoRemove } from 'react-icons/io5'
 
 type NewListForm = z.input<typeof createListSchema>
 
@@ -80,9 +80,10 @@ const NewListForm = () => {
                                             type='button'
                                             variant='soft'
                                             color='red'
+                                            aria-label={`Remove carrot item ${index + 1}`}
                                             onClick={() => remove(index)}
                                         >
-                                            Remove
+                                            <IoRemove />
                                         </Button>
                                     </div>
                                     <TextErrorMessage>{errors.carrots?.[index]?.label?.message}</TextErrorMessage>
