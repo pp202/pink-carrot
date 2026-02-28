@@ -1,4 +1,4 @@
-import { archiveList, setPinned, unarchiveList } from "@/backend/lists";
+import { archiveList, deleteArchivedList, setPinned, unarchiveList } from "@/backend/lists";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(
@@ -6,12 +6,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const archived = await archiveList(parseInt(id));
-  if (archived.count === 0) {
-    return NextResponse.json({ message: "List not found" }, { status: 404 });
+  const deleted = await deleteArchivedList(parseInt(id));
+  if (deleted.deletedChests.count === 0) {
+    return NextResponse.json({ message: "Archived list not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ message: "List archived" }, { status: 200 });
+  return NextResponse.json({ message: "Archived list deleted" }, { status: 200 });
 }
 
 export async function PATCH(
