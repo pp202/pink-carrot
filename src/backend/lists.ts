@@ -5,7 +5,8 @@ export async function getChests() {
     const user = await loggedUser();
     return prisma.chest.findMany({
         where: {
-            userId: user.id
+            userId: user.id,
+            status: 'NEW',
         },
         orderBy: {
             id: 'asc'
@@ -19,6 +20,7 @@ export async function getPinnedChestsWithCarrots() {
         where: {
             userId: user.id,
             pinned: true,
+            status: 'NEW',
         },
         include: {
             carrots: {
@@ -37,44 +39,39 @@ export async function getChest(id: number) {
     const user = await loggedUser();
     return prisma.chest.findFirst({
         where: {
-            id: id,            
-            AND : {
-                userId: user.id,
-            },
+            id: id,
+            userId: user.id,
+            status: 'NEW',
         },
     })
 }
 
-export async function deleteList(id: number) {
+export async function archiveList(id: number) {
     const user = await loggedUser();
-    const chest = await prisma.chest.findFirst({
+    return prisma.chest.updateMany({
         where: {
             id,
             userId: user.id,
+            status: 'NEW',
         },
-        select: {
-            id: true,
+        data: {
+            status: 'ARCHIVED',
         },
     });
+}
 
-    if (!chest) {
-        return { count: 0 };
-    }
-
-    const [, deletedChests] = await prisma.$transaction([
-        prisma.carrot.deleteMany({
-            where: {
-                chestId: chest.id,
-            },
-        }),
-        prisma.chest.deleteMany({
-            where: {
-                id: chest.id,
-            },
-        }),
-    ]);
-
-    return deletedChests;
+export async function unarchiveList(id: number) {
+    const user = await loggedUser();
+    return prisma.chest.updateMany({
+        where: {
+            id,
+            userId: user.id,
+            status: 'ARCHIVED',
+        },
+        data: {
+            status: 'NEW',
+        },
+    });
 }
 
 export async function setPinned(id: number, pinned: boolean) {
@@ -83,6 +80,7 @@ export async function setPinned(id: number, pinned: boolean) {
         where: {
             id,
             userId: user.id,
+            status: 'NEW',
         },
         data: {
             pinned,

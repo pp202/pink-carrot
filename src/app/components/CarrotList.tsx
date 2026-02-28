@@ -4,14 +4,17 @@ import { Chest } from '@/app/generated/prisma/client';
 import Spinner from '@/app/components/Spinner';
 import { Box, Flex, IconButton, Tooltip, Text } from '@radix-ui/themes';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FaArchive, FaThumbtack } from 'react-icons/fa';
 
 const SWIPE_DELETE_THRESHOLD = 90;
+const UNDO_VISIBLE_MS = 5000;
 
 const CarrotList = () => {
   const [state, setState] = useState<Chest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [recentlyArchived, setRecentlyArchived] = useState<Chest | null>(null);
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     fetch('/api/lists', { cache: 'no-cache' })
@@ -20,10 +23,60 @@ const CarrotList = () => {
       .finally(() => setIsLoading(false));
   }, []);
 
-  function handleRemove(id: number): void {
-    axios.delete(`/api/lists/${id}`).then(() => {
-      const newState = state.filter((item) => item.id !== id);
-      setState(newState);
+  useEffect(() => {
+    return () => {
+      if (undoTimerRef.current) {
+        clearTimeout(undoTimerRef.current);
+      }
+    };
+  }, []);
+
+  function queueUndoBanner(chest: Chest): void {
+    if (undoTimerRef.current) {
+      clearTimeout(undoTimerRef.current);
+    }
+
+    setRecentlyArchived(chest);
+    undoTimerRef.current = setTimeout(() => {
+      setRecentlyArchived(null);
+      undoTimerRef.current = null;
+    }, UNDO_VISIBLE_MS);
+  }
+
+  function handleArchive(id: number): void {
+    const chest = state.find((item) => item.id === id);
+    if (!chest) {
+      return;
+    }
+
+    axios.patch(`/api/lists/${id}`, { status: 'ARCHIVED' }).then(() => {
+      setState((previous) => previous.filter((item) => item.id !== id));
+      queueUndoBanner(chest);
+    });
+  }
+
+  function handleUndoArchive(): void {
+    if (!recentlyArchived) {
+      return;
+    }
+
+    const chest = recentlyArchived;
+    axios.patch(`/api/lists/${chest.id}`, { status: 'NEW' }).then(() => {
+      setState((previous) => {
+        if (previous.some((item) => item.id === chest.id)) {
+          return previous;
+        }
+
+        const restored = { ...chest, status: 'NEW' };
+        return [...previous, restored].sort((a, b) => a.id - b.id);
+      });
+
+      if (undoTimerRef.current) {
+        clearTimeout(undoTimerRef.current);
+        undoTimerRef.current = null;
+      }
+
+      setRecentlyArchived(null);
     });
   }
 
@@ -42,12 +95,26 @@ const CarrotList = () => {
   }
 
   return (
-    <Carrots
-      carrotList={state}
-      isLoading={isLoading}
-      onRemove={handleRemove}
-      onPinnedToggle={handlePinnedToggle}
-    />
+    <>
+      {recentlyArchived ? (
+        <div className="mb-3 rounded-lg border border-zinc-600/40 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-200">
+          Archived "{recentlyArchived.label}".{' '}
+          <button
+            type="button"
+            className="underline underline-offset-2 hover:text-zinc-100"
+            onClick={handleUndoArchive}
+          >
+            Undo
+          </button>
+        </div>
+      ) : null}
+      <Carrots
+        carrotList={state}
+        isLoading={isLoading}
+        onRemove={handleArchive}
+        onPinnedToggle={handlePinnedToggle}
+      />
+    </>
   );
 };
 
@@ -71,13 +138,15 @@ const Carrots = ({
     );
   }
 
-  if (carrotList.length === 0) {
+  const activeCarrotList = carrotList.filter((item) => item.status === 'NEW');
+
+  if (activeCarrotList.length === 0) {
     return <p className="text-center text-sm text-zinc-400">No lists yet.</p>;
   }
 
   return (
     <ul className="space-y-2">
-      {carrotList.map((item) => (
+      {activeCarrotList.map((item) => (
         <CarrotListItem
           key={item.id}
           item={item}
