@@ -10,10 +10,16 @@ import { FaArchive, FaThumbtack } from 'react-icons/fa';
 const SWIPE_DELETE_THRESHOLD = 90;
 const UNDO_VISIBLE_MS = 5000;
 
+type RecentlyArchived = {
+  chest: Chest;
+  index: number;
+};
+
 const CarrotList = () => {
   const [state, setState] = useState<Chest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [recentlyArchived, setRecentlyArchived] = useState<Chest | null>(null);
+  const [recentlyArchived, setRecentlyArchived] =
+    useState<RecentlyArchived | null>(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -31,12 +37,12 @@ const CarrotList = () => {
     };
   }, []);
 
-  function queueUndoBanner(chest: Chest): void {
+  function queueUndoBanner(chest: Chest, index: number): void {
     if (undoTimerRef.current) {
       clearTimeout(undoTimerRef.current);
     }
 
-    setRecentlyArchived(chest);
+    setRecentlyArchived({ chest, index });
     undoTimerRef.current = setTimeout(() => {
       setRecentlyArchived(null);
       undoTimerRef.current = null;
@@ -44,14 +50,16 @@ const CarrotList = () => {
   }
 
   function handleArchive(id: number): void {
-    const chest = state.find((item) => item.id === id);
-    if (!chest) {
+    const archivedItem = state.find((item) => item.id === id);
+    if (!archivedItem) {
       return;
     }
 
+    const archivedIndex = state.findIndex((item) => item.id === id);
+
     axios.patch(`/api/lists/${id}`, { status: 'ARCHIVED' }).then(() => {
       setState((previous) => previous.filter((item) => item.id !== id));
-      queueUndoBanner(chest);
+      queueUndoBanner(archivedItem, archivedIndex);
     });
   }
 
@@ -60,7 +68,7 @@ const CarrotList = () => {
       return;
     }
 
-    const chest = recentlyArchived;
+    const { chest, index } = recentlyArchived;
     axios.patch(`/api/lists/${chest.id}`, { status: 'NEW' }).then(() => {
       setState((previous) => {
         if (previous.some((item) => item.id === chest.id)) {
@@ -68,7 +76,13 @@ const CarrotList = () => {
         }
 
         const restored: Chest = { ...chest, status: 'NEW' as Chest['status'] };
-        return [...previous, restored].sort((a, b) => a.id - b.id);
+        const insertAt = Math.min(Math.max(index, 0), previous.length);
+
+        return [
+          ...previous.slice(0, insertAt),
+          restored,
+          ...previous.slice(insertAt),
+        ];
       });
 
       if (undoTimerRef.current) {
@@ -98,7 +112,7 @@ const CarrotList = () => {
     <>
       {recentlyArchived ? (
         <div className="mb-3 rounded-lg border border-zinc-600/40 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-200">
-          Archived "{recentlyArchived.label}".{' '}
+          Archived "{recentlyArchived.chest.label}".{' '}
           <button
             type="button"
             className="underline underline-offset-2 hover:text-zinc-100"
