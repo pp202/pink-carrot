@@ -5,7 +5,7 @@ const MyCarrotsPage = async () => {
   return (
     <section className="min-h-[calc(100vh-5rem)] bg-zinc-950">
       <div className="container mx-auto flex min-h-[calc(100vh-5rem)] items-stretch justify-center px-6 py-12">
-        <div className="flex min-h-full w-full max-w-md flex-col rounded-2xl border border-zinc-600/30 bg-zinc-800 px-8 py-10 shadow-2xl shadow-black/40 md:px-10 md:py-12">
+        <div className="w-full max-w-md rounded-2xl border border-zinc-600/30 bg-zinc-800 px-8 py-10 shadow-2xl shadow-black/40 md:px-10 md:py-12">
           <header className="mb-8 w-full text-center">
             <h1 className="text-2xl font-semibold text-zinc-100">My lists</h1>
             <p className="mt-2 text-sm text-zinc-300">
@@ -13,9 +13,7 @@ const MyCarrotsPage = async () => {
             </p>
           </header>
 
-          <div className="flex-1">
-            <CarrotList />
-          </div>
+          <CarrotList />
 
           <div className="mt-8 flex justify-center">
             <Link
