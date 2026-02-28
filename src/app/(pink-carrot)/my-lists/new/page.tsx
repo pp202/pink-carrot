@@ -10,6 +10,8 @@ import { createListSchema } from '@/app/schema/createListSchema'
 import { z } from 'zod'
 import TextErrorMessage from '@/app/components/TextErrorMessage'
 import Spinner from '@/app/components/Spinner'
+import { GiCarrot } from 'react-icons/gi'
+import { IoAdd } from 'react-icons/io5'
 
 type NewListForm = z.input<typeof createListSchema>
 
@@ -91,9 +93,13 @@ const NewListForm = () => {
                                 type='button'
                                 variant='soft'
                                 color='gray'
+                                aria-label='Add carrot item'
                                 onClick={() => append({ label: '' })}
                             >
-                                Add carrot item
+                                <span className='inline-flex items-center gap-1'>
+                                    <GiCarrot />
+                                    <IoAdd />
+                                </span>
                             </Button>
                         </div>
                         <div className='flex gap-3'>
