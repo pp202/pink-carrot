@@ -253,12 +253,12 @@ const CarrotListItem = ({
             </IconButton>
           </Tooltip>
         </Box>
-        <Box className="hidden md:block">
+        <Box>
           <Tooltip content="Archive">
             <IconButton
               size="1"
               variant="ghost"
-              className="text-zinc-300"
+              className="hidden text-zinc-300 md:inline-flex"
               onClick={() => onRemove(item.id)}
             >
               <FaArchive />
