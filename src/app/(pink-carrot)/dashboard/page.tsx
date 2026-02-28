@@ -5,7 +5,9 @@ import { GiCarrot } from 'react-icons/gi';
 type PinnedChest = Awaited<ReturnType<typeof getPinnedChestsWithCarrots>>[number];
 
 export default async function DashboardPage() {
-  const pinnedChests: PinnedChest[] = await getPinnedChestsWithCarrots();
+  const pinnedChests: PinnedChest[] = (await getPinnedChestsWithCarrots()).filter(
+    (chest: PinnedChest) => chest.status === 'NEW'
+  );
 
   return (
     <section className="min-h-[calc(100vh-5rem)] bg-zinc-950">
