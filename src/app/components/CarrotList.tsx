@@ -67,7 +67,7 @@ const CarrotList = () => {
           return previous;
         }
 
-        const restored = { ...chest, status: 'NEW' };
+        const restored: Chest = { ...chest, status: 'NEW' as Chest['status'] };
         return [...previous, restored].sort((a, b) => a.id - b.id);
       });
 
