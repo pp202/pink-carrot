@@ -12,7 +12,6 @@ const UNDO_VISIBLE_MS = 5000;
 
 type RecentlyArchived = {
   chest: Chest;
-  index: number;
 };
 
 const CarrotList = () => {
@@ -37,12 +36,12 @@ const CarrotList = () => {
     };
   }, []);
 
-  function queueUndoBanner(chest: Chest, index: number): void {
+  function queueUndoBanner(chest: Chest): void {
     if (undoTimerRef.current) {
       clearTimeout(undoTimerRef.current);
     }
 
-    setRecentlyArchived({ chest, index });
+    setRecentlyArchived({ chest });
     undoTimerRef.current = setTimeout(() => {
       setRecentlyArchived(null);
       undoTimerRef.current = null;
@@ -55,11 +54,9 @@ const CarrotList = () => {
       return;
     }
 
-    const archivedIndex = state.findIndex((item) => item.id === id);
-
     axios.patch(`/api/lists/${id}`, { status: 'ARCHIVED' }).then(() => {
       setState((previous) => previous.filter((item) => item.id !== id));
-      queueUndoBanner(archivedItem, archivedIndex);
+      queueUndoBanner(archivedItem);
     });
   }
 
@@ -68,7 +65,7 @@ const CarrotList = () => {
       return;
     }
 
-    const { chest, index } = recentlyArchived;
+    const { chest } = recentlyArchived;
     axios.patch(`/api/lists/${chest.id}`, { status: 'NEW' }).then(() => {
       setState((previous) => {
         if (previous.some((item) => item.id === chest.id)) {
@@ -76,13 +73,8 @@ const CarrotList = () => {
         }
 
         const restored: Chest = { ...chest, status: 'NEW' as Chest['status'] };
-        const insertAt = Math.min(Math.max(index, 0), previous.length);
 
-        return [
-          ...previous.slice(0, insertAt),
-          restored,
-          ...previous.slice(insertAt),
-        ];
+        return [...previous, restored];
       });
 
       if (undoTimerRef.current) {
@@ -110,24 +102,26 @@ const CarrotList = () => {
 
   return (
     <>
-      {recentlyArchived ? (
-        <div className="mb-3 rounded-lg border border-zinc-600/40 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-200">
-          Archived "{recentlyArchived.chest.label}".{' '}
-          <button
-            type="button"
-            className="underline underline-offset-2 hover:text-zinc-100"
-            onClick={handleUndoArchive}
-          >
-            Undo
-          </button>
-        </div>
-      ) : null}
       <Carrots
         carrotList={state}
         isLoading={isLoading}
         onRemove={handleArchive}
         onPinnedToggle={handlePinnedToggle}
       />
+      {recentlyArchived ? (
+        <div className="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center px-4">
+          <div className="pointer-events-auto rounded-lg border border-zinc-600/40 bg-zinc-900/90 px-3 py-2 text-sm text-zinc-200 shadow-lg shadow-black/30">
+            Archived "{recentlyArchived.chest.label}".{' '}
+            <button
+              type="button"
+              className="underline underline-offset-2 hover:text-zinc-100"
+              onClick={handleUndoArchive}
+            >
+              Undo
+            </button>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 };
@@ -231,13 +225,13 @@ const CarrotListItem = ({
 
   return (
     <li
-      className="rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-4 py-3 transition-transform duration-150"
+      className="group relative rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-4 py-3 transition-transform duration-150"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       style={{ transform: `translateX(${Math.max(-60, Math.min(60, touchDeltaX))}px)` }}
     >
-      <Flex className="items-center gap-2">
+      <Flex className="items-center gap-2 pr-8">
         <Box className="grow">
           <Text className="text-sm font-medium text-zinc-100">{item.label}</Text>
         </Box>
@@ -253,12 +247,12 @@ const CarrotListItem = ({
             </IconButton>
           </Tooltip>
         </Box>
-        <Box>
+        <Box className="absolute right-3 top-1/2 -translate-y-1/2">
           <Tooltip content="Archive">
             <IconButton
               size="1"
               variant="ghost"
-              className="hidden text-zinc-300 md:inline-flex"
+              className="hidden text-zinc-300 transition-opacity md:inline-flex md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-focus-within:opacity-100 md:group-focus-within:pointer-events-auto"
               onClick={() => onRemove(item.id)}
             >
               <FaArchive />
