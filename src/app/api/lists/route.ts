@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma}  from "@/config/prisma"
 import { loggedUser } from "@/backend/user"
 import { createListSchema } from "../../schema/createListSchema"
-import { getChests } from "@/backend/lists"
+import { getArchivedChests, getChests } from "@/backend/lists"
 
 export async function POST(request: NextRequest) {
     const body = await request.json()
@@ -27,6 +27,10 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {  
+  const status = request.nextUrl.searchParams.get('status');
+  if (status === 'ARCHIVED') {
+    return NextResponse.json(await getArchivedChests(), { status: 200 })
+  }
+
   return NextResponse.json(await getChests(), { status: 200 })
 }
-

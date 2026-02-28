@@ -14,6 +14,19 @@ export async function getChests() {
     })
 }
 
+export async function getArchivedChests() {
+    const user = await loggedUser();
+    return prisma.chest.findMany({
+        where: {
+            userId: user.id,
+            status: 'ARCHIVED',
+        },
+        orderBy: {
+            id: 'asc'
+        }
+    })
+}
+
 export async function getPinnedChestsWithCarrots() {
     const user = await loggedUser();
     return prisma.chest.findMany({
@@ -86,4 +99,31 @@ export async function setPinned(id: number, pinned: boolean) {
             pinned,
         },
     })
+}
+
+export async function deleteArchivedList(id: number) {
+    const user = await loggedUser();
+
+    const deletedCarrots = await prisma.carrot.deleteMany({
+        where: {
+            chestId: id,
+            chest: {
+                userId: user.id,
+                status: 'ARCHIVED',
+            },
+        },
+    });
+
+    const deletedChests = await prisma.chest.deleteMany({
+        where: {
+            id,
+            userId: user.id,
+            status: 'ARCHIVED',
+        },
+    });
+
+    return {
+        deletedChests,
+        deletedCarrots,
+    };
 }
