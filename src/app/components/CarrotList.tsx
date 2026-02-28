@@ -5,7 +5,7 @@ import Spinner from '@/app/components/Spinner';
 import { Box, Flex, IconButton, Tooltip, Text } from '@radix-ui/themes';
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-import { FaArchive, FaThumbtack } from 'react-icons/fa';
+import { FaMinus, FaThumbtack } from 'react-icons/fa';
 
 const SWIPE_DELETE_THRESHOLD = 90;
 const UNDO_VISIBLE_MS = 5000;
@@ -252,10 +252,10 @@ const CarrotListItem = ({
             <IconButton
               size="1"
               variant="ghost"
-              className="hidden text-zinc-300 transition-opacity md:inline-flex md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-focus-within:opacity-100 md:group-focus-within:pointer-events-auto"
+              className="hidden text-zinc-300 md:inline-flex md:invisible md:opacity-0 md:pointer-events-none md:transition-opacity md:group-hover:visible md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-focus-within:visible md:group-focus-within:opacity-100 md:group-focus-within:pointer-events-auto"
               onClick={() => onRemove(item.id)}
             >
-              <FaArchive />
+              <FaMinus />
             </IconButton>
           </Tooltip>
         </Box>
