@@ -5,7 +5,7 @@ import Spinner from '@/app/components/Spinner';
 import { Box, Flex, IconButton, Tooltip, Text } from '@radix-ui/themes';
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-import { FaMinus, FaThumbtack, FaTrash } from 'react-icons/fa';
+import { FaMinus, FaRedoAlt, FaThumbtack, FaTrash } from 'react-icons/fa';
 
 const SWIPE_DELETE_THRESHOLD = 90;
 const UNDO_VISIBLE_MS = 5000;
@@ -74,6 +74,12 @@ const CarrotList = ({ mode = 'active' }: CarrotListProps) => {
     });
   }
 
+  function handleRestore(id: number): void {
+    axios.patch(`/api/lists/${id}`, { status: 'NEW' }).then(() => {
+      setState((previous) => previous.filter((item) => item.id !== id));
+    });
+  }
+
   function handleUndoArchive(): void {
     if (!recentlyArchived || isArchiveMode) {
       return;
@@ -120,6 +126,7 @@ const CarrotList = ({ mode = 'active' }: CarrotListProps) => {
         carrotList={state}
         isLoading={isLoading}
         onRemove={handleRemove}
+        onRestore={handleRestore}
         onPinnedToggle={handlePinnedToggle}
         mode={mode}
       />
@@ -145,12 +152,14 @@ const Carrots = ({
   carrotList,
   isLoading,
   onRemove,
+  onRestore,
   onPinnedToggle,
   mode,
 }: {
   carrotList: Chest[];
   isLoading: boolean;
   onRemove: (id: number) => void;
+  onRestore: (id: number) => void;
   onPinnedToggle: (id: number, pinned: boolean) => void;
   mode: 'active' | 'archived';
 }) => {
@@ -178,6 +187,7 @@ const Carrots = ({
           key={item.id}
           item={item}
           onRemove={onRemove}
+          onRestore={onRestore}
           onPinnedToggle={onPinnedToggle}
           mode={mode}
         />
@@ -189,11 +199,13 @@ const Carrots = ({
 const CarrotListItem = ({
   item,
   onRemove,
+  onRestore,
   onPinnedToggle,
   mode,
 }: {
   item: Chest;
   onRemove: (id: number) => void;
+  onRestore: (id: number) => void;
   onPinnedToggle: (id: number, pinned: boolean) => void;
   mode: 'active' | 'archived';
 }) => {
@@ -272,7 +284,19 @@ const CarrotListItem = ({
             </Tooltip>
           </Box>
         ) : null}
-        <Box className="absolute right-3 top-1/2 -translate-y-1/2">
+        <Box className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1">
+          {isArchiveMode ? (
+            <Tooltip content="Restore">
+              <IconButton
+                size="1"
+                variant="ghost"
+                className="hidden text-zinc-300 md:inline-flex md:invisible md:opacity-0 md:pointer-events-none md:transition-opacity md:group-hover:visible md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-focus-within:visible md:group-focus-within:opacity-100 md:group-focus-within:pointer-events-auto"
+                onClick={() => onRestore(item.id)}
+              >
+                <FaRedoAlt />
+              </IconButton>
+            </Tooltip>
+          ) : null}
           <Tooltip content={isArchiveMode ? 'Delete permanently' : 'Archive'}>
             <IconButton
               size="1"
