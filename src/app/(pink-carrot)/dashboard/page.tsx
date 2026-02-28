@@ -36,7 +36,7 @@ export default async function DashboardPage() {
                     <ul className="mt-3 space-y-1 text-sm text-zinc-200">
                       {chest.carrots.map((carrot: PinnedChest['carrots'][number]) => (
                         <li key={carrot.id.toString()} className="flex items-center gap-2">
-                          <GiCarrot aria-hidden className="text-xs text-orange-300" />
+                          <GiCarrot aria-hidden className="text-xs text-zinc-100" />
                           <span>{carrot.label}</span>
                         </li>
                       ))}

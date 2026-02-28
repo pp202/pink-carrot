@@ -37,8 +37,9 @@ export default NavBar
 
 export const navItem = (href: string, name: string, path: string) => {
     const className = classNames({
-        'text-zinc-500': path === href,
-        'text-zinc-200': path !== href
+        'rounded-md px-3 py-1.5 text-sm font-semibold transition-colors': true,
+        'bg-zinc-100 text-zinc-900 shadow-sm': path === href,
+        'text-zinc-200 hover:bg-zinc-800 hover:text-zinc-100': path !== href
     })
 
     return (
