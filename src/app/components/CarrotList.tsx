@@ -215,6 +215,8 @@ const Carrots = ({
   onRestoreSelected: () => void;
   onDeleteSelected: () => void;
 }) => {
+  const isArchiveActionDisabled = selectedArchiveIds.length === 0;
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center gap-2 text-sm text-zinc-300">
@@ -249,12 +251,12 @@ const Carrots = ({
       </ul>
 
       {mode === "archived" ? (
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-center gap-2">
           <Button
             size="2"
             variant="soft"
-            className="!text-zinc-100"
-            disabled={selectedArchiveIds.length === 0}
+            className={isArchiveActionDisabled ? "" : "!text-zinc-100"}
+            disabled={isArchiveActionDisabled}
             onClick={onRestoreSelected}
           >
             <FaRedoAlt />
@@ -264,7 +266,7 @@ const Carrots = ({
             size="2"
             variant="soft"
             color="red"
-            disabled={selectedArchiveIds.length === 0}
+            disabled={isArchiveActionDisabled}
             onClick={onDeleteSelected}
           >
             <FaTrash />
