@@ -353,6 +353,11 @@ const CarrotListItem = ({
       }}
     >
       <Flex className={`items-center gap-2 ${isArchiveMode ? "" : "pr-8"}`}>
+        <Box className="grow">
+          <Text className="text-sm font-medium text-zinc-100">
+            {item.label}
+          </Text>
+        </Box>
         {isArchiveMode ? (
           <input
             type="checkbox"
@@ -362,11 +367,6 @@ const CarrotListItem = ({
             className="h-4 w-4 cursor-pointer accent-zinc-200"
           />
         ) : null}
-        <Box className="grow">
-          <Text className="text-sm font-medium text-zinc-100">
-            {item.label}
-          </Text>
-        </Box>
         {!isArchiveMode ? (
           <Box>
             <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
