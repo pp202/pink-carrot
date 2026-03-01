@@ -4,7 +4,7 @@ import { Chest } from "@/app/generated/prisma/client";
 import Spinner from "@/app/components/Spinner";
 import { Box, Button, Flex, IconButton, Tooltip, Text } from "@radix-ui/themes";
 import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FaMinus, FaRedoAlt, FaThumbtack, FaTrash } from "react-icons/fa";
 
 const SWIPE_DELETE_THRESHOLD = 90;
@@ -26,6 +26,11 @@ const CarrotList = ({ mode = "active" }: CarrotListProps) => {
     useState<RecentlyArchived | null>(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isArchiveMode = mode === "archived";
+  const visibleSelectedArchiveIds = useMemo(
+    () => selectedArchiveIds.filter((id) => state.some((item) => item.id === id)),
+    [selectedArchiveIds, state],
+  );
+
 
   useEffect(() => {
     const statusParam = isArchiveMode ? "?status=ARCHIVED" : "";
@@ -36,11 +41,6 @@ const CarrotList = ({ mode = "active" }: CarrotListProps) => {
       .finally(() => setIsLoading(false));
   }, [isArchiveMode]);
 
-  useEffect(() => {
-    setSelectedArchiveIds((previous) =>
-      previous.filter((id) => state.some((item) => item.id === id)),
-    );
-  }, [state]);
 
   useEffect(() => {
     return () => {
@@ -90,11 +90,11 @@ const CarrotList = ({ mode = "active" }: CarrotListProps) => {
   }
 
   function handleRestoreSelected(): void {
-    if (selectedArchiveIds.length === 0) {
+    if (visibleSelectedArchiveIds.length === 0) {
       return;
     }
 
-    const idsToRestore = [...selectedArchiveIds];
+    const idsToRestore = [...visibleSelectedArchiveIds];
     Promise.all(
       idsToRestore.map((id) =>
         axios.patch(`/api/lists/${id}`, { status: "NEW" }),
@@ -108,11 +108,11 @@ const CarrotList = ({ mode = "active" }: CarrotListProps) => {
   }
 
   function handleDeleteSelected(): void {
-    if (selectedArchiveIds.length === 0) {
+    if (visibleSelectedArchiveIds.length === 0) {
       return;
     }
 
-    const idsToDelete = [...selectedArchiveIds];
+    const idsToDelete = [...visibleSelectedArchiveIds];
     Promise.all(idsToDelete.map((id) => axios.delete(`/api/lists/${id}`))).then(
       () => {
         setState((previous) =>
@@ -171,7 +171,7 @@ const CarrotList = ({ mode = "active" }: CarrotListProps) => {
         onRemove={handleRemove}
         onPinnedToggle={handlePinnedToggle}
         mode={mode}
-        selectedArchiveIds={selectedArchiveIds}
+        selectedArchiveIds={visibleSelectedArchiveIds}
         onArchiveSelectionToggle={handleArchiveSelectionToggle}
         onRestoreSelected={handleRestoreSelected}
         onDeleteSelected={handleDeleteSelected}
@@ -179,7 +179,7 @@ const CarrotList = ({ mode = "active" }: CarrotListProps) => {
       {recentlyArchived && !isArchiveMode ? (
         <div className="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center px-4">
           <div className="pointer-events-auto rounded-lg border border-zinc-600/40 bg-zinc-900/90 px-3 py-2 text-sm text-zinc-200 shadow-lg shadow-black/30">
-            Archived "{recentlyArchived.chest.label}".{" "}
+            Archived &quot;{recentlyArchived.chest.label}&quot;.{" "}
             <button
               type="button"
               className="underline underline-offset-2 hover:text-zinc-100"
@@ -298,6 +298,11 @@ const CarrotListItem = ({
   const [touchDeltaX, setTouchDeltaX] = useState(0);
   const [touchDeltaY, setTouchDeltaY] = useState(0);
   const isArchiveMode = mode === "archived";
+  const visibleSelectedArchiveIds = useMemo(
+    () => selectedArchiveIds.filter((id) => state.some((item) => item.id === id)),
+    [selectedArchiveIds, state],
+  );
+
 
   function handleTouchStart(event: React.TouchEvent<HTMLLIElement>): void {
     setTouchStartX(event.touches[0]?.clientX ?? null);
