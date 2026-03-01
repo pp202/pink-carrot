@@ -284,7 +284,7 @@ const CarrotListItem = ({
             </Tooltip>
           </Box>
         ) : null}
-        <Box className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1">
+        <Box className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-3">
           {isArchiveMode ? (
             <Tooltip content="Restore">
               <IconButton
