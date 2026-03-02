@@ -3,9 +3,10 @@
 import { Chest } from "@/app/generated/prisma/client";
 import Spinner from "@/app/components/Spinner";
 import { Box, Button, Flex, IconButton, Tooltip, Text } from "@radix-ui/themes";
+import Link from "next/link";
 import axios from "axios";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { FaMinus, FaRedoAlt, FaThumbtack, FaTrash } from "react-icons/fa";
+import { FaEdit, FaMinus, FaRedoAlt, FaThumbtack, FaTrash } from "react-icons/fa";
 
 const SWIPE_DELETE_THRESHOLD = 90;
 const UNDO_VISIBLE_MS = 5000;
@@ -386,7 +387,17 @@ const CarrotListItem = ({
           </Box>
         ) : null}
         {!isArchiveMode ? (
-          <Box className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-3">
+          <Box className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
+            <Tooltip content="Edit">
+              <IconButton
+                asChild
+                size="1"
+                variant="ghost"
+                className="hidden text-zinc-300 md:inline-flex md:invisible md:opacity-0 md:pointer-events-none md:transition-opacity md:group-hover:visible md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-focus-within:visible md:group-focus-within:opacity-100 md:group-focus-within:pointer-events-auto"
+              >
+                <Link href={`/my-lists/${item.id}/edit`} aria-label={`Edit ${item.label}`}><FaEdit /></Link>
+              </IconButton>
+            </Tooltip>
             <Tooltip content="Archive">
               <IconButton
                 size="1"

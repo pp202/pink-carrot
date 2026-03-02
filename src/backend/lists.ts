@@ -56,7 +56,55 @@ export async function getChest(id: number) {
             userId: user.id,
             status: 'NEW',
         },
+        include: {
+            carrots: {
+                orderBy: {
+                    id: 'asc',
+                },
+            },
+        },
     })
+}
+
+export async function updateChest(id: number, name: string, carrots: { label: string }[]) {
+    const user = await loggedUser();
+
+    const existing = await prisma.chest.findFirst({
+        where: {
+            id,
+            userId: user.id,
+            status: 'NEW',
+        },
+        select: {
+            id: true,
+        },
+    });
+
+    if (!existing) {
+        return null;
+    }
+
+    return prisma.chest.update({
+        where: {
+            id,
+        },
+        data: {
+            label: name,
+            carrots: {
+                deleteMany: {},
+                create: carrots.map((carrot) => ({
+                    label: carrot.label,
+                })),
+            },
+        },
+        include: {
+            carrots: {
+                orderBy: {
+                    id: 'asc',
+                },
+            },
+        },
+    });
 }
 
 export async function archiveList(id: number) {
