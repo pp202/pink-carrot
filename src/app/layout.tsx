@@ -1,13 +1,7 @@
 import '@radix-ui/themes/styles.css'
 import type { Metadata } from 'next'
 import './globals.css'
-import { Inter } from 'next/font/google'
 import { Theme, ThemePanel } from '@radix-ui/themes'
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-})
 
 export const metadata: Metadata = {
   title: 'Pink Carrot',
@@ -21,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
         <Theme appearance="dark" accentColor="gray" grayColor="mauve">
           {children}
         </Theme>

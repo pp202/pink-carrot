@@ -298,11 +298,6 @@ const CarrotListItem = ({
   const [touchDeltaX, setTouchDeltaX] = useState(0);
   const [touchDeltaY, setTouchDeltaY] = useState(0);
   const isArchiveMode = mode === "archived";
-  const visibleSelectedArchiveIds = useMemo(
-    () => selectedArchiveIds.filter((id) => state.some((item) => item.id === id)),
-    [selectedArchiveIds, state],
-  );
-
 
   function handleTouchStart(event: React.TouchEvent<HTMLLIElement>): void {
     setTouchStartX(event.touches[0]?.clientX ?? null);
