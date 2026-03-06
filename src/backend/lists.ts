@@ -58,6 +58,9 @@ export async function getChest(id: number) {
         },
         include: {
             carrots: {
+                select: {
+                    label: true,
+                },
                 orderBy: {
                     id: 'asc',
                 },
@@ -99,6 +102,9 @@ export async function updateChest(id: number, name: string, carrots: { label: st
         },
         include: {
             carrots: {
+                select: {
+                    label: true,
+                },
                 orderBy: {
                     id: 'asc',
                 },
