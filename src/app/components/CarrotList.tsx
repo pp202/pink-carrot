@@ -3,10 +3,10 @@
 import { Chest } from "@/app/generated/prisma/client";
 import Spinner from "@/app/components/Spinner";
 import { Box, Button, Flex, IconButton, Tooltip, Text } from "@radix-ui/themes";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { FaEdit, FaMinus, FaRedoAlt, FaThumbtack, FaTrash } from "react-icons/fa";
+import { FaMinus, FaRedoAlt, FaThumbtack, FaTrash } from "react-icons/fa";
 
 const SWIPE_DELETE_THRESHOLD = 90;
 const UNDO_VISIBLE_MS = 5000;
@@ -294,6 +294,7 @@ const CarrotListItem = ({
   isSelectedArchiveItem: boolean;
   onArchiveSelectionToggle: (id: number) => void;
 }) => {
+  const router = useRouter();
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
   const [touchDeltaX, setTouchDeltaX] = useState(0);
@@ -343,12 +344,44 @@ const CarrotListItem = ({
     }
   }
 
+  function handleItemNavigation(): void {
+    if (isArchiveMode) {
+      return;
+    }
+
+    router.push(`/my-lists/${item.id}/edit`);
+  }
+
+  function handleItemClick(event: React.MouseEvent<HTMLLIElement>): void {
+    const target = event.target as HTMLElement;
+    if (target.closest("button, a, input, label")) {
+      return;
+    }
+
+    handleItemNavigation();
+  }
+
+  function handleItemKeyDown(event: React.KeyboardEvent<HTMLLIElement>): void {
+    if (isArchiveMode) {
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleItemNavigation();
+    }
+  }
+
   return (
     <li
-      className="group relative rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-4 py-3 transition-transform duration-150"
+      className={`group relative rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-4 py-3 transition-transform duration-150 ${isArchiveMode ? "" : "cursor-pointer"}`}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onClick={handleItemClick}
+      onKeyDown={handleItemKeyDown}
+      role={isArchiveMode ? undefined : "button"}
+      tabIndex={isArchiveMode ? undefined : 0}
       style={{
         transform: `translateX(${Math.max(-60, Math.min(60, touchDeltaX))}px)`,
       }}
@@ -388,16 +421,6 @@ const CarrotListItem = ({
         ) : null}
         {!isArchiveMode ? (
           <Box className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
-            <Tooltip content="Edit">
-              <IconButton
-                asChild
-                size="1"
-                variant="ghost"
-                className="hidden text-zinc-300 md:inline-flex md:invisible md:opacity-0 md:pointer-events-none md:transition-opacity md:group-hover:visible md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-focus-within:visible md:group-focus-within:opacity-100 md:group-focus-within:pointer-events-auto"
-              >
-                <Link href={`/my-lists/${item.id}/edit`} aria-label={`Edit ${item.label}`}><FaEdit /></Link>
-              </IconButton>
-            </Tooltip>
             <Tooltip content="Archive">
               <IconButton
                 size="1"
