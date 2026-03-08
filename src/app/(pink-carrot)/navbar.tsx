@@ -18,7 +18,7 @@ const NavBar = () => {
     ]
 
     return (
-        <nav className='flex gap-4 border-b mb-2 px-3 h-12 items-center'>
+        <nav className='sticky top-0 z-10 flex h-12 items-center gap-4 border-b border-zinc-700 bg-zinc-950/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-zinc-950/80'>
             <Link href="/"><GiCarrot /></Link>
             <ul className='flex gap-4 grow'>
                 {navItems.map(item => navItem(item.href, item.name, path))}
