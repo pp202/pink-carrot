@@ -98,7 +98,7 @@ const NewListForm = () => {
                                 onClick={() => append({ label: '' })}
                             >
                                 <span className='inline-flex items-center gap-1'>
-                                    <GiCarrot />
+                                    <GiCarrot className="text-pink-400" />
                                     <IoAdd />
                                 </span>
                             </Button>
