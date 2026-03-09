@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { Button, Callout, TextField } from '@radix-ui/themes'
 import axios from 'axios'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createListSchema } from '@/app/schema/createListSchema'
 import { z } from 'zod'
@@ -26,6 +26,8 @@ const EditListPage = () => {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setSubmitting] = useState(false)
+  const searchParams = useSearchParams()
+  const returnPath = searchParams.get('from') === 'dashboard' ? '/dashboard' : '/my-lists'
 
   const {
     register,
@@ -92,7 +94,7 @@ const EditListPage = () => {
                 try {
                   setSubmitting(true)
                   await axios.patch(`/api/lists/${params.id}`, data)
-                  router.push('/my-lists')
+                  router.push(returnPath)
                 } catch {
                   setError('Validation error')
                   setSubmitting(false)
@@ -144,7 +146,7 @@ const EditListPage = () => {
                   variant="soft"
                   color="gray"
                   disabled={isSubmitting}
-                  onClick={() => router.push('/my-lists')}
+                  onClick={() => router.push(returnPath)}
                 >
                   Cancel
                 </Button>
