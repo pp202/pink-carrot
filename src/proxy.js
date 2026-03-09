@@ -1,5 +1,5 @@
 export { auth as proxy } from "@/auth"
 
 export const config = {
-  matcher: ["/my-lists", "/dashboard", "/api"],
+  matcher: ["/dashboard/:path*", "/my-lists/:path*", "/archives/:path*", "/api/:path*"],
 };
