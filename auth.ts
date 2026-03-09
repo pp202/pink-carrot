@@ -14,6 +14,13 @@ export const authConfig = {
     Google,
   ],
   callbacks: {
+    authorized({ auth, request: { nextUrl } }) {
+      if (nextUrl.pathname.startsWith("/api/auth")) {
+        return true;
+      }
+
+      return !!auth?.user;
+    },
     async signIn({ user }) {
       if (user.email) {
         await createUserIfNew(user.email);
