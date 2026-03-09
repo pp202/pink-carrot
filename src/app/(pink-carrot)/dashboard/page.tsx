@@ -1,6 +1,7 @@
 import { getPinnedChestsWithCarrots } from '@/backend/lists';
 import Link from 'next/link';
 import { GiCarrot } from 'react-icons/gi';
+import { FiEdit2 } from 'react-icons/fi';
 
 type PinnedChest = Awaited<ReturnType<typeof getPinnedChestsWithCarrots>>[number];
 
@@ -31,7 +32,16 @@ export default async function DashboardPage() {
                   key={chest.id}
                   className="rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-5 py-4"
                 >
-                  <h2 className="text-sm font-semibold text-zinc-100">{chest.label}</h2>
+                  <div className="flex items-start justify-between gap-3">
+                    <h2 className="text-sm font-semibold text-zinc-100">{chest.label}</h2>
+                    <Link
+                      href={`/my-lists/${chest.id}/edit?from=dashboard`}
+                      aria-label={`Edit ${chest.label}`}
+                      className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-zinc-600/60 text-zinc-300 transition hover:border-zinc-400 hover:text-zinc-100"
+                    >
+                      <FiEdit2 className="text-sm" />
+                    </Link>
+                  </div>
                   {chest.carrots.length === 0 ? (
                     <p className="mt-2 text-xs text-zinc-400">No carrots in this chest yet.</p>
                   ) : (
