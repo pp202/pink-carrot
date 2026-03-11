@@ -13,11 +13,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className='max-w-xl'>
-      <NavBar />
-      <main className='p-3'>
-        {children}
-      </main>
+    <div className='min-h-screen bg-zinc-900 px-3 py-4 sm:px-6 sm:py-8'>
+      <div className='mx-auto w-full max-w-4xl overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 shadow-xl'>
+        <NavBar />
+        <main className='p-3 sm:p-6'>
+          {children}
+        </main>
+      </div>
     </div>
   )
 }
