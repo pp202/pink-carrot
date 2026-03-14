@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { Button, Callout, TextField } from '@radix-ui/themes'
 import axios from 'axios'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
@@ -48,6 +48,11 @@ const EditListPage = () => {
     name: 'carrots',
   })
 
+  const harvestedCarrots = useWatch({
+    control,
+    name: 'carrots',
+  })
+
   useEffect(() => {
     axios
       .get<ChestResponse>(`/api/lists/${params.id}`)
@@ -56,7 +61,7 @@ const EditListPage = () => {
           name: data.label,
           carrots: data.carrots.map((carrot) => ({
             label: carrot.label,
-            harvested: false,
+            harvested: carrot.harvested ?? false,
           })),
         })
       })
@@ -111,7 +116,7 @@ const EditListPage = () => {
                   <div key={field.id} className="space-y-1">
                     <div className="flex gap-2">
                       <TextField.Root
-                        className="grow"
+                        className={`grow ${harvestedCarrots?.[index]?.harvested ? 'line-through opacity-60' : ''}`}
                         placeholder={`Carrot item ${index + 1}`}
                         {...register(`carrots.${index}.label`)}
                       />
