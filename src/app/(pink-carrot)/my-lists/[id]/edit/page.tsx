@@ -17,7 +17,7 @@ type EditListForm = z.input<typeof createListSchema>
 
 type ChestResponse = {
   label: string
-  carrots: Array<{ label: string }>
+  carrots: Array<{ label: string; harvested?: boolean }>
 }
 
 const EditListPage = () => {
@@ -54,7 +54,10 @@ const EditListPage = () => {
       .then(({ data }) => {
         reset({
           name: data.label,
-          carrots: data.carrots,
+          carrots: data.carrots.map((carrot) => ({
+            label: carrot.label,
+            harvested: false,
+          })),
         })
       })
       .catch(() => {

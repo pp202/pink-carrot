@@ -60,6 +60,7 @@ export async function getChest(id: number) {
             carrots: {
                 select: {
                     label: true,
+                    harvested: true,
                 },
                 orderBy: {
                     id: 'asc',
@@ -69,7 +70,11 @@ export async function getChest(id: number) {
     })
 }
 
-export async function updateChest(id: number, name: string, carrots: { label: string }[]) {
+export async function updateChest(
+    id: number,
+    name: string,
+    carrots: Array<{ label: string; harvested?: boolean }>
+) {
     const user = await loggedUser();
 
     const existing = await prisma.chest.findFirst({
@@ -97,7 +102,7 @@ export async function updateChest(id: number, name: string, carrots: { label: st
                 deleteMany: {},
                 create: carrots.map((carrot) => ({
                     label: carrot.label,
-                    harvested: false,
+                    harvested: carrot.harvested ?? false,
                 })),
             },
         },
@@ -105,6 +110,7 @@ export async function updateChest(id: number, name: string, carrots: { label: st
             carrots: {
                 select: {
                     label: true,
+                    harvested: true,
                 },
                 orderBy: {
                     id: 'asc',
