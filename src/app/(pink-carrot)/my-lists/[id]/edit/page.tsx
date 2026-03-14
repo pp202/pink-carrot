@@ -32,6 +32,8 @@ const EditListPage = () => {
   const {
     register,
     control,
+    setFocus,
+    setValue,
     handleSubmit,
     reset,
     formState: { errors },
@@ -118,6 +120,14 @@ const EditListPage = () => {
                       <TextField.Root
                         className={`grow ${harvestedCarrots?.[index]?.harvested ? 'line-through opacity-60' : ''}`}
                         placeholder={`Carrot item ${index + 1}`}
+                        onClick={() => {
+                          if (!harvestedCarrots?.[index]?.harvested) return
+
+                          setValue(`carrots.${index}.harvested`, false, {
+                            shouldDirty: true,
+                          })
+                          setFocus(`carrots.${index}.label`)
+                        }}
                         {...register(`carrots.${index}.label`)}
                       />
                       <Button
