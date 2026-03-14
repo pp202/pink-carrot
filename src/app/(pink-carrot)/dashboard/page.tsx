@@ -1,7 +1,6 @@
 import { getPinnedChestsWithCarrots } from '@/backend/lists';
 import Link from 'next/link';
-import { GiCarrot } from 'react-icons/gi';
-import { FiEdit2 } from 'react-icons/fi';
+import DashboardPinnedChests from './DashboardPinnedChests';
 
 type PinnedChest = Awaited<ReturnType<typeof getPinnedChestsWithCarrots>>[number];
 
@@ -9,6 +8,16 @@ export default async function DashboardPage() {
   const pinnedChests: PinnedChest[] = (await getPinnedChestsWithCarrots()).filter(
     (chest: PinnedChest) => chest.status === 'NEW'
   );
+
+  const serializablePinnedChests = pinnedChests.map((chest: PinnedChest) => ({
+    id: chest.id,
+    label: chest.label,
+    carrots: chest.carrots.map((carrot: PinnedChest['carrots'][number]) => ({
+      id: carrot.id.toString(),
+      label: carrot.label,
+      harvested: carrot.harvested,
+    })),
+  }));
 
   return (
     <section className="min-h-[calc(100vh-5rem)] bg-zinc-950">
@@ -22,41 +31,7 @@ export default async function DashboardPage() {
           </header>
 
           <div className="space-y-4">
-            {pinnedChests.length === 0 ? (
-              <p className="rounded-xl border border-zinc-600/40 bg-zinc-900/60 px-4 py-6 text-center text-sm text-zinc-400">
-                No pinned chests yet. Create one with the plus button.
-              </p>
-            ) : (
-              pinnedChests.map((chest: PinnedChest) => (
-                <article
-                  key={chest.id}
-                  className="rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-5 py-4"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <h2 className="text-sm font-semibold text-zinc-100">{chest.label}</h2>
-                    <Link
-                      href={`/my-lists/${chest.id}/edit?from=dashboard`}
-                      aria-label={`Edit ${chest.label}`}
-                      className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-zinc-600/60 text-zinc-300 transition hover:border-zinc-400 hover:text-zinc-100"
-                    >
-                      <FiEdit2 className="text-sm" />
-                    </Link>
-                  </div>
-                  {chest.carrots.length === 0 ? (
-                    <p className="mt-2 text-xs text-zinc-400">No carrots in this chest yet.</p>
-                  ) : (
-                    <ul className="mt-3 space-y-1 text-sm text-zinc-200">
-                      {chest.carrots.map((carrot: PinnedChest['carrots'][number]) => (
-                        <li key={carrot.id.toString()} className="flex items-center gap-2">
-                          <GiCarrot aria-hidden className="text-xs text-pink-400" />
-                          <span>{carrot.label}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </article>
-              ))
-            )}
+            <DashboardPinnedChests initialPinnedChests={serializablePinnedChests} />
           </div>
 
           <div className="mt-8 flex justify-center">

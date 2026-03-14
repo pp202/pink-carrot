@@ -9,6 +9,7 @@ export const createListSchema = z.object({
           .string()
           .min(1, 'Carrot item is required')
           .max(255, 'Carrot item accepts only 255 characters'),
+        harvested: z.boolean().optional().default(false),
       })
     )
     .default([]),

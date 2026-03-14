@@ -1,0 +1,2 @@
+ALTER TABLE "Carrot"
+ADD COLUMN "harvested" BOOLEAN NOT NULL DEFAULT false;
