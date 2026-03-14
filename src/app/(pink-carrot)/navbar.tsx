@@ -3,7 +3,7 @@ import Link from 'next/link'
 import React from 'react'
 import classNames from 'classnames'
 import { usePathname } from 'next/navigation'
-import CarrotIcon from '../components/CarrotIcon'
+import { GiCarrot } from 'react-icons/gi'
 import { IoLogOut } from 'react-icons/io5'
 import { signOut } from "next-auth/react"
 
@@ -19,7 +19,7 @@ const NavBar = () => {
 
     return (
         <nav className='sticky top-0 z-10 flex h-12 items-center gap-4 border-b border-zinc-700 bg-zinc-950/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-zinc-950/80'>
-            <Link href="/"><CarrotIcon className='text-xl' /></Link>
+            <Link href="/"><GiCarrot className='text-pink-400' /></Link>
             <ul className='flex gap-4 grow'>
                 {navItems.map(item => navItem(item.href, item.name, path))}
             </ul>
