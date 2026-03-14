@@ -1,6 +1,6 @@
 import { getPinnedChestsWithCarrots } from '@/backend/lists';
 import Link from 'next/link';
-import CarrotIcon from '../../components/CarrotIcon';
+import { GiCarrot } from 'react-icons/gi';
 import { FiEdit2 } from 'react-icons/fi';
 
 type PinnedChest = Awaited<ReturnType<typeof getPinnedChestsWithCarrots>>[number];
@@ -48,7 +48,7 @@ export default async function DashboardPage() {
                     <ul className="mt-3 space-y-1 text-sm text-zinc-200">
                       {chest.carrots.map((carrot: PinnedChest['carrots'][number]) => (
                         <li key={carrot.id.toString()} className="flex items-center gap-2">
-                          <CarrotIcon aria-hidden className="text-xs" />
+                          <GiCarrot aria-hidden className="text-xs text-pink-400" />
                           <span>{carrot.label}</span>
                         </li>
                       ))}

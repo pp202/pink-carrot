@@ -10,7 +10,7 @@ import { createListSchema } from '@/app/schema/createListSchema'
 import { z } from 'zod'
 import TextErrorMessage from '@/app/components/TextErrorMessage'
 import Spinner from '@/app/components/Spinner'
-import CarrotIcon from '../../../../components/CarrotIcon'
+import { GiCarrot } from 'react-icons/gi'
 import { IoAdd, IoRemove } from 'react-icons/io5'
 
 type EditListForm = z.input<typeof createListSchema>
@@ -134,7 +134,7 @@ const EditListPage = () => {
                   onClick={() => append({ label: '' })}
                 >
                   <span className="inline-flex items-center gap-1">
-                    <CarrotIcon />
+                    <GiCarrot className="text-pink-400" />
                     <IoAdd />
                   </span>
                 </Button>
