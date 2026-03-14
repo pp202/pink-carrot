@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
             carrots: {
                 create: validation.data.carrots.map((carrot) => ({
                     label: carrot.label,
+                    harvested: carrot.harvested,
                 })),
             },
         }

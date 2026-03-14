@@ -97,6 +97,7 @@ export async function updateChest(id: number, name: string, carrots: { label: st
                 deleteMany: {},
                 create: carrots.map((carrot) => ({
                     label: carrot.label,
+                    harvested: false,
                 })),
             },
         },
@@ -109,6 +110,23 @@ export async function updateChest(id: number, name: string, carrots: { label: st
                     id: 'asc',
                 },
             },
+        },
+    });
+}
+
+export async function setCarrotHarvested(carrotId: bigint, harvested: boolean) {
+    const user = await loggedUser();
+
+    return prisma.carrot.updateMany({
+        where: {
+            id: carrotId,
+            chest: {
+                userId: user.id,
+                status: 'NEW',
+            },
+        },
+        data: {
+            harvested,
         },
     });
 }

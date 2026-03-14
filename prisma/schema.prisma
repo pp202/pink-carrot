@@ -29,8 +29,9 @@ model Chest {
 }
 
 model Carrot {
-  id    BigInt @id @default(autoincrement())
-  label String @db.VarChar(255)
+  id        BigInt  @id @default(autoincrement())
+  label     String  @db.VarChar(255)
+  harvested Boolean @default(false)
 
   chestId Int
   chest   Chest @relation(fields: [chestId], references: [id])
