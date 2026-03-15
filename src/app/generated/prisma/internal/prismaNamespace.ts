@@ -681,6 +681,8 @@ export const ChestScalarFieldEnum = {
   status: 'status',
   createdAt: 'createdAt',
   pinned: 'pinned',
+  listRank: 'listRank',
+  dashRank: 'dashRank',
   userId: 'userId'
 } as const
 

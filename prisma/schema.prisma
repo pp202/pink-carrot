@@ -22,10 +22,15 @@ model Chest {
   status    Status   @default(NEW)
   createdAt DateTime @default(now())
   pinned    Boolean  @default(false)
+  listRank  String   @db.VarChar(16)
+  dashRank  String   @db.VarChar(16)
   carrots   Carrot[]
 
   userId Int
   user   User @relation(fields: [userId], references: [id])
+
+  @@index([userId, listRank])
+  @@index([userId, dashRank])
 }
 
 model Carrot {
