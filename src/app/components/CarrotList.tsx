@@ -71,7 +71,7 @@ const CarrotList = ({ mode = "active" }: CarrotListProps) => {
 
     if (isArchiveMode) {
       const hasConfirmedDelete = window.confirm(
-        `Delete \"${removedItem.label}\" permanently? This action is irreversible.`,
+        "Are you sure to delete this chest permanently?",
       );
 
       if (!hasConfirmedDelete) {
@@ -121,8 +121,11 @@ const CarrotList = ({ mode = "active" }: CarrotListProps) => {
       return;
     }
 
+    const isSingleSelectedChest = visibleSelectedArchiveIds.length === 1;
     const hasConfirmedDelete = window.confirm(
-      `Delete ${visibleSelectedArchiveIds.length} selected chest${visibleSelectedArchiveIds.length === 1 ? "" : "s"} permanently? This action is irreversible.`,
+      isSingleSelectedChest
+        ? "Are you sure to delete the selected chest permanently?"
+        : "Are you sure to delete the selected chests permanently?",
     );
 
     if (!hasConfirmedDelete) {
