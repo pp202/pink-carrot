@@ -281,6 +281,7 @@ export async function moveChestBetween(
     chestId: number,
     previousChestId: number | null,
     nextChestId: number | null,
+    rankField: 'listRank' | 'dashRank' = 'listRank',
 ) {
     const user = await loggedUser();
 
@@ -299,6 +300,7 @@ export async function moveChestBetween(
         select: {
             id: true,
             listRank: true,
+            dashRank: true,
         },
     });
 
@@ -310,20 +312,20 @@ export async function moveChestBetween(
 
     const previousRank = previousChestId === null
         ? null
-        : chestById.get(previousChestId)?.listRank;
+        : chestById.get(previousChestId)?.[rankField];
 
     const nextRank = nextChestId === null
         ? null
-        : chestById.get(nextChestId)?.listRank;
+        : chestById.get(nextChestId)?.[rankField];
 
     if ((previousChestId !== null && !previousRank) || (nextChestId !== null && !nextRank)) {
         return false;
     }
 
-    let listRank: string;
+    let nextRankValue: string;
 
     try {
-        listRank = lexoRankBetween(previousRank, nextRank);
+        nextRankValue = lexoRankBetween(previousRank, nextRank);
     } catch {
         return false;
     }
@@ -335,7 +337,7 @@ export async function moveChestBetween(
             status: 'NEW',
         },
         data: {
-            listRank,
+            [rankField]: nextRankValue,
         },
     });
 

@@ -3,6 +3,7 @@
 import axios from "axios";
 import Link from "next/link";
 import { useState } from "react";
+import { FaGripLines } from "react-icons/fa";
 import { FiEdit2 } from "react-icons/fi";
 import { GiCarrot } from "react-icons/gi";
 
@@ -24,6 +25,10 @@ export default function DashboardPinnedChests({
   initialPinnedChests: DashboardChest[];
 }) {
   const [pinnedChests, setPinnedChests] = useState(initialPinnedChests);
+  const [dragSourceIndex, setDragSourceIndex] = useState<number | null>(null);
+  const [dragTargetIndex, setDragTargetIndex] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isTouchReordering, setIsTouchReordering] = useState(false);
 
   function handleHarvestedToggle(chestId: number, carrotId: string, harvested: boolean): void {
     setPinnedChests((previous) =>
@@ -55,6 +60,56 @@ export default function DashboardPinnedChests({
     });
   }
 
+  function startDragPreview(sourceIndex: number): void {
+    setDragSourceIndex(sourceIndex);
+    setDragTargetIndex(sourceIndex);
+  }
+
+  function clearDragPreview(): void {
+    setDragSourceIndex(null);
+    setDragTargetIndex(null);
+  }
+
+  function handleReorder(startIndex: number, targetIndex: number): void {
+    if (startIndex === targetIndex || targetIndex < 0 || targetIndex >= pinnedChests.length) {
+      return;
+    }
+
+    const previousState = [...pinnedChests];
+    const nextState = [...pinnedChests];
+    const [dragged] = nextState.splice(startIndex, 1);
+
+    if (!dragged) {
+      return;
+    }
+
+    nextState.splice(targetIndex, 0, dragged);
+    setPinnedChests(nextState);
+
+    const movedChest = nextState[targetIndex];
+    const previousChest = targetIndex > 0 ? nextState[targetIndex - 1] : null;
+    const nextChest = targetIndex < (nextState.length - 1) ? nextState[targetIndex + 1] : null;
+
+    axios.patch("/api/lists", {
+      chestId: movedChest?.id,
+      previousChestId: previousChest?.id ?? null,
+      nextChestId: nextChest?.id ?? null,
+      rankField: "dashRank",
+    }).catch(() => {
+      setPinnedChests(previousState);
+    });
+  }
+
+  function finishTouchReorder(): void {
+    if (dragSourceIndex !== null && dragTargetIndex !== null) {
+      handleReorder(dragSourceIndex, dragTargetIndex);
+    }
+
+    setIsTouchReordering(false);
+    clearDragPreview();
+    setTimeout(() => setIsDragging(false), 0);
+  }
+
   if (pinnedChests.length === 0) {
     return (
       <p className="rounded-xl border border-zinc-600/40 bg-zinc-900/60 px-4 py-6 text-center text-sm text-zinc-400">
@@ -64,53 +119,138 @@ export default function DashboardPinnedChests({
   }
 
   return (
-    <>
-      {pinnedChests.map((chest) => (
-        <article
-          key={chest.id}
-          className="rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-5 py-4"
-        >
-          <div className="flex items-start justify-between gap-3">
-            <h2 className="text-sm font-semibold text-zinc-100">{chest.label}</h2>
-            <Link
-              href={`/my-lists/${chest.id}/edit?from=dashboard`}
-              aria-label={`Edit ${chest.label}`}
-              className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-zinc-600/60 text-zinc-300 transition hover:border-zinc-400 hover:text-zinc-100"
-            >
-              <FiEdit2 className="text-sm" />
-            </Link>
-          </div>
-          {chest.carrots.length === 0 ? (
-            <p className="mt-2 text-xs text-zinc-400">No carrots in this chest yet.</p>
-          ) : (
-            <ul className="mt-3 space-y-1 text-sm text-zinc-200">
-              {chest.carrots.map((carrot) => (
-                <li key={carrot.id} className="flex items-center gap-2">
+    <ul className="space-y-3">
+      {pinnedChests.map((chest, index) => {
+        const shouldShowDropIndicator = dragTargetIndex === index && dragSourceIndex !== index;
+        const isDraggingDown =
+          shouldShowDropIndicator && dragSourceIndex !== null && dragSourceIndex < index;
+
+        return (
+          <li
+            key={chest.id}
+            className="group relative rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-5 py-4"
+            data-reorder-index={index}
+            style={{
+              opacity: dragSourceIndex === index ? 0.45 : 1,
+            }}
+            onDragEnter={(event) => {
+              event.preventDefault();
+              if (dragSourceIndex !== null) {
+                setDragTargetIndex(index);
+              }
+            }}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => {
+              event.preventDefault();
+              const sourceIndex = Number(event.dataTransfer.getData("text/plain"));
+              if (!Number.isNaN(sourceIndex)) {
+                handleReorder(sourceIndex, index);
+              }
+
+              clearDragPreview();
+            }}
+          >
+            {shouldShowDropIndicator ? (
+              <div
+                className={`pointer-events-none absolute inset-x-4 h-1 rounded-full bg-amber-400/80 ${
+                  isDraggingDown ? "-bottom-1" : "-top-1"
+                }`}
+              />
+            ) : null}
+            <article>
+              <div
+                className={`flex items-start justify-between gap-3 ${
+                  dragTargetIndex === index ? "rounded-lg bg-zinc-800/70" : ""
+                }`}
+              >
+                <div className="flex min-w-0 items-start gap-2">
                   <button
                     type="button"
-                    onClick={() =>
-                      handleHarvestedToggle(chest.id, carrot.id, !carrot.harvested)
-                    }
-                    className="inline-flex items-center gap-2 rounded px-1 py-0.5 text-left transition hover:bg-zinc-800/70"
-                    aria-pressed={carrot.harvested}
-                    aria-label={`${carrot.harvested ? "Unharvest" : "Harvest"} ${carrot.label}`}
+                    aria-label="Drag chest"
+                    className="-m-1 mt-0.5 cursor-grab rounded p-1 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
+                    draggable
+                    onDragStart={(event) => {
+                      setIsDragging(true);
+                      startDragPreview(index);
+                      event.dataTransfer.setData("text/plain", String(index));
+                      event.dataTransfer.effectAllowed = "move";
+                    }}
+                    onDragEnd={() => {
+                      clearDragPreview();
+                      setTimeout(() => setIsDragging(false), 0);
+                    }}
+                    onTouchStart={(event) => {
+                      event.stopPropagation();
+                      setIsDragging(true);
+                      setIsTouchReordering(true);
+                      startDragPreview(index);
+                    }}
+                    onTouchMove={(event) => {
+                      const touch = event.touches[0];
+                      if (!touch || !isTouchReordering) {
+                        return;
+                      }
+
+                      event.preventDefault();
+                      const touchTarget = document
+                        .elementFromPoint(touch.clientX, touch.clientY)
+                        ?.closest("[data-reorder-index]");
+
+                      const targetIndex = Number(touchTarget?.getAttribute("data-reorder-index"));
+                      if (!Number.isNaN(targetIndex)) {
+                        setDragTargetIndex(targetIndex);
+                      }
+                    }}
+                    onTouchEnd={finishTouchReorder}
+                    onTouchCancel={finishTouchReorder}
+                    onClick={(event) => event.stopPropagation()}
                   >
-                    <GiCarrot
-                      aria-hidden
-                      className={`text-xs ${carrot.harvested ? "text-zinc-500" : "text-pink-400"}`}
-                    />
-                    <span
-                      className={carrot.harvested ? "text-zinc-400 line-through" : "text-zinc-200"}
-                    >
-                      {carrot.label}
-                    </span>
+                    <FaGripLines aria-hidden />
                   </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </article>
-      ))}
-    </>
+                  <h2 className="truncate text-sm font-semibold text-zinc-100">{chest.label}</h2>
+                </div>
+                <Link
+                  href={`/my-lists/${chest.id}/edit?from=dashboard`}
+                  aria-label={`Edit ${chest.label}`}
+                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-zinc-600/60 text-zinc-300 transition hover:border-zinc-400 hover:text-zinc-100"
+                >
+                  <FiEdit2 className="text-sm" />
+                </Link>
+              </div>
+              {chest.carrots.length === 0 ? (
+                <p className="mt-2 text-xs text-zinc-400">No carrots in this chest yet.</p>
+              ) : (
+                <ul className="mt-3 space-y-1 text-sm text-zinc-200">
+                  {chest.carrots.map((carrot) => (
+                    <li key={carrot.id} className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={isDragging}
+                        onClick={() =>
+                          handleHarvestedToggle(chest.id, carrot.id, !carrot.harvested)
+                        }
+                        className="inline-flex items-center gap-2 rounded px-1 py-0.5 text-left transition hover:bg-zinc-800/70 disabled:pointer-events-none"
+                        aria-pressed={carrot.harvested}
+                        aria-label={`${carrot.harvested ? "Unharvest" : "Harvest"} ${carrot.label}`}
+                      >
+                        <GiCarrot
+                          aria-hidden
+                          className={`text-xs ${carrot.harvested ? "text-zinc-500" : "text-pink-400"}`}
+                        />
+                        <span
+                          className={carrot.harvested ? "text-zinc-400 line-through" : "text-zinc-200"}
+                        >
+                          {carrot.label}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </article>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
