@@ -1,6 +1,6 @@
 import { prisma } from '@/config/prisma'
 import { loggedUser } from './user';
-import { nextLexoRank } from './lexoRank';
+import { lexoRankBetween, nextLexoRank } from './lexoRank';
 
 export async function getChests() {
     const user = await loggedUser();
@@ -275,4 +275,69 @@ export async function cloneChest(id: number) {
             },
         },
     });
+}
+
+export async function moveChestBetween(
+    chestId: number,
+    previousChestId: number | null,
+    nextChestId: number | null,
+) {
+    const user = await loggedUser();
+
+    const idsToLoad = [chestId, previousChestId, nextChestId].filter(
+        (id): id is number => typeof id === 'number',
+    );
+
+    const chests = await prisma.chest.findMany({
+        where: {
+            userId: user.id,
+            status: 'NEW',
+            id: {
+                in: idsToLoad,
+            },
+        },
+        select: {
+            id: true,
+            listRank: true,
+        },
+    });
+
+    const chestById = new Map(chests.map((chest) => [chest.id, chest]));
+
+    if (!chestById.has(chestId)) {
+        return false;
+    }
+
+    const previousRank = previousChestId === null
+        ? null
+        : chestById.get(previousChestId)?.listRank;
+
+    const nextRank = nextChestId === null
+        ? null
+        : chestById.get(nextChestId)?.listRank;
+
+    if ((previousChestId !== null && !previousRank) || (nextChestId !== null && !nextRank)) {
+        return false;
+    }
+
+    let listRank: string;
+
+    try {
+        listRank = lexoRankBetween(previousRank, nextRank);
+    } catch {
+        return false;
+    }
+
+    await prisma.chest.updateMany({
+        where: {
+            id: chestId,
+            userId: user.id,
+            status: 'NEW',
+        },
+        data: {
+            listRank,
+        },
+    });
+
+    return true;
 }

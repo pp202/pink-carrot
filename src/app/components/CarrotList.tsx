@@ -6,7 +6,7 @@ import { Box, DropdownMenu, Flex, IconButton, Text, Tooltip } from "@radix-ui/th
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import { FaBars, FaClone, FaMinus, FaThumbtack } from "react-icons/fa";
+import { FaBars, FaClone, FaGripLines, FaMinus, FaThumbtack } from "react-icons/fa";
 
 const SWIPE_DELETE_THRESHOLD = 90;
 const UNDO_VISIBLE_MS = 5000;
@@ -107,6 +107,35 @@ const CarrotList = () => {
     });
   }
 
+  function handleReorder(startIndex: number, targetIndex: number): void {
+    if (startIndex === targetIndex || targetIndex < 0 || targetIndex >= state.length) {
+      return;
+    }
+
+    const previousState = [...state];
+    const nextState = [...state];
+    const [dragged] = nextState.splice(startIndex, 1);
+
+    if (!dragged) {
+      return;
+    }
+
+    nextState.splice(targetIndex, 0, dragged);
+    setState(nextState);
+
+    const movedChest = nextState[targetIndex];
+    const previousChest = targetIndex > 0 ? nextState[targetIndex - 1] : null;
+    const nextChest = targetIndex < (nextState.length - 1) ? nextState[targetIndex + 1] : null;
+
+    axios.patch("/api/lists", {
+      chestId: movedChest?.id,
+      previousChestId: previousChest?.id ?? null,
+      nextChestId: nextChest?.id ?? null,
+    }).catch(() => {
+      setState(previousState);
+    });
+  }
+
   return (
     <>
       <Carrots
@@ -115,6 +144,7 @@ const CarrotList = () => {
         onRemove={handleRemove}
         onPinnedToggle={handlePinnedToggle}
         onClone={handleClone}
+        onReorder={handleReorder}
       />
       {recentlyArchived ? (
         <div className="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center px-4">
@@ -140,12 +170,14 @@ const Carrots = ({
   onRemove,
   onPinnedToggle,
   onClone,
+  onReorder,
 }: {
   carrotList: Chest[];
   isLoading: boolean;
   onRemove: (id: number) => void;
   onPinnedToggle: (id: number, pinned: boolean) => void;
   onClone: (id: number) => void;
+  onReorder: (startIndex: number, targetIndex: number) => void;
 }) => {
   if (isLoading) {
     return (
@@ -162,13 +194,15 @@ const Carrots = ({
 
   return (
     <ul className="space-y-2">
-      {carrotList.map((item) => (
+      {carrotList.map((item, index) => (
         <CarrotListItem
           key={item.id}
           item={item}
           onRemove={onRemove}
           onPinnedToggle={onPinnedToggle}
           onClone={onClone}
+          index={index}
+          onReorder={onReorder}
         />
       ))}
     </ul>
@@ -180,17 +214,22 @@ const CarrotListItem = ({
   onRemove,
   onPinnedToggle,
   onClone,
+  index,
+  onReorder,
 }: {
   item: Chest;
   onRemove: (id: number) => void;
   onPinnedToggle: (id: number, pinned: boolean) => void;
   onClone: (id: number) => void;
+  index: number;
+  onReorder: (startIndex: number, targetIndex: number) => void;
 }) => {
   const router = useRouter();
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
   const [touchDeltaX, setTouchDeltaX] = useState(0);
   const [touchDeltaY, setTouchDeltaY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   function handleTouchStart(event: React.TouchEvent<HTMLLIElement>): void {
     setTouchStartX(event.touches[0]?.clientX ?? null);
@@ -241,7 +280,7 @@ const CarrotListItem = ({
 
   function handleItemClick(event: React.MouseEvent<HTMLLIElement>): void {
     const target = event.target as HTMLElement;
-    if (target.closest("button, a, input, label")) {
+    if (isDragging || target.closest("button, a, input, label")) {
       return;
     }
 
@@ -268,27 +307,55 @@ const CarrotListItem = ({
       style={{
         transform: `translateX(${Math.max(-60, Math.min(60, touchDeltaX))}px)`,
       }}
+      onDragOver={(event) => {
+        event.preventDefault();
+      }}
+      onDrop={(event) => {
+        event.preventDefault();
+        const sourceIndex = Number(event.dataTransfer.getData("text/plain"));
+        if (!Number.isNaN(sourceIndex)) {
+          onReorder(sourceIndex, index);
+        }
+      }}
     >
       <Flex className="items-center gap-2 pr-6">
         <Box className="grow">
           <Text className="text-sm font-medium text-zinc-100">{item.label}</Text>
         </Box>
-        <Box>
-          <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
-            <IconButton
-              size="1"
-              variant="ghost"
-              className={
-                item.pinned
-                  ? "!text-red-500 hover:!text-red-400"
-                  : "!text-zinc-400 hover:!text-zinc-300"
-              }
-              onClick={() => onPinnedToggle(item.id, !item.pinned)}
-            >
-              <FaThumbtack />
-            </IconButton>
-          </Tooltip>
-        </Box>
+        <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
+          <IconButton
+            size="1"
+            variant="ghost"
+            className={
+              item.pinned
+                ? "!text-red-500 hover:!text-red-400"
+                : "!text-zinc-400 hover:!text-zinc-300"
+            }
+            onClick={() => onPinnedToggle(item.id, !item.pinned)}
+          >
+            <FaThumbtack />
+          </IconButton>
+        </Tooltip>
+        <Tooltip content="Drag to reorder">
+          <IconButton
+            size="1"
+            variant="ghost"
+            aria-label="Drag chest"
+            className="cursor-grab text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
+            draggable
+            onDragStart={(event) => {
+              setIsDragging(true);
+              event.dataTransfer.setData("text/plain", String(index));
+              event.dataTransfer.effectAllowed = "move";
+            }}
+            onDragEnd={() => {
+              setTimeout(() => setIsDragging(false), 0);
+            }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <FaGripLines />
+          </IconButton>
+        </Tooltip>
         <Box className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center md:inline-flex md:invisible md:pointer-events-none md:opacity-0 md:transition-opacity md:group-hover:pointer-events-auto md:group-hover:visible md:group-hover:opacity-100 md:group-focus-within:pointer-events-auto md:group-focus-within:visible md:group-focus-within:opacity-100">
           <DropdownMenu.Root>
             <Tooltip content="More actions">
