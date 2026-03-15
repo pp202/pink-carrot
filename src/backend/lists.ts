@@ -1,5 +1,6 @@
 import { prisma } from '@/config/prisma'
 import { loggedUser } from './user';
+import { nextLexoRank } from './lexoRank';
 
 export async function getChests() {
     const user = await loggedUser();
@@ -8,9 +9,10 @@ export async function getChests() {
             userId: user.id,
             status: 'NEW',
         },
-        orderBy: {
-            id: 'asc'
-        }
+        orderBy: [
+            { listRank: 'asc' },
+            { id: 'asc' },
+        ],
     })
 }
 
@@ -21,9 +23,10 @@ export async function getArchivedChests() {
             userId: user.id,
             status: 'ARCHIVED',
         },
-        orderBy: {
-            id: 'asc'
-        }
+        orderBy: [
+            { listRank: 'asc' },
+            { id: 'asc' },
+        ],
     })
 }
 
@@ -42,9 +45,10 @@ export async function getPinnedChestsWithCarrots() {
                 },
             },
         },
-        orderBy: {
-            createdAt: 'desc',
-        },
+        orderBy: [
+            { dashRank: 'asc' },
+            { id: 'asc' },
+        ],
     })
 }
 
@@ -228,12 +232,41 @@ export async function cloneChest(id: number) {
         return null;
     }
 
+    const [lastListRankedChest, lastDashRankedChest] = await Promise.all([
+        prisma.chest.findFirst({
+            where: {
+                userId: user.id,
+            },
+            select: {
+                listRank: true,
+            },
+            orderBy: [
+                { listRank: 'desc' },
+                { id: 'desc' },
+            ],
+        }),
+        prisma.chest.findFirst({
+            where: {
+                userId: user.id,
+            },
+            select: {
+                dashRank: true,
+            },
+            orderBy: [
+                { dashRank: 'desc' },
+                { id: 'desc' },
+            ],
+        }),
+    ]);
+
     return prisma.chest.create({
         data: {
             label: `${chest.label} (Copy)`,
             status: 'NEW',
             pinned: false,
             userId: user.id,
+            listRank: nextLexoRank(lastListRankedChest?.listRank),
+            dashRank: nextLexoRank(lastDashRankedChest?.dashRank),
             carrots: {
                 create: chest.carrots.map((carrot) => ({
                     label: carrot.label,

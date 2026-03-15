@@ -3,6 +3,7 @@ import { prisma}  from "@/config/prisma"
 import { loggedUser } from "@/backend/user"
 import { createListSchema } from "../../schema/createListSchema"
 import { getArchivedChests, getChests } from "@/backend/lists"
+import { nextLexoRank } from "@/backend/lexoRank"
 
 export async function POST(request: NextRequest) {
     const body = await request.json()
@@ -11,11 +12,40 @@ export async function POST(request: NextRequest) {
     if (!validation.success)
         return NextResponse.json(validation.error.issues, { status: 400 })
 
+    const [lastListRankedChest, lastDashRankedChest] = await Promise.all([
+        prisma.chest.findFirst({
+            where: {
+                userId: user.id,
+            },
+            select: {
+                listRank: true,
+            },
+            orderBy: [
+                { listRank: "desc" },
+                { id: "desc" },
+            ],
+        }),
+        prisma.chest.findFirst({
+            where: {
+                userId: user.id,
+            },
+            select: {
+                dashRank: true,
+            },
+            orderBy: [
+                { dashRank: "desc" },
+                { id: "desc" },
+            ],
+        }),
+    ]);
+
     const newList = await prisma.chest.create({
         data: {
             label: validation.data.name,
             userId: user.id,
             pinned: validation.data.pinned,
+            listRank: nextLexoRank(lastListRankedChest?.listRank),
+            dashRank: nextLexoRank(lastDashRankedChest?.dashRank),
             carrots: {
                 create: validation.data.carrots.map((carrot) => ({
                     label: carrot.label,

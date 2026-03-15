@@ -42,6 +42,8 @@ export type ChestMinAggregateOutputType = {
   status: $Enums.Status | null
   createdAt: Date | null
   pinned: boolean | null
+  listRank: string | null
+  dashRank: string | null
   userId: number | null
 }
 
@@ -51,6 +53,8 @@ export type ChestMaxAggregateOutputType = {
   status: $Enums.Status | null
   createdAt: Date | null
   pinned: boolean | null
+  listRank: string | null
+  dashRank: string | null
   userId: number | null
 }
 
@@ -60,6 +64,8 @@ export type ChestCountAggregateOutputType = {
   status: number
   createdAt: number
   pinned: number
+  listRank: number
+  dashRank: number
   userId: number
   _all: number
 }
@@ -81,6 +87,8 @@ export type ChestMinAggregateInputType = {
   status?: true
   createdAt?: true
   pinned?: true
+  listRank?: true
+  dashRank?: true
   userId?: true
 }
 
@@ -90,6 +98,8 @@ export type ChestMaxAggregateInputType = {
   status?: true
   createdAt?: true
   pinned?: true
+  listRank?: true
+  dashRank?: true
   userId?: true
 }
 
@@ -99,6 +109,8 @@ export type ChestCountAggregateInputType = {
   status?: true
   createdAt?: true
   pinned?: true
+  listRank?: true
+  dashRank?: true
   userId?: true
   _all?: true
 }
@@ -195,6 +207,8 @@ export type ChestGroupByOutputType = {
   status: $Enums.Status
   createdAt: Date
   pinned: boolean
+  listRank: string
+  dashRank: string
   userId: number
   _count: ChestCountAggregateOutputType | null
   _avg: ChestAvgAggregateOutputType | null
@@ -227,6 +241,8 @@ export type ChestWhereInput = {
   status?: Prisma.EnumStatusFilter<"Chest"> | $Enums.Status
   createdAt?: Prisma.DateTimeFilter<"Chest"> | Date | string
   pinned?: Prisma.BoolFilter<"Chest"> | boolean
+  listRank?: Prisma.StringFilter<"Chest"> | string
+  dashRank?: Prisma.StringFilter<"Chest"> | string
   userId?: Prisma.IntFilter<"Chest"> | number
   carrots?: Prisma.CarrotListRelationFilter
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -238,6 +254,8 @@ export type ChestOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   pinned?: Prisma.SortOrder
+  listRank?: Prisma.SortOrder
+  dashRank?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   carrots?: Prisma.CarrotOrderByRelationAggregateInput
   user?: Prisma.UserOrderByWithRelationInput
@@ -252,6 +270,8 @@ export type ChestWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumStatusFilter<"Chest"> | $Enums.Status
   createdAt?: Prisma.DateTimeFilter<"Chest"> | Date | string
   pinned?: Prisma.BoolFilter<"Chest"> | boolean
+  listRank?: Prisma.StringFilter<"Chest"> | string
+  dashRank?: Prisma.StringFilter<"Chest"> | string
   userId?: Prisma.IntFilter<"Chest"> | number
   carrots?: Prisma.CarrotListRelationFilter
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -263,6 +283,8 @@ export type ChestOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   pinned?: Prisma.SortOrder
+  listRank?: Prisma.SortOrder
+  dashRank?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   _count?: Prisma.ChestCountOrderByAggregateInput
   _avg?: Prisma.ChestAvgOrderByAggregateInput
@@ -280,6 +302,8 @@ export type ChestScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumStatusWithAggregatesFilter<"Chest"> | $Enums.Status
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Chest"> | Date | string
   pinned?: Prisma.BoolWithAggregatesFilter<"Chest"> | boolean
+  listRank?: Prisma.StringWithAggregatesFilter<"Chest"> | string
+  dashRank?: Prisma.StringWithAggregatesFilter<"Chest"> | string
   userId?: Prisma.IntWithAggregatesFilter<"Chest"> | number
 }
 
@@ -288,6 +312,8 @@ export type ChestCreateInput = {
   status?: $Enums.Status
   createdAt?: Date | string
   pinned?: boolean
+  listRank: string
+  dashRank: string
   carrots?: Prisma.CarrotCreateNestedManyWithoutChestInput
   user: Prisma.UserCreateNestedOneWithoutChestsInput
 }
@@ -298,6 +324,8 @@ export type ChestUncheckedCreateInput = {
   status?: $Enums.Status
   createdAt?: Date | string
   pinned?: boolean
+  listRank: string
+  dashRank: string
   userId: number
   carrots?: Prisma.CarrotUncheckedCreateNestedManyWithoutChestInput
 }
@@ -307,6 +335,8 @@ export type ChestUpdateInput = {
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  listRank?: Prisma.StringFieldUpdateOperationsInput | string
+  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   carrots?: Prisma.CarrotUpdateManyWithoutChestNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutChestsNestedInput
 }
@@ -317,6 +347,8 @@ export type ChestUncheckedUpdateInput = {
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  listRank?: Prisma.StringFieldUpdateOperationsInput | string
+  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.IntFieldUpdateOperationsInput | number
   carrots?: Prisma.CarrotUncheckedUpdateManyWithoutChestNestedInput
 }
@@ -327,6 +359,8 @@ export type ChestCreateManyInput = {
   status?: $Enums.Status
   createdAt?: Date | string
   pinned?: boolean
+  listRank: string
+  dashRank: string
   userId: number
 }
 
@@ -335,6 +369,8 @@ export type ChestUpdateManyMutationInput = {
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  listRank?: Prisma.StringFieldUpdateOperationsInput | string
+  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ChestUncheckedUpdateManyInput = {
@@ -343,6 +379,8 @@ export type ChestUncheckedUpdateManyInput = {
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  listRank?: Prisma.StringFieldUpdateOperationsInput | string
+  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -362,6 +400,8 @@ export type ChestCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   pinned?: Prisma.SortOrder
+  listRank?: Prisma.SortOrder
+  dashRank?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
 
@@ -376,6 +416,8 @@ export type ChestMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   pinned?: Prisma.SortOrder
+  listRank?: Prisma.SortOrder
+  dashRank?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
 
@@ -385,6 +427,8 @@ export type ChestMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   pinned?: Prisma.SortOrder
+  listRank?: Prisma.SortOrder
+  dashRank?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
 
@@ -471,6 +515,8 @@ export type ChestCreateWithoutUserInput = {
   status?: $Enums.Status
   createdAt?: Date | string
   pinned?: boolean
+  listRank: string
+  dashRank: string
   carrots?: Prisma.CarrotCreateNestedManyWithoutChestInput
 }
 
@@ -480,6 +526,8 @@ export type ChestUncheckedCreateWithoutUserInput = {
   status?: $Enums.Status
   createdAt?: Date | string
   pinned?: boolean
+  listRank: string
+  dashRank: string
   carrots?: Prisma.CarrotUncheckedCreateNestedManyWithoutChestInput
 }
 
@@ -518,6 +566,8 @@ export type ChestScalarWhereInput = {
   status?: Prisma.EnumStatusFilter<"Chest"> | $Enums.Status
   createdAt?: Prisma.DateTimeFilter<"Chest"> | Date | string
   pinned?: Prisma.BoolFilter<"Chest"> | boolean
+  listRank?: Prisma.StringFilter<"Chest"> | string
+  dashRank?: Prisma.StringFilter<"Chest"> | string
   userId?: Prisma.IntFilter<"Chest"> | number
 }
 
@@ -526,6 +576,8 @@ export type ChestCreateWithoutCarrotsInput = {
   status?: $Enums.Status
   createdAt?: Date | string
   pinned?: boolean
+  listRank: string
+  dashRank: string
   user: Prisma.UserCreateNestedOneWithoutChestsInput
 }
 
@@ -535,6 +587,8 @@ export type ChestUncheckedCreateWithoutCarrotsInput = {
   status?: $Enums.Status
   createdAt?: Date | string
   pinned?: boolean
+  listRank: string
+  dashRank: string
   userId: number
 }
 
@@ -559,6 +613,8 @@ export type ChestUpdateWithoutCarrotsInput = {
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  listRank?: Prisma.StringFieldUpdateOperationsInput | string
+  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   user?: Prisma.UserUpdateOneRequiredWithoutChestsNestedInput
 }
 
@@ -568,6 +624,8 @@ export type ChestUncheckedUpdateWithoutCarrotsInput = {
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  listRank?: Prisma.StringFieldUpdateOperationsInput | string
+  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -577,6 +635,8 @@ export type ChestCreateManyUserInput = {
   status?: $Enums.Status
   createdAt?: Date | string
   pinned?: boolean
+  listRank: string
+  dashRank: string
 }
 
 export type ChestUpdateWithoutUserInput = {
@@ -584,6 +644,8 @@ export type ChestUpdateWithoutUserInput = {
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  listRank?: Prisma.StringFieldUpdateOperationsInput | string
+  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   carrots?: Prisma.CarrotUpdateManyWithoutChestNestedInput
 }
 
@@ -593,6 +655,8 @@ export type ChestUncheckedUpdateWithoutUserInput = {
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  listRank?: Prisma.StringFieldUpdateOperationsInput | string
+  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   carrots?: Prisma.CarrotUncheckedUpdateManyWithoutChestNestedInput
 }
 
@@ -602,6 +666,8 @@ export type ChestUncheckedUpdateManyWithoutUserInput = {
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  listRank?: Prisma.StringFieldUpdateOperationsInput | string
+  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -641,6 +707,8 @@ export type ChestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   status?: boolean
   createdAt?: boolean
   pinned?: boolean
+  listRank?: boolean
+  dashRank?: boolean
   userId?: boolean
   carrots?: boolean | Prisma.Chest$carrotsArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -653,6 +721,8 @@ export type ChestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   status?: boolean
   createdAt?: boolean
   pinned?: boolean
+  listRank?: boolean
+  dashRank?: boolean
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["chest"]>
@@ -663,6 +733,8 @@ export type ChestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   status?: boolean
   createdAt?: boolean
   pinned?: boolean
+  listRank?: boolean
+  dashRank?: boolean
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["chest"]>
@@ -673,10 +745,12 @@ export type ChestSelectScalar = {
   status?: boolean
   createdAt?: boolean
   pinned?: boolean
+  listRank?: boolean
+  dashRank?: boolean
   userId?: boolean
 }
 
-export type ChestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "status" | "createdAt" | "pinned" | "userId", ExtArgs["result"]["chest"]>
+export type ChestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "status" | "createdAt" | "pinned" | "listRank" | "dashRank" | "userId", ExtArgs["result"]["chest"]>
 export type ChestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   carrots?: boolean | Prisma.Chest$carrotsArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -701,6 +775,8 @@ export type $ChestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     status: $Enums.Status
     createdAt: Date
     pinned: boolean
+    listRank: string
+    dashRank: string
     userId: number
   }, ExtArgs["result"]["chest"]>
   composites: {}
@@ -1132,6 +1208,8 @@ export interface ChestFieldRefs {
   readonly status: Prisma.FieldRef<"Chest", 'Status'>
   readonly createdAt: Prisma.FieldRef<"Chest", 'DateTime'>
   readonly pinned: Prisma.FieldRef<"Chest", 'Boolean'>
+  readonly listRank: Prisma.FieldRef<"Chest", 'String'>
+  readonly dashRank: Prisma.FieldRef<"Chest", 'String'>
   readonly userId: Prisma.FieldRef<"Chest", 'Int'>
 }
     
