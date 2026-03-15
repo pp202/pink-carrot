@@ -70,6 +70,14 @@ const CarrotList = ({ mode = "active" }: CarrotListProps) => {
     }
 
     if (isArchiveMode) {
+      const hasConfirmedDelete = window.confirm(
+        `Delete \"${removedItem.label}\" permanently? This action is irreversible.`,
+      );
+
+      if (!hasConfirmedDelete) {
+        return;
+      }
+
       axios.delete(`/api/lists/${id}`).then(() => {
         setState((previous) => previous.filter((item) => item.id !== id));
       });
@@ -110,6 +118,14 @@ const CarrotList = ({ mode = "active" }: CarrotListProps) => {
 
   function handleDeleteSelected(): void {
     if (visibleSelectedArchiveIds.length === 0) {
+      return;
+    }
+
+    const hasConfirmedDelete = window.confirm(
+      `Delete ${visibleSelectedArchiveIds.length} selected chest${visibleSelectedArchiveIds.length === 1 ? "" : "s"} permanently? This action is irreversible.`,
+    );
+
+    if (!hasConfirmedDelete) {
       return;
     }
 
