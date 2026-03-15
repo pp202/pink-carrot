@@ -2,6 +2,9 @@ import { getPinnedChestsWithCarrots } from '@/backend/lists';
 import Link from 'next/link';
 import DashboardPinnedChests from './DashboardPinnedChests';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 type PinnedChest = Awaited<ReturnType<typeof getPinnedChestsWithCarrots>>[number];
 
 export default async function DashboardPage() {
