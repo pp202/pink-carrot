@@ -280,7 +280,7 @@ const Carrots = ({
 
   return (
     <div className="space-y-4">
-      <ul className="space-y-6">
+      <ul className="space-y-2">
         {carrotList.map((item) => (
           <CarrotListItem
             key={item.id}
@@ -432,7 +432,7 @@ const CarrotListItem = ({
         transform: `translateX(${Math.max(-60, Math.min(60, touchDeltaX))}px)`,
       }}
     >
-      <Flex className={`items-center gap-2 ${isArchiveMode ? "" : "pr-8"}`}>
+      <Flex className={`items-center gap-2 ${isArchiveMode ? "" : "pr-12"}`}>
         <Box className="grow">
           <Text className="text-sm font-medium text-zinc-100">
             {item.label}
