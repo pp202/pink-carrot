@@ -10,9 +10,6 @@ import { FaBars, FaClone, FaGripLines, FaMinus, FaThumbtack } from "react-icons/
 
 const SWIPE_DELETE_THRESHOLD = 90;
 const UNDO_VISIBLE_MS = 5000;
-const TOUCH_REORDER_HOLD_MS = 180;
-const TOUCH_REORDER_CANCEL_PX = 10;
-
 type RecentlyArchived = {
   chest: Chest;
 };
@@ -22,6 +19,8 @@ const CarrotList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [recentlyArchived, setRecentlyArchived] =
     useState<RecentlyArchived | null>(null);
+  const [dragSourceIndex, setDragSourceIndex] = useState<number | null>(null);
+  const [dragTargetIndex, setDragTargetIndex] = useState<number | null>(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -138,6 +137,20 @@ const CarrotList = () => {
     });
   }
 
+  function startDragPreview(sourceIndex: number): void {
+    setDragSourceIndex(sourceIndex);
+    setDragTargetIndex(sourceIndex);
+  }
+
+  function updateDragPreview(targetIndex: number): void {
+    setDragTargetIndex(targetIndex);
+  }
+
+  function clearDragPreview(): void {
+    setDragSourceIndex(null);
+    setDragTargetIndex(null);
+  }
+
   return (
     <>
       <Carrots
@@ -147,6 +160,11 @@ const CarrotList = () => {
         onPinnedToggle={handlePinnedToggle}
         onClone={handleClone}
         onReorder={handleReorder}
+        dragSourceIndex={dragSourceIndex}
+        dragTargetIndex={dragTargetIndex}
+        onDragPreviewStart={startDragPreview}
+        onDragPreviewUpdate={updateDragPreview}
+        onDragPreviewClear={clearDragPreview}
       />
       {recentlyArchived ? (
         <div className="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center px-4">
@@ -173,6 +191,11 @@ const Carrots = ({
   onPinnedToggle,
   onClone,
   onReorder,
+  dragSourceIndex,
+  dragTargetIndex,
+  onDragPreviewStart,
+  onDragPreviewUpdate,
+  onDragPreviewClear,
 }: {
   carrotList: Chest[];
   isLoading: boolean;
@@ -180,6 +203,11 @@ const Carrots = ({
   onPinnedToggle: (id: number, pinned: boolean) => void;
   onClone: (id: number) => void;
   onReorder: (startIndex: number, targetIndex: number) => void;
+  dragSourceIndex: number | null;
+  dragTargetIndex: number | null;
+  onDragPreviewStart: (sourceIndex: number) => void;
+  onDragPreviewUpdate: (targetIndex: number) => void;
+  onDragPreviewClear: () => void;
 }) => {
   if (isLoading) {
     return (
@@ -205,6 +233,11 @@ const Carrots = ({
           onClone={onClone}
           index={index}
           onReorder={onReorder}
+          dragSourceIndex={dragSourceIndex}
+          dragTargetIndex={dragTargetIndex}
+          onDragPreviewStart={onDragPreviewStart}
+          onDragPreviewUpdate={onDragPreviewUpdate}
+          onDragPreviewClear={onDragPreviewClear}
         />
       ))}
     </ul>
@@ -218,6 +251,11 @@ const CarrotListItem = ({
   onClone,
   index,
   onReorder,
+  dragSourceIndex,
+  dragTargetIndex,
+  onDragPreviewStart,
+  onDragPreviewUpdate,
+  onDragPreviewClear,
 }: {
   item: Chest;
   onRemove: (id: number) => void;
@@ -225,6 +263,11 @@ const CarrotListItem = ({
   onClone: (id: number) => void;
   index: number;
   onReorder: (startIndex: number, targetIndex: number) => void;
+  dragSourceIndex: number | null;
+  dragTargetIndex: number | null;
+  onDragPreviewStart: (sourceIndex: number) => void;
+  onDragPreviewUpdate: (targetIndex: number) => void;
+  onDragPreviewClear: () => void;
 }) => {
   const router = useRouter();
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
@@ -232,17 +275,28 @@ const CarrotListItem = ({
   const [touchDeltaX, setTouchDeltaX] = useState(0);
   const [touchDeltaY, setTouchDeltaY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [touchDragSourceIndex, setTouchDragSourceIndex] = useState<number | null>(null);
-  const [touchDragTargetIndex, setTouchDragTargetIndex] = useState<number | null>(null);
   const [isTouchReordering, setIsTouchReordering] = useState(false);
-  const touchReorderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const touchHandleStartRef = useRef<{ x: number; y: number } | null>(null);
+  const bodyScrollWasLockedRef = useRef(false);
 
   useEffect(() => () => {
-    if (touchReorderTimerRef.current) {
-      clearTimeout(touchReorderTimerRef.current);
-    }
+    document.body.style.overflow = "";
+    document.documentElement.style.overscrollBehavior = "";
   }, []);
+
+  function setPageScrollLock(locked: boolean): void {
+    if (locked) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overscrollBehavior = "none";
+      bodyScrollWasLockedRef.current = true;
+      return;
+    }
+
+    if (bodyScrollWasLockedRef.current) {
+      document.body.style.overflow = "";
+      document.documentElement.style.overscrollBehavior = "";
+      bodyScrollWasLockedRef.current = false;
+    }
+  }
 
   function handleTouchStart(event: React.TouchEvent<HTMLLIElement>): void {
     if (isTouchReordering) {
@@ -306,20 +360,10 @@ const CarrotListItem = ({
   function handleDragHandleTouchStart(event: React.TouchEvent<HTMLButtonElement>): void {
     event.stopPropagation();
 
-    const touch = event.touches[0];
-    if (!touch) {
-      return;
-    }
-
-    touchHandleStartRef.current = { x: touch.clientX, y: touch.clientY };
-
-    touchReorderTimerRef.current = setTimeout(() => {
-      setIsDragging(true);
-      setIsTouchReordering(true);
-      setTouchDragSourceIndex(index);
-      setTouchDragTargetIndex(index);
-      touchReorderTimerRef.current = null;
-    }, TOUCH_REORDER_HOLD_MS);
+    setIsDragging(true);
+    setIsTouchReordering(true);
+    onDragPreviewStart(index);
+    setPageScrollLock(true);
 
     setTouchStartX(null);
     setTouchStartY(null);
@@ -334,19 +378,6 @@ const CarrotListItem = ({
     }
 
     if (!isTouchReordering) {
-      const start = touchHandleStartRef.current;
-      const distanceFromStart = start
-        ? Math.hypot(touch.clientX - start.x, touch.clientY - start.y)
-        : 0;
-
-      if (
-        touchReorderTimerRef.current &&
-        distanceFromStart > TOUCH_REORDER_CANCEL_PX
-      ) {
-        clearTimeout(touchReorderTimerRef.current);
-        touchReorderTimerRef.current = null;
-      }
-
       return;
     }
 
@@ -357,25 +388,18 @@ const CarrotListItem = ({
 
     const targetIndex = Number(touchTarget?.getAttribute("data-reorder-index"));
     if (!Number.isNaN(targetIndex)) {
-      setTouchDragTargetIndex(targetIndex);
+      onDragPreviewUpdate(targetIndex);
     }
   }
 
   function finishTouchReorder(): void {
-    if (touchReorderTimerRef.current) {
-      clearTimeout(touchReorderTimerRef.current);
-      touchReorderTimerRef.current = null;
+    if (dragSourceIndex !== null && dragTargetIndex !== null) {
+      onReorder(dragSourceIndex, dragTargetIndex);
     }
 
-    touchHandleStartRef.current = null;
-
-    if (touchDragSourceIndex !== null && touchDragTargetIndex !== null) {
-      onReorder(touchDragSourceIndex, touchDragTargetIndex);
-    }
-
-    setTouchDragSourceIndex(null);
-    setTouchDragTargetIndex(null);
     setIsTouchReordering(false);
+    setPageScrollLock(false);
+    onDragPreviewClear();
     setTimeout(() => setIsDragging(false), 0);
   }
 
@@ -408,6 +432,13 @@ const CarrotListItem = ({
       tabIndex={0}
       style={{
         transform: `translateX(${isTouchReordering ? 0 : Math.max(-60, Math.min(60, touchDeltaX))}px)`,
+        opacity: dragSourceIndex === index ? 0.45 : 1,
+      }}
+      onDragEnter={(event) => {
+        event.preventDefault();
+        if (dragSourceIndex !== null) {
+          onDragPreviewUpdate(index);
+        }
       }}
       onDragOver={(event) => {
         event.preventDefault();
@@ -418,11 +449,16 @@ const CarrotListItem = ({
         if (!Number.isNaN(sourceIndex)) {
           onReorder(sourceIndex, index);
         }
+
+        onDragPreviewClear();
       }}
     >
+      {dragTargetIndex === index && dragSourceIndex !== index ? (
+        <div className="pointer-events-none absolute inset-x-4 -top-1 h-1 rounded-full bg-amber-400/80" />
+      ) : null}
       <Flex
         className={`items-center gap-2 pr-6 ${
-          touchDragTargetIndex === index ? "rounded-lg bg-zinc-800/70" : ""
+          dragTargetIndex === index ? "rounded-lg bg-zinc-800/70" : ""
         }`}
       >
         <Tooltip content="Drag to reorder">
@@ -434,10 +470,12 @@ const CarrotListItem = ({
             draggable
             onDragStart={(event) => {
               setIsDragging(true);
+              onDragPreviewStart(index);
               event.dataTransfer.setData("text/plain", String(index));
               event.dataTransfer.effectAllowed = "move";
             }}
             onDragEnd={() => {
+              onDragPreviewClear();
               setTimeout(() => setIsDragging(false), 0);
             }}
             onTouchStart={handleDragHandleTouchStart}
