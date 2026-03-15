@@ -223,7 +223,7 @@ const Carrots = ({
   }
 
   return (
-    <ul className="space-y-2">
+    <ul className="space-y-1.5">
       {carrotList.map((item, index) => (
         <CarrotListItem
           key={item.id}
@@ -424,7 +424,7 @@ const CarrotListItem = ({
 
   return (
     <li
-      className="group relative cursor-pointer rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-4 py-4 transition-transform duration-150"
+      className="group relative cursor-pointer rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-3 py-2.5 transition-transform duration-150"
       data-reorder-index={index}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -465,7 +465,7 @@ const CarrotListItem = ({
         />
       ) : null}
       <Flex
-        className={`min-h-10 items-center gap-2 pr-6 ${
+        className={`min-h-8 items-center gap-1.5 pr-6 ${
           dragTargetIndex === index ? "rounded-lg bg-zinc-800/70" : ""
         }`}
       >
@@ -474,7 +474,7 @@ const CarrotListItem = ({
             size="3"
             variant="ghost"
             aria-label="Drag chest"
-            className="-m-2 self-start cursor-grab p-3 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
+            className="-m-1 self-start cursor-grab p-2 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
             draggable
             onDragStart={(event) => {
               setIsDragging(true);
@@ -498,8 +498,8 @@ const CarrotListItem = ({
             <FaGripLines />
           </IconButton>
         </Tooltip>
-        <Box className="flex min-h-10 grow items-center">
-          <Text className="text-sm font-medium leading-none text-zinc-100">{item.label}</Text>
+        <Box className="flex min-h-8 grow items-center">
+          <Text className="text-sm font-medium leading-tight text-zinc-100">{item.label}</Text>
         </Box>
         <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
           <IconButton
