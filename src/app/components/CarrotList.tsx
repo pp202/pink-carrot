@@ -474,7 +474,7 @@ const CarrotListItem = ({
             size="3"
             variant="ghost"
             aria-label="Drag chest"
-            className="-m-2 cursor-grab p-3 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
+            className="-m-2 self-start cursor-grab p-3 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
             draggable
             onDragStart={(event) => {
               setIsDragging(true);
