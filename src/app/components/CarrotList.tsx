@@ -2,11 +2,26 @@
 
 import { Chest } from "@/app/generated/prisma/client";
 import Spinner from "@/app/components/Spinner";
-import { Box, Button, Flex, IconButton, Tooltip, Text } from "@radix-ui/themes";
+import {
+  Box,
+  Button,
+  DropdownMenu,
+  Flex,
+  IconButton,
+  Tooltip,
+  Text,
+} from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { FaClone, FaMinus, FaRedoAlt, FaThumbtack, FaTrash } from "react-icons/fa";
+import {
+  FaCaretDown,
+  FaClone,
+  FaMinus,
+  FaRedoAlt,
+  FaThumbtack,
+  FaTrash,
+} from "react-icons/fa";
 
 const SWIPE_DELETE_THRESHOLD = 90;
 const UNDO_VISIBLE_MS = 5000;
@@ -451,27 +466,42 @@ const CarrotListItem = ({
           </Box>
         ) : null}
         {!isArchiveMode ? (
-          <Box className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
-            <Tooltip content="Clone">
-              <IconButton
-                size="1"
-                variant="ghost"
-                className="hidden text-zinc-300 md:inline-flex md:invisible md:opacity-0 md:pointer-events-none md:transition-opacity md:group-hover:visible md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-focus-within:visible md:group-focus-within:opacity-100 md:group-focus-within:pointer-events-auto"
-                onClick={() => onClone(item.id)}
-              >
-                <FaClone />
-              </IconButton>
-            </Tooltip>
+          <Box className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center md:inline-flex md:invisible md:opacity-0 md:pointer-events-none md:transition-opacity md:group-hover:visible md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-focus-within:visible md:group-focus-within:opacity-100 md:group-focus-within:pointer-events-auto">
             <Tooltip content="Archive">
               <IconButton
                 size="1"
                 variant="ghost"
-                className="hidden text-zinc-300 md:inline-flex md:invisible md:opacity-0 md:pointer-events-none md:transition-opacity md:group-hover:visible md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-focus-within:visible md:group-focus-within:opacity-100 md:group-focus-within:pointer-events-auto"
+                className="rounded-r-none text-zinc-300"
                 onClick={() => onRemove(item.id)}
               >
                 <FaMinus />
               </IconButton>
             </Tooltip>
+
+            <DropdownMenu.Root>
+              <Tooltip content="More actions">
+                <DropdownMenu.Trigger>
+                  <IconButton
+                    size="1"
+                    variant="ghost"
+                    className="-ml-px rounded-l-none text-zinc-300"
+                    aria-label="More actions"
+                  >
+                    <FaCaretDown />
+                  </IconButton>
+                </DropdownMenu.Trigger>
+              </Tooltip>
+              <DropdownMenu.Content size="1" align="end">
+                <DropdownMenu.Item onClick={() => onClone(item.id)}>
+                  <FaClone />
+                  Clone
+                </DropdownMenu.Item>
+                <DropdownMenu.Item color="red" onClick={() => onRemove(item.id)}>
+                  <FaMinus />
+                  Archive
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
           </Box>
         ) : null}
       </Flex>
