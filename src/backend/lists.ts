@@ -1,6 +1,46 @@
 import { prisma } from '@/config/prisma'
 import { loggedUser } from './user';
-import { lexoRankBetween, nextLexoRank } from './lexoRank';
+import { allocateLexoRanks, lexoRankBetween, nextLexoRank } from './lexoRank';
+
+
+async function rebalanceChestRanks(userId: number, rankField: 'listRank' | 'dashRank') {
+    const chests = await prisma.chest.findMany({
+        where: {
+            userId,
+            status: 'NEW',
+        },
+        select: {
+            id: true,
+            listRank: true,
+            dashRank: true,
+        },
+        orderBy: [
+            { [rankField]: 'asc' },
+            { id: 'asc' },
+        ],
+    });
+
+    if (chests.length === 0) {
+        return;
+    }
+
+    const allocatedRanks = allocateLexoRanks(chests.length);
+
+    await prisma.$transaction(
+        chests.map((chest, index) =>
+            prisma.chest.updateMany({
+                where: {
+                    id: chest.id,
+                    userId,
+                    status: 'NEW',
+                },
+                data: {
+                    [rankField]: allocatedRanks[index],
+                },
+            }),
+        ),
+    );
+}
 
 export async function getChests() {
     const user = await loggedUser();
@@ -327,7 +367,40 @@ export async function moveChestBetween(
     try {
         nextRankValue = lexoRankBetween(previousRank, nextRank);
     } catch {
-        return false;
+        await rebalanceChestRanks(user.id, rankField);
+
+        const refreshedChests = await prisma.chest.findMany({
+            where: {
+                userId: user.id,
+                status: 'NEW',
+                id: {
+                    in: idsToLoad,
+                },
+            },
+            select: {
+                id: true,
+                listRank: true,
+                dashRank: true,
+            },
+        });
+
+        const refreshedById = new Map(refreshedChests.map((chest) => [chest.id, chest]));
+        const refreshedPreviousRank = previousChestId === null
+            ? null
+            : refreshedById.get(previousChestId)?.[rankField];
+        const refreshedNextRank = nextChestId === null
+            ? null
+            : refreshedById.get(nextChestId)?.[rankField];
+
+        if ((previousChestId !== null && !refreshedPreviousRank) || (nextChestId !== null && !refreshedNextRank)) {
+            return false;
+        }
+
+        try {
+            nextRankValue = lexoRankBetween(refreshedPreviousRank, refreshedNextRank);
+        } catch {
+            return false;
+        }
     }
 
     await prisma.chest.updateMany({
