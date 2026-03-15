@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-  FaCaretDown,
+  FaBars,
   FaClone,
   FaMinus,
   FaRedoAlt,
@@ -467,27 +467,16 @@ const CarrotListItem = ({
         ) : null}
         {!isArchiveMode ? (
           <Box className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center md:inline-flex md:invisible md:opacity-0 md:pointer-events-none md:transition-opacity md:group-hover:visible md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-focus-within:visible md:group-focus-within:opacity-100 md:group-focus-within:pointer-events-auto">
-            <Tooltip content="Archive">
-              <IconButton
-                size="1"
-                variant="ghost"
-                className="rounded-r-none text-zinc-300"
-                onClick={() => onRemove(item.id)}
-              >
-                <FaMinus />
-              </IconButton>
-            </Tooltip>
-
             <DropdownMenu.Root>
               <Tooltip content="More actions">
                 <DropdownMenu.Trigger>
                   <IconButton
                     size="1"
                     variant="ghost"
-                    className="-ml-px rounded-l-none text-zinc-300"
+                    className="text-zinc-300"
                     aria-label="More actions"
                   >
-                    <FaCaretDown />
+                    <FaBars />
                   </IconButton>
                 </DropdownMenu.Trigger>
               </Tooltip>
