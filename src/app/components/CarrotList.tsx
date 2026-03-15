@@ -10,6 +10,8 @@ import { FaBars, FaClone, FaGripLines, FaMinus, FaThumbtack } from "react-icons/
 
 const SWIPE_DELETE_THRESHOLD = 90;
 const UNDO_VISIBLE_MS = 5000;
+const TOUCH_REORDER_HOLD_MS = 180;
+const TOUCH_REORDER_CANCEL_PX = 10;
 
 type RecentlyArchived = {
   chest: Chest;
@@ -233,6 +235,14 @@ const CarrotListItem = ({
   const [touchDragSourceIndex, setTouchDragSourceIndex] = useState<number | null>(null);
   const [touchDragTargetIndex, setTouchDragTargetIndex] = useState<number | null>(null);
   const [isTouchReordering, setIsTouchReordering] = useState(false);
+  const touchReorderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const touchHandleStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  useEffect(() => () => {
+    if (touchReorderTimerRef.current) {
+      clearTimeout(touchReorderTimerRef.current);
+    }
+  }, []);
 
   function handleTouchStart(event: React.TouchEvent<HTMLLIElement>): void {
     if (isTouchReordering) {
@@ -295,10 +305,22 @@ const CarrotListItem = ({
 
   function handleDragHandleTouchStart(event: React.TouchEvent<HTMLButtonElement>): void {
     event.stopPropagation();
-    setIsDragging(true);
-    setIsTouchReordering(true);
-    setTouchDragSourceIndex(index);
-    setTouchDragTargetIndex(index);
+
+    const touch = event.touches[0];
+    if (!touch) {
+      return;
+    }
+
+    touchHandleStartRef.current = { x: touch.clientX, y: touch.clientY };
+
+    touchReorderTimerRef.current = setTimeout(() => {
+      setIsDragging(true);
+      setIsTouchReordering(true);
+      setTouchDragSourceIndex(index);
+      setTouchDragTargetIndex(index);
+      touchReorderTimerRef.current = null;
+    }, TOUCH_REORDER_HOLD_MS);
+
     setTouchStartX(null);
     setTouchStartY(null);
     setTouchDeltaX(0);
@@ -306,18 +328,31 @@ const CarrotListItem = ({
   }
 
   function handleDragHandleTouchMove(event: React.TouchEvent<HTMLButtonElement>): void {
+    const touch = event.touches[0];
+    if (!touch) {
+      return;
+    }
+
     if (!isTouchReordering) {
+      const start = touchHandleStartRef.current;
+      const distanceFromStart = start
+        ? Math.hypot(touch.clientX - start.x, touch.clientY - start.y)
+        : 0;
+
+      if (
+        touchReorderTimerRef.current &&
+        distanceFromStart > TOUCH_REORDER_CANCEL_PX
+      ) {
+        clearTimeout(touchReorderTimerRef.current);
+        touchReorderTimerRef.current = null;
+      }
+
       return;
     }
 
     event.preventDefault();
-    const currentTouch = event.touches[0];
-    if (!currentTouch) {
-      return;
-    }
-
     const touchTarget = document
-      .elementFromPoint(currentTouch.clientX, currentTouch.clientY)
+      .elementFromPoint(touch.clientX, touch.clientY)
       ?.closest("[data-reorder-index]");
 
     const targetIndex = Number(touchTarget?.getAttribute("data-reorder-index"));
@@ -327,6 +362,13 @@ const CarrotListItem = ({
   }
 
   function finishTouchReorder(): void {
+    if (touchReorderTimerRef.current) {
+      clearTimeout(touchReorderTimerRef.current);
+      touchReorderTimerRef.current = null;
+    }
+
+    touchHandleStartRef.current = null;
+
     if (touchDragSourceIndex !== null && touchDragTargetIndex !== null) {
       onReorder(touchDragSourceIndex, touchDragTargetIndex);
     }
@@ -385,10 +427,10 @@ const CarrotListItem = ({
       >
         <Tooltip content="Drag to reorder">
           <IconButton
-            size="1"
+            size="2"
             variant="ghost"
             aria-label="Drag chest"
-            className="cursor-grab text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
+            className="-m-2 cursor-grab p-2 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
             draggable
             onDragStart={(event) => {
               setIsDragging(true);
