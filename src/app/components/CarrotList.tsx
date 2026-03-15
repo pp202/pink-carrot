@@ -279,8 +279,8 @@ const Carrots = ({
   }
 
   return (
-    <div className="space-y-3">
-      <ul className="space-y-4">
+    <div className="space-y-4">
+      <ul className="space-y-6">
         {carrotList.map((item) => (
           <CarrotListItem
             key={item.id}
@@ -420,7 +420,7 @@ const CarrotListItem = ({
 
   return (
     <li
-      className={`group relative rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-4 py-3 transition-transform duration-150 ${isArchiveMode ? "" : "cursor-pointer"}`}
+      className={`group relative rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-4 py-4 transition-transform duration-150 ${isArchiveMode ? "" : "cursor-pointer"}`}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
