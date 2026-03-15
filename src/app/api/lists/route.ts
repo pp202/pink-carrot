@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma}  from "@/config/prisma"
 import { loggedUser } from "@/backend/user"
 import { createListSchema } from "../../schema/createListSchema"
-import { getArchivedChests, getChests } from "@/backend/lists"
+import { getArchivedChests, getChests, moveChestBetween } from "@/backend/lists"
 import { nextLexoRank } from "@/backend/lexoRank"
 
 export async function POST(request: NextRequest) {
@@ -55,6 +55,40 @@ export async function POST(request: NextRequest) {
         }
     })
     return NextResponse.json(newList, { status: 201 })
+}
+
+
+
+export async function PATCH(request: NextRequest) {
+  const body = await request.json();
+
+  const chestId = body?.chestId;
+  const previousChestId = body?.previousChestId ?? null;
+  const nextChestId = body?.nextChestId ?? null;
+
+  if (!Number.isInteger(chestId)) {
+    return NextResponse.json({ message: "Invalid chest id" }, { status: 400 });
+  }
+
+  if (previousChestId !== null && !Number.isInteger(previousChestId)) {
+    return NextResponse.json({ message: "Invalid previous chest id" }, { status: 400 });
+  }
+
+  if (nextChestId !== null && !Number.isInteger(nextChestId)) {
+    return NextResponse.json({ message: "Invalid next chest id" }, { status: 400 });
+  }
+
+  if (chestId === previousChestId || chestId === nextChestId) {
+    return NextResponse.json({ message: "Invalid reorder bounds" }, { status: 400 });
+  }
+
+  const reordered = await moveChestBetween(chestId, previousChestId, nextChestId);
+
+  if (!reordered) {
+    return NextResponse.json({ message: "Unable to reorder chest" }, { status: 404 });
+  }
+
+  return NextResponse.json({ message: "Chest reordered" }, { status: 200 });
 }
 
 export async function GET(request: NextRequest) {  
