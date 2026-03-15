@@ -280,7 +280,7 @@ const Carrots = ({
 
   return (
     <div className="space-y-3">
-      <ul className="space-y-2">
+      <ul className="space-y-3">
         {carrotList.map((item) => (
           <CarrotListItem
             key={item.id}
