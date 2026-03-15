@@ -432,7 +432,7 @@ const CarrotListItem = ({
         transform: `translateX(${Math.max(-60, Math.min(60, touchDeltaX))}px)`,
       }}
     >
-      <Flex className={`items-center gap-2 ${isArchiveMode ? "" : "pr-12"}`}>
+      <Flex className={`items-center gap-2 ${isArchiveMode ? "" : "pr-6"}`}>
         <Box className="grow">
           <Text className="text-sm font-medium text-zinc-100">
             {item.label}
@@ -484,7 +484,7 @@ const CarrotListItem = ({
               <DropdownMenu.Content
                 size="1"
                 align="end"
-                className="space-y-1"
+                className="space-y-2"
                 onClick={(event) => event.stopPropagation()}
               >
                 <DropdownMenu.Item
@@ -492,7 +492,7 @@ const CarrotListItem = ({
                     event.stopPropagation();
                     onClone(item.id);
                   }}
-                  className="!py-2 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+                  className="!py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
                 >
                   <FaClone />
                   Clone
@@ -503,7 +503,7 @@ const CarrotListItem = ({
                     event.stopPropagation();
                     onRemove(item.id);
                   }}
-                  className="!py-2 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+                  className="!py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
                 >
                   <FaMinus />
                   Archive
