@@ -15,6 +15,20 @@ function pow(base: number, exponent: number): number {
 const MAX_RANK_VALUE = pow(LEXO_BASE, LEXO_RANK_LENGTH) - 1;
 const INITIAL_RANK_VALUE = pow(LEXO_BASE, LEXO_RANK_LENGTH - 1);
 
+export function allocateLexoRanks(count: number): string[] {
+  if (count <= 0) {
+    return [];
+  }
+
+  const step = Math.floor(MAX_RANK_VALUE / (count + 1));
+
+  if (step <= 0) {
+    throw new Error('No lexo-rank space available for allocation.');
+  }
+
+  return Array.from({ length: count }, (_, index) => toLexoString(step * (index + 1)));
+}
+
 function fromLexoString(value: string): number {
   return value.toLowerCase().split('').reduce((accumulator, character) => {
     const digit = LEXO_ALPHABET.indexOf(character);
