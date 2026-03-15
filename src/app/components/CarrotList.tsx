@@ -274,6 +274,9 @@ const CarrotListItem = ({
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
   const [touchDeltaX, setTouchDeltaX] = useState(0);
   const [touchDeltaY, setTouchDeltaY] = useState(0);
+  const shouldShowDropIndicator = dragTargetIndex === index && dragSourceIndex !== index;
+  const isDraggingDown =
+    shouldShowDropIndicator && dragSourceIndex !== null && dragSourceIndex < index;
   const [isDragging, setIsDragging] = useState(false);
   const [isTouchReordering, setIsTouchReordering] = useState(false);
   const bodyScrollWasLockedRef = useRef(false);
@@ -453,8 +456,12 @@ const CarrotListItem = ({
         onDragPreviewClear();
       }}
     >
-      {dragTargetIndex === index && dragSourceIndex !== index ? (
-        <div className="pointer-events-none absolute inset-x-4 -top-1 h-1 rounded-full bg-amber-400/80" />
+      {shouldShowDropIndicator ? (
+        <div
+          className={`pointer-events-none absolute inset-x-4 h-1 rounded-full bg-amber-400/80 ${
+            isDraggingDown ? "-bottom-1" : "-top-1"
+          }`}
+        />
       ) : null}
       <Flex
         className={`items-center gap-2 pr-6 ${
