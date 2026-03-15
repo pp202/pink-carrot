@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaGripLines } from "react-icons/fa";
 import { FiEdit2 } from "react-icons/fi";
 import { GiCarrot } from "react-icons/gi";
@@ -29,6 +29,23 @@ export default function DashboardPinnedChests({
   const [dragTargetIndex, setDragTargetIndex] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isTouchReordering, setIsTouchReordering] = useState(false);
+
+  useEffect(() => {
+    if (!isTouchReordering) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    const previousTouchAction = document.body.style.touchAction;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.touchAction = previousTouchAction;
+    };
+  }, [isTouchReordering]);
 
   function handleHarvestedToggle(chestId: number, carrotId: string, harvested: boolean): void {
     setPinnedChests((previous) =>
@@ -159,15 +176,15 @@ export default function DashboardPinnedChests({
             ) : null}
             <article>
               <div
-                className={`flex items-start justify-between gap-3 ${
+                className={`flex items-center justify-between gap-3 ${
                   dragTargetIndex === index ? "rounded-lg bg-zinc-800/70" : ""
                 }`}
               >
-                <div className="flex min-w-0 items-start gap-2">
+                <div className="flex min-w-0 items-center gap-2">
                   <button
                     type="button"
                     aria-label="Drag chest"
-                    className="-m-1 mt-0.5 cursor-grab rounded p-1 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
+                    className="-m-1 cursor-grab rounded p-1 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
                     draggable
                     onDragStart={(event) => {
                       setIsDragging(true);
