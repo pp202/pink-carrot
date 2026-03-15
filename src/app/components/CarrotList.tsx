@@ -481,11 +481,18 @@ const CarrotListItem = ({
                 </DropdownMenu.Trigger>
               </Tooltip>
               <DropdownMenu.Content size="1" align="end">
-                <DropdownMenu.Item onClick={() => onClone(item.id)}>
+                <DropdownMenu.Item
+                  onClick={() => onClone(item.id)}
+                  className="!text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+                >
                   <FaClone />
                   Clone
                 </DropdownMenu.Item>
-                <DropdownMenu.Item color="red" onClick={() => onRemove(item.id)}>
+                <DropdownMenu.Item
+                  color="red"
+                  onClick={() => onRemove(item.id)}
+                  className="!text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+                >
                   <FaMinus />
                   Archive
                 </DropdownMenu.Item>
