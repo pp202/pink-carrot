@@ -453,6 +453,7 @@ const CarrotListItem = ({
           onReorder(sourceIndex, index);
         }
 
+        setPageScrollLock(false);
         onDragPreviewClear();
       }}
     >
@@ -464,24 +465,26 @@ const CarrotListItem = ({
         />
       ) : null}
       <Flex
-        className={`items-center gap-2 pr-6 ${
+        className={`min-h-10 items-center gap-2 pr-6 ${
           dragTargetIndex === index ? "rounded-lg bg-zinc-800/70" : ""
         }`}
       >
         <Tooltip content="Drag to reorder">
           <IconButton
-            size="2"
+            size="3"
             variant="ghost"
             aria-label="Drag chest"
-            className="-m-2 cursor-grab p-2 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
+            className="-m-2 cursor-grab p-3 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
             draggable
             onDragStart={(event) => {
               setIsDragging(true);
               onDragPreviewStart(index);
+              setPageScrollLock(true);
               event.dataTransfer.setData("text/plain", String(index));
               event.dataTransfer.effectAllowed = "move";
             }}
             onDragEnd={() => {
+              setPageScrollLock(false);
               onDragPreviewClear();
               setTimeout(() => setIsDragging(false), 0);
             }}
@@ -490,12 +493,13 @@ const CarrotListItem = ({
             onTouchEnd={finishTouchReorder}
             onTouchCancel={finishTouchReorder}
             onClick={(event) => event.stopPropagation()}
+            style={{ touchAction: "none" }}
           >
             <FaGripLines />
           </IconButton>
         </Tooltip>
-        <Box className="grow">
-          <Text className="text-sm font-medium text-zinc-100">{item.label}</Text>
+        <Box className="flex min-h-10 grow items-center">
+          <Text className="text-sm font-medium leading-none text-zinc-100">{item.label}</Text>
         </Box>
         <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
           <IconButton
