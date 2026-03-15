@@ -503,7 +503,7 @@ const CarrotListItem = ({
                     event.stopPropagation();
                     onRemove(item.id);
                   }}
-                  className="!py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+                  className="!mt-2 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
                 >
                   <FaMinus />
                   Archive
