@@ -13,7 +13,7 @@ const NavBar = () => {
 
     const navItems = [
         { name: 'Dashboard', href: '/dashboard' },
-        { name: 'My List', href: '/my-lists' },
+        { name: 'Chests', href: '/my-lists' },
         { name: 'Archives', href: '/archives' }
     ]
 
