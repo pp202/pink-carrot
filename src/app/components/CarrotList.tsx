@@ -2,26 +2,11 @@
 
 import { Chest } from "@/app/generated/prisma/client";
 import Spinner from "@/app/components/Spinner";
-import {
-  Box,
-  Button,
-  DropdownMenu,
-  Flex,
-  IconButton,
-  Tooltip,
-  Text,
-} from "@radix-ui/themes";
+import { Box, DropdownMenu, Flex, IconButton, Text, Tooltip } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-  FaBars,
-  FaClone,
-  FaMinus,
-  FaRedoAlt,
-  FaThumbtack,
-  FaTrash,
-} from "react-icons/fa";
+import React, { useEffect, useRef, useState } from "react";
+import { FaBars, FaClone, FaMinus, FaThumbtack } from "react-icons/fa";
 
 const SWIPE_DELETE_THRESHOLD = 90;
 const UNDO_VISIBLE_MS = 5000;
@@ -30,33 +15,19 @@ type RecentlyArchived = {
   chest: Chest;
 };
 
-type CarrotListProps = {
-  mode?: "active" | "archived";
-};
-
-const CarrotList = ({ mode = "active" }: CarrotListProps) => {
+const CarrotList = () => {
   const [state, setState] = useState<Chest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedArchiveIds, setSelectedArchiveIds] = useState<number[]>([]);
   const [recentlyArchived, setRecentlyArchived] =
     useState<RecentlyArchived | null>(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isArchiveMode = mode === "archived";
-  const visibleSelectedArchiveIds = useMemo(
-    () => selectedArchiveIds.filter((id) => state.some((item) => item.id === id)),
-    [selectedArchiveIds, state],
-  );
-
 
   useEffect(() => {
-    const statusParam = isArchiveMode ? "?status=ARCHIVED" : "";
-
-    fetch(`/api/lists${statusParam}`, { cache: "no-cache" })
+    fetch("/api/lists", { cache: "no-cache" })
       .then((res) => res.json())
       .then((data) => setState(data))
       .finally(() => setIsLoading(false));
-  }, [isArchiveMode]);
-
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -84,82 +55,14 @@ const CarrotList = ({ mode = "active" }: CarrotListProps) => {
       return;
     }
 
-    if (isArchiveMode) {
-      const hasConfirmedDelete = window.confirm(
-        "Are you sure to delete this chest permanently?",
-      );
-
-      if (!hasConfirmedDelete) {
-        return;
-      }
-
-      axios.delete(`/api/lists/${id}`).then(() => {
-        setState((previous) => previous.filter((item) => item.id !== id));
-      });
-      return;
-    }
-
     axios.patch(`/api/lists/${id}`, { status: "ARCHIVED" }).then(() => {
       setState((previous) => previous.filter((item) => item.id !== id));
       queueUndoBanner(removedItem);
     });
   }
 
-  function handleArchiveSelectionToggle(id: number): void {
-    setSelectedArchiveIds((previous) =>
-      previous.includes(id)
-        ? previous.filter((existingId) => existingId !== id)
-        : [...previous, id],
-    );
-  }
-
-  function handleRestoreSelected(): void {
-    if (visibleSelectedArchiveIds.length === 0) {
-      return;
-    }
-
-    const idsToRestore = [...visibleSelectedArchiveIds];
-    Promise.all(
-      idsToRestore.map((id) =>
-        axios.patch(`/api/lists/${id}`, { status: "NEW" }),
-      ),
-    ).then(() => {
-      setState((previous) =>
-        previous.filter((item) => !idsToRestore.includes(item.id)),
-      );
-      setSelectedArchiveIds([]);
-    });
-  }
-
-  function handleDeleteSelected(): void {
-    if (visibleSelectedArchiveIds.length === 0) {
-      return;
-    }
-
-    const isSingleSelectedChest = visibleSelectedArchiveIds.length === 1;
-    const hasConfirmedDelete = window.confirm(
-      isSingleSelectedChest
-        ? "Are you sure to delete the selected chest permanently?"
-        : "Are you sure to delete the selected chests permanently?",
-    );
-
-    if (!hasConfirmedDelete) {
-      return;
-    }
-
-    const idsToDelete = [...visibleSelectedArchiveIds];
-    Promise.all(idsToDelete.map((id) => axios.delete(`/api/lists/${id}`))).then(
-      () => {
-        setState((previous) =>
-          previous.filter((item) => !idsToDelete.includes(item.id)),
-        );
-        setSelectedArchiveIds([]);
-      },
-    );
-  }
-
   function handleUndoArchive(): void {
-    if (!recentlyArchived || isArchiveMode) {
+    if (!recentlyArchived) {
       return;
     }
 
@@ -212,13 +115,8 @@ const CarrotList = ({ mode = "active" }: CarrotListProps) => {
         onRemove={handleRemove}
         onPinnedToggle={handlePinnedToggle}
         onClone={handleClone}
-        mode={mode}
-        selectedArchiveIds={visibleSelectedArchiveIds}
-        onArchiveSelectionToggle={handleArchiveSelectionToggle}
-        onRestoreSelected={handleRestoreSelected}
-        onDeleteSelected={handleDeleteSelected}
       />
-      {recentlyArchived && !isArchiveMode ? (
+      {recentlyArchived ? (
         <div className="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center px-4">
           <div className="pointer-events-auto rounded-lg border border-zinc-600/40 bg-zinc-900/90 px-3 py-2 text-sm text-zinc-200 shadow-lg shadow-black/30">
             Archived &quot;{recentlyArchived.chest.label}&quot;.{" "}
@@ -242,25 +140,13 @@ const Carrots = ({
   onRemove,
   onPinnedToggle,
   onClone,
-  mode,
-  selectedArchiveIds,
-  onArchiveSelectionToggle,
-  onRestoreSelected,
-  onDeleteSelected,
 }: {
   carrotList: Chest[];
   isLoading: boolean;
   onRemove: (id: number) => void;
   onPinnedToggle: (id: number, pinned: boolean) => void;
   onClone: (id: number) => void;
-  mode: "active" | "archived";
-  selectedArchiveIds: number[];
-  onArchiveSelectionToggle: (id: number) => void;
-  onRestoreSelected: () => void;
-  onDeleteSelected: () => void;
 }) => {
-  const isArchiveActionDisabled = selectedArchiveIds.length === 0;
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center gap-2 text-sm text-zinc-300">
@@ -271,55 +157,21 @@ const Carrots = ({
   }
 
   if (carrotList.length === 0) {
-    return (
-      <p className="text-center text-sm text-zinc-400">
-        {mode === "archived" ? "No archived lists." : "No lists yet."}
-      </p>
-    );
+    return <p className="text-center text-sm text-zinc-400">No lists yet.</p>;
   }
 
   return (
-    <div className="space-y-4">
-      <ul className="space-y-2">
-        {carrotList.map((item) => (
-          <CarrotListItem
-            key={item.id}
-            item={item}
-            onRemove={onRemove}
-            onPinnedToggle={onPinnedToggle}
-            onClone={onClone}
-            mode={mode}
-            isSelectedArchiveItem={selectedArchiveIds.includes(item.id)}
-            onArchiveSelectionToggle={onArchiveSelectionToggle}
-          />
-        ))}
-      </ul>
-
-      {mode === "archived" ? (
-        <div className="flex justify-center gap-2">
-          <Button
-            size="2"
-            variant="soft"
-            className={isArchiveActionDisabled ? "" : "!text-zinc-100"}
-            disabled={isArchiveActionDisabled}
-            onClick={onRestoreSelected}
-          >
-            <FaRedoAlt />
-            Restore
-          </Button>
-          <Button
-            size="2"
-            variant="soft"
-            color="red"
-            disabled={isArchiveActionDisabled}
-            onClick={onDeleteSelected}
-          >
-            <FaTrash />
-            Delete
-          </Button>
-        </div>
-      ) : null}
-    </div>
+    <ul className="space-y-2">
+      {carrotList.map((item) => (
+        <CarrotListItem
+          key={item.id}
+          item={item}
+          onRemove={onRemove}
+          onPinnedToggle={onPinnedToggle}
+          onClone={onClone}
+        />
+      ))}
+    </ul>
   );
 };
 
@@ -328,24 +180,17 @@ const CarrotListItem = ({
   onRemove,
   onPinnedToggle,
   onClone,
-  mode,
-  isSelectedArchiveItem,
-  onArchiveSelectionToggle,
 }: {
   item: Chest;
   onRemove: (id: number) => void;
   onPinnedToggle: (id: number, pinned: boolean) => void;
   onClone: (id: number) => void;
-  mode: "active" | "archived";
-  isSelectedArchiveItem: boolean;
-  onArchiveSelectionToggle: (id: number) => void;
 }) => {
   const router = useRouter();
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
   const [touchDeltaX, setTouchDeltaX] = useState(0);
   const [touchDeltaY, setTouchDeltaY] = useState(0);
-  const isArchiveMode = mode === "archived";
 
   function handleTouchStart(event: React.TouchEvent<HTMLLIElement>): void {
     setTouchStartX(event.touches[0]?.clientX ?? null);
@@ -391,10 +236,6 @@ const CarrotListItem = ({
   }
 
   function handleItemNavigation(): void {
-    if (isArchiveMode) {
-      return;
-    }
-
     router.push(`/my-lists/${item.id}/edit`);
   }
 
@@ -408,10 +249,6 @@ const CarrotListItem = ({
   }
 
   function handleItemKeyDown(event: React.KeyboardEvent<HTMLLIElement>): void {
-    if (isArchiveMode) {
-      return;
-    }
-
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       handleItemNavigation();
@@ -420,98 +257,83 @@ const CarrotListItem = ({
 
   return (
     <li
-      className={`group relative rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-4 py-4 transition-transform duration-150 ${isArchiveMode ? "" : "cursor-pointer"}`}
+      className="group relative cursor-pointer rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-4 py-4 transition-transform duration-150"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onClick={handleItemClick}
       onKeyDown={handleItemKeyDown}
-      role={isArchiveMode ? undefined : "button"}
-      tabIndex={isArchiveMode ? undefined : 0}
+      role="button"
+      tabIndex={0}
       style={{
         transform: `translateX(${Math.max(-60, Math.min(60, touchDeltaX))}px)`,
       }}
     >
-      <Flex className={`items-center gap-2 ${isArchiveMode ? "" : "pr-6"}`}>
+      <Flex className="items-center gap-2 pr-6">
         <Box className="grow">
-          <Text className="text-sm font-medium text-zinc-100">
-            {item.label}
-          </Text>
+          <Text className="text-sm font-medium text-zinc-100">{item.label}</Text>
         </Box>
-        {isArchiveMode ? (
-          <input
-            type="checkbox"
-            checked={isSelectedArchiveItem}
-            onChange={() => onArchiveSelectionToggle(item.id)}
-            aria-label={`Select ${item.label}`}
-            className="h-4 w-4 cursor-pointer accent-zinc-200"
-          />
-        ) : null}
-        {!isArchiveMode ? (
-          <Box>
-            <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
-              <IconButton
-                size="1"
-                variant="ghost"
-                className={
-                  item.pinned
-                    ? "!text-red-500 hover:!text-red-400"
-                    : "!text-zinc-400 hover:!text-zinc-300"
-                }
-                onClick={() => onPinnedToggle(item.id, !item.pinned)}
-              >
-                <FaThumbtack />
-              </IconButton>
+        <Box>
+          <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
+            <IconButton
+              size="1"
+              variant="ghost"
+              className={
+                item.pinned
+                  ? "!text-red-500 hover:!text-red-400"
+                  : "!text-zinc-400 hover:!text-zinc-300"
+              }
+              onClick={() => onPinnedToggle(item.id, !item.pinned)}
+            >
+              <FaThumbtack />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        <Box className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center md:inline-flex md:invisible md:pointer-events-none md:opacity-0 md:transition-opacity md:group-hover:pointer-events-auto md:group-hover:visible md:group-hover:opacity-100 md:group-focus-within:pointer-events-auto md:group-focus-within:visible md:group-focus-within:opacity-100">
+          <DropdownMenu.Root>
+            <Tooltip content="More actions">
+              <DropdownMenu.Trigger>
+                <IconButton
+                  size="1"
+                  variant="ghost"
+                  className="text-zinc-300"
+                  aria-label="More actions"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <FaBars />
+                </IconButton>
+              </DropdownMenu.Trigger>
             </Tooltip>
-          </Box>
-        ) : null}
-        {!isArchiveMode ? (
-          <Box className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center md:inline-flex md:invisible md:opacity-0 md:pointer-events-none md:transition-opacity md:group-hover:visible md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-focus-within:visible md:group-focus-within:opacity-100 md:group-focus-within:pointer-events-auto">
-            <DropdownMenu.Root>
-              <Tooltip content="More actions">
-                <DropdownMenu.Trigger>
-                  <IconButton
-                    size="1"
-                    variant="ghost"
-                    className="text-zinc-300"
-                    aria-label="More actions"
-                    onClick={(event) => event.stopPropagation()}
-                  >
-                    <FaBars />
-                  </IconButton>
-                </DropdownMenu.Trigger>
-              </Tooltip>
-              <DropdownMenu.Content
-                size="1"
-                align="end"
-                className="space-y-2"
-                onClick={(event) => event.stopPropagation()}
+            <DropdownMenu.Content
+              size="1"
+              align="end"
+              className="space-y-2"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <DropdownMenu.Item
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onClone(item.id);
+                }}
+                className="!py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
               >
-                <DropdownMenu.Item
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onClone(item.id);
-                  }}
-                  className="!py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
-                >
-                  <FaClone />
-                  Clone
-                </DropdownMenu.Item>
-                <DropdownMenu.Item
-                  color="red"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onRemove(item.id);
-                  }}
-                  className="!mt-2 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
-                >
-                  <FaMinus />
-                  Archive
-                </DropdownMenu.Item>
-              </DropdownMenu.Content>
-            </DropdownMenu.Root>
-          </Box>
-        ) : null}
+                <FaClone />
+                Clone
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                color="red"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onRemove(item.id);
+                }}
+                className="!mt-2 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+              >
+                <FaMinus />
+                Archive
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
+        </Box>
       </Flex>
     </li>
   );

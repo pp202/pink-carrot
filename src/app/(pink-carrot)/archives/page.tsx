@@ -1,4 +1,4 @@
-import CarrotList from '@/app/components/CarrotList';
+import ArchiveList from '@/app/components/ArchiveList';
 
 const ArchivesPage = async () => {
   return (
@@ -9,7 +9,7 @@ const ArchivesPage = async () => {
             <h1 className="text-2xl font-semibold text-zinc-100">Archives</h1>
           </header>
 
-          <CarrotList mode="archived" />
+          <ArchiveList />
         </div>
       </div>
     </section>
