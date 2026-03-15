@@ -95,6 +95,7 @@ export type ChestScalarFieldEnum = (typeof ChestScalarFieldEnum)[keyof typeof Ch
 export const CarrotScalarFieldEnum = {
   id: 'id',
   label: 'label',
+  harvested: 'harvested',
   chestId: 'chestId'
 } as const
 
