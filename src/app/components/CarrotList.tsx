@@ -6,7 +6,7 @@ import { Box, Button, Flex, IconButton, Tooltip, Text } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { FaMinus, FaRedoAlt, FaThumbtack, FaTrash } from "react-icons/fa";
+import { FaClone, FaMinus, FaRedoAlt, FaThumbtack, FaTrash } from "react-icons/fa";
 
 const SWIPE_DELETE_THRESHOLD = 90;
 const UNDO_VISIBLE_MS = 5000;
@@ -183,6 +183,12 @@ const CarrotList = ({ mode = "active" }: CarrotListProps) => {
     });
   }
 
+  function handleClone(id: number): void {
+    axios.patch(`/api/lists/${id}`, { action: "clone" }).then((response) => {
+      setState((previous) => [...previous, response.data as Chest]);
+    });
+  }
+
   return (
     <>
       <Carrots
@@ -190,6 +196,7 @@ const CarrotList = ({ mode = "active" }: CarrotListProps) => {
         isLoading={isLoading}
         onRemove={handleRemove}
         onPinnedToggle={handlePinnedToggle}
+        onClone={handleClone}
         mode={mode}
         selectedArchiveIds={visibleSelectedArchiveIds}
         onArchiveSelectionToggle={handleArchiveSelectionToggle}
@@ -219,6 +226,7 @@ const Carrots = ({
   isLoading,
   onRemove,
   onPinnedToggle,
+  onClone,
   mode,
   selectedArchiveIds,
   onArchiveSelectionToggle,
@@ -229,6 +237,7 @@ const Carrots = ({
   isLoading: boolean;
   onRemove: (id: number) => void;
   onPinnedToggle: (id: number, pinned: boolean) => void;
+  onClone: (id: number) => void;
   mode: "active" | "archived";
   selectedArchiveIds: number[];
   onArchiveSelectionToggle: (id: number) => void;
@@ -263,6 +272,7 @@ const Carrots = ({
             item={item}
             onRemove={onRemove}
             onPinnedToggle={onPinnedToggle}
+            onClone={onClone}
             mode={mode}
             isSelectedArchiveItem={selectedArchiveIds.includes(item.id)}
             onArchiveSelectionToggle={onArchiveSelectionToggle}
@@ -302,6 +312,7 @@ const CarrotListItem = ({
   item,
   onRemove,
   onPinnedToggle,
+  onClone,
   mode,
   isSelectedArchiveItem,
   onArchiveSelectionToggle,
@@ -309,6 +320,7 @@ const CarrotListItem = ({
   item: Chest;
   onRemove: (id: number) => void;
   onPinnedToggle: (id: number, pinned: boolean) => void;
+  onClone: (id: number) => void;
   mode: "active" | "archived";
   isSelectedArchiveItem: boolean;
   onArchiveSelectionToggle: (id: number) => void;
@@ -440,6 +452,16 @@ const CarrotListItem = ({
         ) : null}
         {!isArchiveMode ? (
           <Box className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
+            <Tooltip content="Clone">
+              <IconButton
+                size="1"
+                variant="ghost"
+                className="hidden text-zinc-300 md:inline-flex md:invisible md:opacity-0 md:pointer-events-none md:transition-opacity md:group-hover:visible md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-focus-within:visible md:group-focus-within:opacity-100 md:group-focus-within:pointer-events-auto"
+                onClick={() => onClone(item.id)}
+              >
+                <FaClone />
+              </IconButton>
+            </Tooltip>
             <Tooltip content="Archive">
               <IconButton
                 size="1"

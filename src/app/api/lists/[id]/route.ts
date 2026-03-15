@@ -1,4 +1,4 @@
-import { archiveList, deleteArchivedList, getChest, setPinned, unarchiveList, updateChest } from "@/backend/lists";
+import { archiveList, cloneChest, deleteArchivedList, getChest, setPinned, unarchiveList, updateChest } from "@/backend/lists";
 import { NextRequest, NextResponse } from "next/server";
 import { createListSchema } from "@/app/schema/createListSchema";
 
@@ -52,6 +52,15 @@ export async function PATCH(
     }
 
     return NextResponse.json({ message: "List restored" }, { status: 200 });
+  }
+
+  if (body?.action === "clone") {
+    const cloned = await cloneChest(parseInt(id));
+    if (!cloned) {
+      return NextResponse.json({ message: "List not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(cloned, { status: 201 });
   }
 
   const validation = createListSchema.safeParse(body);

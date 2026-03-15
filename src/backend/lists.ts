@@ -205,3 +205,41 @@ export async function deleteArchivedList(id: number) {
         deletedCarrots,
     };
 }
+
+export async function cloneChest(id: number) {
+    const user = await loggedUser();
+
+    const chest = await prisma.chest.findFirst({
+        where: {
+            id,
+            userId: user.id,
+            status: 'NEW',
+        },
+        include: {
+            carrots: {
+                orderBy: {
+                    id: 'asc',
+                },
+            },
+        },
+    });
+
+    if (!chest) {
+        return null;
+    }
+
+    return prisma.chest.create({
+        data: {
+            label: `${chest.label} (Copy)`,
+            status: 'NEW',
+            pinned: false,
+            userId: user.id,
+            carrots: {
+                create: chest.carrots.map((carrot) => ({
+                    label: carrot.label,
+                    harvested: carrot.harvested,
+                })),
+            },
+        },
+    });
+}
