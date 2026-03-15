@@ -230,8 +230,15 @@ const CarrotListItem = ({
   const [touchDeltaX, setTouchDeltaX] = useState(0);
   const [touchDeltaY, setTouchDeltaY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [touchDragSourceIndex, setTouchDragSourceIndex] = useState<number | null>(null);
+  const [touchDragTargetIndex, setTouchDragTargetIndex] = useState<number | null>(null);
+  const [isTouchReordering, setIsTouchReordering] = useState(false);
 
   function handleTouchStart(event: React.TouchEvent<HTMLLIElement>): void {
+    if (isTouchReordering) {
+      return;
+    }
+
     setTouchStartX(event.touches[0]?.clientX ?? null);
     setTouchStartY(event.touches[0]?.clientY ?? null);
     setTouchDeltaX(0);
@@ -239,6 +246,10 @@ const CarrotListItem = ({
   }
 
   function handleTouchMove(event: React.TouchEvent<HTMLLIElement>): void {
+    if (isTouchReordering) {
+      return;
+    }
+
     if (touchStartX === null) {
       return;
     }
@@ -260,6 +271,10 @@ const CarrotListItem = ({
   }
 
   function handleTouchEnd(): void {
+    if (isTouchReordering) {
+      return;
+    }
+
     const isHorizontalSwipe = Math.abs(touchDeltaX) > Math.abs(touchDeltaY);
     const hasTriggeredDelete =
       isHorizontalSwipe && Math.abs(touchDeltaX) >= SWIPE_DELETE_THRESHOLD;
@@ -276,6 +291,50 @@ const CarrotListItem = ({
 
   function handleItemNavigation(): void {
     router.push(`/my-lists/${item.id}/edit`);
+  }
+
+  function handleDragHandleTouchStart(event: React.TouchEvent<HTMLButtonElement>): void {
+    event.stopPropagation();
+    setIsDragging(true);
+    setIsTouchReordering(true);
+    setTouchDragSourceIndex(index);
+    setTouchDragTargetIndex(index);
+    setTouchStartX(null);
+    setTouchStartY(null);
+    setTouchDeltaX(0);
+    setTouchDeltaY(0);
+  }
+
+  function handleDragHandleTouchMove(event: React.TouchEvent<HTMLButtonElement>): void {
+    if (!isTouchReordering) {
+      return;
+    }
+
+    event.preventDefault();
+    const currentTouch = event.touches[0];
+    if (!currentTouch) {
+      return;
+    }
+
+    const touchTarget = document
+      .elementFromPoint(currentTouch.clientX, currentTouch.clientY)
+      ?.closest("[data-reorder-index]");
+
+    const targetIndex = Number(touchTarget?.getAttribute("data-reorder-index"));
+    if (!Number.isNaN(targetIndex)) {
+      setTouchDragTargetIndex(targetIndex);
+    }
+  }
+
+  function finishTouchReorder(): void {
+    if (touchDragSourceIndex !== null && touchDragTargetIndex !== null) {
+      onReorder(touchDragSourceIndex, touchDragTargetIndex);
+    }
+
+    setTouchDragSourceIndex(null);
+    setTouchDragTargetIndex(null);
+    setIsTouchReordering(false);
+    setTimeout(() => setIsDragging(false), 0);
   }
 
   function handleItemClick(event: React.MouseEvent<HTMLLIElement>): void {
@@ -297,6 +356,7 @@ const CarrotListItem = ({
   return (
     <li
       className="group relative cursor-pointer rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-4 py-4 transition-transform duration-150"
+      data-reorder-index={index}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -305,7 +365,7 @@ const CarrotListItem = ({
       role="button"
       tabIndex={0}
       style={{
-        transform: `translateX(${Math.max(-60, Math.min(60, touchDeltaX))}px)`,
+        transform: `translateX(${isTouchReordering ? 0 : Math.max(-60, Math.min(60, touchDeltaX))}px)`,
       }}
       onDragOver={(event) => {
         event.preventDefault();
@@ -318,24 +378,11 @@ const CarrotListItem = ({
         }
       }}
     >
-      <Flex className="items-center gap-2 pr-6">
-        <Box className="grow">
-          <Text className="text-sm font-medium text-zinc-100">{item.label}</Text>
-        </Box>
-        <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
-          <IconButton
-            size="1"
-            variant="ghost"
-            className={
-              item.pinned
-                ? "!text-red-500 hover:!text-red-400"
-                : "!text-zinc-400 hover:!text-zinc-300"
-            }
-            onClick={() => onPinnedToggle(item.id, !item.pinned)}
-          >
-            <FaThumbtack />
-          </IconButton>
-        </Tooltip>
+      <Flex
+        className={`items-center gap-2 pr-6 ${
+          touchDragTargetIndex === index ? "rounded-lg bg-zinc-800/70" : ""
+        }`}
+      >
         <Tooltip content="Drag to reorder">
           <IconButton
             size="1"
@@ -351,9 +398,30 @@ const CarrotListItem = ({
             onDragEnd={() => {
               setTimeout(() => setIsDragging(false), 0);
             }}
+            onTouchStart={handleDragHandleTouchStart}
+            onTouchMove={handleDragHandleTouchMove}
+            onTouchEnd={finishTouchReorder}
+            onTouchCancel={finishTouchReorder}
             onClick={(event) => event.stopPropagation()}
           >
             <FaGripLines />
+          </IconButton>
+        </Tooltip>
+        <Box className="grow">
+          <Text className="text-sm font-medium text-zinc-100">{item.label}</Text>
+        </Box>
+        <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
+          <IconButton
+            size="1"
+            variant="ghost"
+            className={
+              item.pinned
+                ? "!text-red-500 hover:!text-red-400"
+                : "!text-zinc-400 hover:!text-zinc-300"
+            }
+            onClick={() => onPinnedToggle(item.id, !item.pinned)}
+          >
+            <FaThumbtack />
           </IconButton>
         </Tooltip>
         <Box className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center md:inline-flex md:invisible md:pointer-events-none md:opacity-0 md:transition-opacity md:group-hover:pointer-events-auto md:group-hover:visible md:group-hover:opacity-100 md:group-focus-within:pointer-events-auto md:group-focus-within:visible md:group-focus-within:opacity-100">
