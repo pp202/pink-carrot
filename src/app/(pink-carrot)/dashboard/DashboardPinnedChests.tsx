@@ -3,7 +3,7 @@
 import axios from "axios";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FaGripLines } from "react-icons/fa";
+import { GiChest } from "react-icons/gi";
 import { FiEdit2 } from "react-icons/fi";
 import { GiCarrot } from "react-icons/gi";
 
@@ -222,7 +222,7 @@ export default function DashboardPinnedChests({
                     onTouchCancel={finishTouchReorder}
                     onClick={(event) => event.stopPropagation()}
                   >
-                    <FaGripLines aria-hidden />
+                    <GiChest aria-hidden />
                   </button>
                   <h2 className="truncate text-sm font-semibold text-zinc-100">{chest.label}</h2>
                 </div>
