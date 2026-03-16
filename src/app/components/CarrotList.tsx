@@ -424,7 +424,7 @@ const CarrotListItem = ({
 
   return (
     <li
-      className="group relative cursor-pointer rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-3 py-1 transition-transform duration-150"
+      className="group relative cursor-pointer rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-3 pt-2 pb-1 transition-transform duration-150"
       data-reorder-index={index}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
