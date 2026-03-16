@@ -498,8 +498,8 @@ const CarrotListItem = ({
             <FaGripLines />
           </IconButton>
         </Tooltip>
-        <Box className="flex min-h-8 grow items-center">
-          <Text className="text-sm font-medium leading-normal text-zinc-100">{item.label}</Text>
+        <Box className="flex min-h-8 grow items-center self-stretch">
+          <Text className="block w-full text-sm font-medium leading-5 text-zinc-100">{item.label}</Text>
         </Box>
         <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
           <IconButton
