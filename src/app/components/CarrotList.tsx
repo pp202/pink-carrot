@@ -424,7 +424,7 @@ const CarrotListItem = ({
 
   return (
     <li
-      className="group relative cursor-pointer rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-3 py-2.5 transition-transform duration-150"
+      className="group relative cursor-pointer rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-3 py-1 transition-transform duration-150"
       data-reorder-index={index}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -465,16 +465,16 @@ const CarrotListItem = ({
         />
       ) : null}
       <Flex
-        className={`min-h-10 items-center gap-1.5 pr-10 ${
+        className={`min-h-5 items-center gap-1.5 pr-10 ${
           dragTargetIndex === index ? "rounded-lg bg-zinc-800/70" : ""
         }`}
       >
         <Tooltip content="Drag to reorder">
           <IconButton
-            size="3"
+            size="2"
             variant="ghost"
             aria-label="Drag chest"
-            className="h-8 w-8 shrink-0 cursor-grab p-0 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
+            className="h-5 w-5 shrink-0 cursor-grab p-0 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
             draggable
             onDragStart={(event) => {
               setIsDragging(true);
@@ -498,8 +498,8 @@ const CarrotListItem = ({
             <FaGripLines />
           </IconButton>
         </Tooltip>
-        <Box className="flex min-h-8 grow items-center self-stretch">
-          <span className="block w-full break-words text-sm font-medium leading-5 text-zinc-100">
+        <Box className="flex min-h-4 grow items-center self-stretch">
+          <span className="block w-full break-words text-sm font-medium leading-4 text-zinc-100">
             {item.label}
           </span>
         </Box>
@@ -507,7 +507,7 @@ const CarrotListItem = ({
           <IconButton
             size="1"
             variant="ghost"
-            className={`h-8 w-8 shrink-0 p-0 ${
+            className={`h-5 w-5 shrink-0 p-0 ${
               item.pinned
                 ? "!text-red-500 hover:!text-red-400"
                 : "!text-zinc-400 hover:!text-zinc-300"
