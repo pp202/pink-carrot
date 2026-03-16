@@ -1,11 +1,11 @@
 "use client";
 
 import axios from "axios";
-import Link from "next/link";
+import { Box, DropdownMenu, IconButton, Tooltip } from "@radix-ui/themes";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { GiChest } from "react-icons/gi";
-import { FiEdit2 } from "react-icons/fi";
-import { GiCarrot } from "react-icons/gi";
+import { FaBars, FaClone, FaEdit, FaMinus } from "react-icons/fa";
+import { GiCarrot, GiChest } from "react-icons/gi";
 
 type DashboardCarrot = {
   id: string;
@@ -17,6 +17,7 @@ type DashboardChest = {
   id: number;
   label: string;
   carrots: DashboardCarrot[];
+  pinned?: boolean;
 };
 
 export default function DashboardPinnedChests({
@@ -24,6 +25,7 @@ export default function DashboardPinnedChests({
 }: {
   initialPinnedChests: DashboardChest[];
 }) {
+  const router = useRouter();
   const [pinnedChests, setPinnedChests] = useState(initialPinnedChests);
   const [dragSourceIndex, setDragSourceIndex] = useState<number | null>(null);
   const [dragTargetIndex, setDragTargetIndex] = useState<number | null>(null);
@@ -74,6 +76,37 @@ export default function DashboardPinnedChests({
               },
         ),
       );
+    });
+  }
+
+  function handleArchive(chestId: number): void {
+    const archivedChest = pinnedChests.find((chest) => chest.id === chestId);
+    if (!archivedChest) {
+      return;
+    }
+
+    setPinnedChests((previous) => previous.filter((chest) => chest.id !== chestId));
+
+    axios.patch(`/api/lists/${chestId}`, { status: "ARCHIVED" }).catch(() => {
+      setPinnedChests((previous) => {
+        if (previous.some((chest) => chest.id === chestId)) {
+          return previous;
+        }
+
+        return [...previous, archivedChest];
+      });
+    });
+  }
+
+  function handleClone(chestId: number): void {
+    axios.patch(`/api/lists/${chestId}`, { action: "clone" }).then((response) => {
+      const clonedChest = response.data as DashboardChest;
+
+      if (!clonedChest.pinned) {
+        return;
+      }
+
+      setPinnedChests((previous) => [...previous, clonedChest]);
     });
   }
 
@@ -226,13 +259,61 @@ export default function DashboardPinnedChests({
                   </button>
                   <h2 className="truncate text-sm font-semibold text-zinc-100">{chest.label}</h2>
                 </div>
-                <Link
-                  href={`/my-lists/${chest.id}/edit?from=dashboard`}
-                  aria-label={`Edit ${chest.label}`}
-                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-zinc-600/60 text-zinc-300 transition hover:border-zinc-400 hover:text-zinc-100"
-                >
-                  <FiEdit2 className="text-sm" />
-                </Link>
+                <Box className="items-center">
+                  <DropdownMenu.Root>
+                    <Tooltip content="More actions">
+                      <DropdownMenu.Trigger>
+                        <IconButton
+                          size="1"
+                          variant="ghost"
+                          className="h-8 w-8 p-0 text-zinc-300"
+                          aria-label="More actions"
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          <FaBars />
+                        </IconButton>
+                      </DropdownMenu.Trigger>
+                    </Tooltip>
+                    <DropdownMenu.Content
+                      size="1"
+                      align="end"
+                      className="space-y-2"
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <DropdownMenu.Item
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          router.push(`/my-lists/${chest.id}/edit?from=dashboard`);
+                        }}
+                        className="!py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+                      >
+                        <FaEdit />
+                        Edit
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleClone(chest.id);
+                        }}
+                        className="!py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+                      >
+                        <FaClone />
+                        Clone
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item
+                        color="red"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleArchive(chest.id);
+                        }}
+                        className="!mt-2 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+                      >
+                        <FaMinus />
+                        Archive
+                      </DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Root>
+                </Box>
               </div>
               {chest.carrots.length === 0 ? (
                 <p className="mt-2 text-xs text-zinc-400">No carrots in this chest yet.</p>

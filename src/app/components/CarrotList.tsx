@@ -6,7 +6,7 @@ import { Box, DropdownMenu, Flex, IconButton, Tooltip } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import { FaBars, FaClone, FaMinus, FaThumbtack } from "react-icons/fa";
+import { FaBars, FaClone, FaEdit, FaMinus, FaThumbtack } from "react-icons/fa";
 import { GiChest } from "react-icons/gi";
 
 const SWIPE_DELETE_THRESHOLD = 90;
@@ -407,33 +407,13 @@ const CarrotListItem = ({
     setTimeout(() => setIsDragging(false), 0);
   }
 
-  function handleItemClick(event: React.MouseEvent<HTMLLIElement>): void {
-    const target = event.target as HTMLElement;
-    if (isDragging || target.closest("button, a, input, label")) {
-      return;
-    }
-
-    handleItemNavigation();
-  }
-
-  function handleItemKeyDown(event: React.KeyboardEvent<HTMLLIElement>): void {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      handleItemNavigation();
-    }
-  }
-
   return (
     <li
-      className="group relative cursor-pointer rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-3 pt-4 pb-2 transition-transform duration-150"
+      className="group relative rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-3 pt-4 pb-2 transition-transform duration-150"
       data-reorder-index={index}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      onClick={handleItemClick}
-      onKeyDown={handleItemKeyDown}
-      role="button"
-      tabIndex={0}
       style={{
         transform: `translateX(${isTouchReordering ? 0 : Math.max(-60, Math.min(60, touchDeltaX))}px)`,
         opacity: dragSourceIndex === index ? 0.45 : 1,
@@ -539,6 +519,16 @@ const CarrotListItem = ({
               className="space-y-2"
               onClick={(event) => event.stopPropagation()}
             >
+              <DropdownMenu.Item
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleItemNavigation();
+                }}
+                className="!py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+              >
+                <FaEdit />
+                Edit
+              </DropdownMenu.Item>
               <DropdownMenu.Item
                 onClick={(event) => {
                   event.stopPropagation();
