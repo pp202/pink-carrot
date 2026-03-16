@@ -498,8 +498,8 @@ const CarrotListItem = ({
             <FaGripLines />
           </IconButton>
         </Tooltip>
-        <Box className="flex min-h-8 grow self-stretch">
-          <span className="my-auto block w-full break-words text-sm font-medium leading-5 text-zinc-100">
+        <Box className="flex min-h-8 grow items-center self-stretch">
+          <span className="block w-full break-words text-sm font-medium leading-5 text-zinc-100">
             {item.label}
           </span>
         </Box>
