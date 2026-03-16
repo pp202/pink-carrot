@@ -474,7 +474,7 @@ const CarrotListItem = ({
             size="3"
             variant="ghost"
             aria-label="Drag chest"
-            className="-m-1 self-start cursor-grab p-2 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
+            className="-m-1 cursor-grab p-2 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
             draggable
             onDragStart={(event) => {
               setIsDragging(true);
@@ -499,7 +499,7 @@ const CarrotListItem = ({
           </IconButton>
         </Tooltip>
         <Box className="flex min-h-8 grow items-center">
-          <Text className="text-sm font-medium leading-tight text-zinc-100">{item.label}</Text>
+          <Text className="text-sm font-medium leading-normal text-zinc-100">{item.label}</Text>
         </Box>
         <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
           <IconButton
