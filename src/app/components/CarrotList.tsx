@@ -2,7 +2,7 @@
 
 import { Chest } from "@/app/generated/prisma/client";
 import Spinner from "@/app/components/Spinner";
-import { Box, DropdownMenu, Flex, IconButton, Text, Tooltip } from "@radix-ui/themes";
+import { Box, DropdownMenu, Flex, IconButton, Tooltip } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
@@ -498,8 +498,10 @@ const CarrotListItem = ({
             <FaGripLines />
           </IconButton>
         </Tooltip>
-        <Box className="flex min-h-8 grow items-center self-stretch">
-          <Text className="block w-full text-sm font-medium leading-5 text-zinc-100">{item.label}</Text>
+        <Box className="flex min-h-8 grow self-stretch">
+          <span className="my-auto block w-full break-words text-sm font-medium leading-5 text-zinc-100">
+            {item.label}
+          </span>
         </Box>
         <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
           <IconButton
