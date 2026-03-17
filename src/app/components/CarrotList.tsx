@@ -5,7 +5,7 @@ import Spinner from "@/app/components/Spinner";
 import { Box, DropdownMenu, Flex, IconButton, Tooltip } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FaBars, FaClone, FaEdit, FaMinus, FaThumbtack } from "react-icons/fa";
 import { GiChest } from "react-icons/gi";
 
@@ -281,6 +281,11 @@ const CarrotListItem = ({
   const [isDragging, setIsDragging] = useState(false);
   const [isTouchReordering, setIsTouchReordering] = useState(false);
   const bodyScrollWasLockedRef = useRef(false);
+  const isTouchReorderingRef = useRef(false);
+
+  useEffect(() => {
+    isTouchReorderingRef.current = isTouchReordering;
+  }, [isTouchReordering]);
 
   useEffect(() => () => {
     document.body.style.overflow = "";
@@ -386,17 +391,21 @@ const CarrotListItem = ({
     }
 
     event.preventDefault();
+    updateTouchReorderPreview(touch.clientX, touch.clientY);
+  }
+
+  const updateTouchReorderPreview = useCallback((clientX: number, clientY: number): void => {
     const touchTarget = document
-      .elementFromPoint(touch.clientX, touch.clientY)
+      .elementFromPoint(clientX, clientY)
       ?.closest("[data-reorder-index]");
 
     const targetIndex = Number(touchTarget?.getAttribute("data-reorder-index"));
     if (!Number.isNaN(targetIndex)) {
       onDragPreviewUpdate(targetIndex);
     }
-  }
+  }, [onDragPreviewUpdate]);
 
-  function finishTouchReorder(): void {
+  const finishTouchReorder = useCallback((): void => {
     if (dragSourceIndex !== null && dragTargetIndex !== null) {
       onReorder(dragSourceIndex, dragTargetIndex);
     }
@@ -405,7 +414,47 @@ const CarrotListItem = ({
     setPageScrollLock(false);
     onDragPreviewClear();
     setTimeout(() => setIsDragging(false), 0);
-  }
+  }, [dragSourceIndex, dragTargetIndex, onDragPreviewClear, onReorder]);
+
+  useEffect(() => {
+    if (!isTouchReordering) {
+      return;
+    }
+
+    const handleDocumentTouchMove = (event: TouchEvent): void => {
+      if (!isTouchReorderingRef.current) {
+        return;
+      }
+
+      const touch = event.touches[0];
+      if (!touch) {
+        return;
+      }
+
+      event.preventDefault();
+      updateTouchReorderPreview(touch.clientX, touch.clientY);
+    };
+
+    const handleDocumentTouchEnd = (): void => {
+      if (!isTouchReorderingRef.current) {
+        return;
+      }
+
+      finishTouchReorder();
+    };
+
+    document.addEventListener("touchmove", handleDocumentTouchMove, {
+      passive: false,
+    });
+    document.addEventListener("touchend", handleDocumentTouchEnd);
+    document.addEventListener("touchcancel", handleDocumentTouchEnd);
+
+    return () => {
+      document.removeEventListener("touchmove", handleDocumentTouchMove);
+      document.removeEventListener("touchend", handleDocumentTouchEnd);
+      document.removeEventListener("touchcancel", handleDocumentTouchEnd);
+    };
+  }, [isTouchReordering, finishTouchReorder, updateTouchReorderPreview]);
 
   return (
     <li
