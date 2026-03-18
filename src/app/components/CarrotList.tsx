@@ -500,11 +500,10 @@ const CarrotListItem = ({
         }`}
       >
         <Tooltip content="Drag to reorder">
-          <IconButton
-            size="2"
-            variant="ghost"
+          <button
+            type="button"
             aria-label="Drag chest"
-            className="h-5 w-5 shrink-0 cursor-grab p-0 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
+            className="-m-1 cursor-grab rounded p-1 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
             draggable
             onDragStart={(event) => {
               setIsDragging(true);
@@ -523,10 +522,9 @@ const CarrotListItem = ({
             onTouchEnd={finishTouchReorder}
             onTouchCancel={finishTouchReorder}
             onClick={(event) => event.stopPropagation()}
-            style={{ touchAction: "none" }}
           >
-            <GiChest />
-          </IconButton>
+            <GiChest aria-hidden />
+          </button>
         </Tooltip>
         <Box className="flex min-h-4 grow items-center self-stretch">
           <span className="block w-full break-words text-sm font-medium leading-4 text-zinc-100">
