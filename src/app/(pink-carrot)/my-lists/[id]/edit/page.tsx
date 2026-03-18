@@ -158,11 +158,11 @@ const EditListPage = () => {
                 </Button>
               </div>
               <div className="flex gap-3">
-                <Button disabled={isSubmitting}>Save List {isSubmitting && <Spinner />}</Button>
+                <Button color="green" disabled={isSubmitting}>Save List {isSubmitting && <Spinner />}</Button>
                 <Button
                   type="button"
                   variant="soft"
-                  color="gray"
+                  color="red"
                   disabled={isSubmitting}
                   onClick={() => router.push(returnPath)}
                 >

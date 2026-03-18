@@ -2,7 +2,7 @@
 
 import { Chest } from "@/app/generated/prisma/client";
 import Spinner from "@/app/components/Spinner";
-import { Button } from "@radix-ui/themes";
+import { AlertDialog, Button, Flex } from "@radix-ui/themes";
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import { FaRedoAlt, FaTrash } from "react-icons/fa";
@@ -11,6 +11,7 @@ const ArchiveList = () => {
   const [state, setState] = useState<Chest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedArchiveIds, setSelectedArchiveIds] = useState<number[]>([]);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const visibleSelectedArchiveIds = useMemo(
     () => selectedArchiveIds.filter((id) => state.some((item) => item.id === id)),
@@ -52,15 +53,11 @@ const ArchiveList = () => {
     if (visibleSelectedArchiveIds.length === 0) {
       return;
     }
+    setIsDeleteDialogOpen(true);
+  }
 
-    const isSingleSelectedChest = visibleSelectedArchiveIds.length === 1;
-    const hasConfirmedDelete = window.confirm(
-      isSingleSelectedChest
-        ? "Are you sure to delete the selected chest permanently?"
-        : "Are you sure to delete the selected chests permanently?",
-    );
-
-    if (!hasConfirmedDelete) {
+  function confirmDeleteSelected(): void {
+    if (visibleSelectedArchiveIds.length === 0) {
       return;
     }
 
@@ -71,11 +68,13 @@ const ArchiveList = () => {
           previous.filter((item) => !idsToDelete.includes(item.id)),
         );
         setSelectedArchiveIds([]);
+        setIsDeleteDialogOpen(false);
       },
     );
   }
 
   const isArchiveActionDisabled = visibleSelectedArchiveIds.length === 0;
+  const isSingleSelectedChest = visibleSelectedArchiveIds.length === 1;
 
   if (isLoading) {
     return (
@@ -115,23 +114,52 @@ const ArchiveList = () => {
         <Button
           size="2"
           variant="soft"
-          className={isArchiveActionDisabled ? "" : "!text-zinc-100"}
+          color="green"
           disabled={isArchiveActionDisabled}
           onClick={handleRestoreSelected}
         >
           <FaRedoAlt />
           Restore
         </Button>
-        <Button
-          size="2"
-          variant="soft"
-          color="red"
-          disabled={isArchiveActionDisabled}
-          onClick={handleDeleteSelected}
+        <AlertDialog.Root
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
         >
-          <FaTrash />
-          Delete
-        </Button>
+          <AlertDialog.Trigger>
+            <Button
+              size="2"
+              variant="soft"
+              color="red"
+              disabled={isArchiveActionDisabled}
+              onClick={handleDeleteSelected}
+            >
+              <FaTrash />
+              Delete
+            </Button>
+          </AlertDialog.Trigger>
+          <AlertDialog.Content maxWidth="28rem">
+            <AlertDialog.Title>
+              Delete archived list{isSingleSelectedChest ? "" : "s"}?
+            </AlertDialog.Title>
+            <AlertDialog.Description size="2">
+              {isSingleSelectedChest
+                ? "This permanently deletes the selected archived list."
+                : "This permanently deletes the selected archived lists."}
+            </AlertDialog.Description>
+            <Flex gap="3" mt="4" justify="end">
+              <AlertDialog.Cancel>
+                <Button variant="soft" color="red">
+                  Cancel
+                </Button>
+              </AlertDialog.Cancel>
+              <AlertDialog.Action>
+                <Button variant="solid" color="green" onClick={confirmDeleteSelected}>
+                  Confirm delete
+                </Button>
+              </AlertDialog.Action>
+            </Flex>
+          </AlertDialog.Content>
+        </AlertDialog.Root>
       </div>
     </div>
   );
