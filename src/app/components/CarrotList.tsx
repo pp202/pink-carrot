@@ -483,7 +483,6 @@ const CarrotListItem = ({
           onReorder(sourceIndex, index);
         }
 
-        setPageScrollLock(false);
         onDragPreviewClear();
       }}
     >
@@ -508,12 +507,10 @@ const CarrotListItem = ({
             onDragStart={(event) => {
               setIsDragging(true);
               onDragPreviewStart(index);
-              setPageScrollLock(true);
               event.dataTransfer.setData("text/plain", String(index));
               event.dataTransfer.effectAllowed = "move";
             }}
             onDragEnd={() => {
-              setPageScrollLock(false);
               onDragPreviewClear();
               setTimeout(() => setIsDragging(false), 0);
             }}
