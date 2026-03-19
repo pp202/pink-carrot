@@ -68,7 +68,7 @@ const EditListPage = () => {
         })
       })
       .catch(() => {
-        setError('Unable to load the list')
+        setError('Unable to load the chest')
       })
       .finally(() => {
         setIsLoading(false)
@@ -80,9 +80,9 @@ const EditListPage = () => {
       <div className="container mx-auto flex min-h-[calc(100vh-5rem)] items-center justify-center px-6 py-12">
         <div className="w-full max-w-md rounded-2xl border border-zinc-600/30 bg-zinc-800 px-8 py-10 shadow-2xl shadow-black/40 md:px-10 md:py-12">
           <header className="mb-8 text-center">
-            <h1 className="text-2xl font-semibold text-zinc-100">Edit list</h1>
+            <h1 className="text-2xl font-semibold text-zinc-100">Edit chest</h1>
             <p className="mt-2 text-sm text-zinc-300">
-              Update your list title and carrots.
+              Update your chest title and carrots.
             </p>
           </header>
 
@@ -95,7 +95,7 @@ const EditListPage = () => {
           {isLoading ? (
             <div className="flex items-center justify-center gap-2 text-sm text-zinc-300">
               <Spinner />
-              <span>Loading list...</span>
+              <span>Loading chest...</span>
             </div>
           ) : (
             <form
@@ -158,7 +158,7 @@ const EditListPage = () => {
                 </Button>
               </div>
               <div className="flex gap-3">
-                <Button color="green" disabled={isSubmitting}>Save List {isSubmitting && <Spinner />}</Button>
+                <Button color="green" disabled={isSubmitting}>Save Chest {isSubmitting && <Spinner />}</Button>
                 <Button
                   type="button"
                   variant="soft"
