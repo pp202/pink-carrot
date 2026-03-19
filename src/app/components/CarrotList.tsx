@@ -494,7 +494,7 @@ const CarrotListItem = ({
         />
       ) : null}
       <Flex
-        className={`min-h-5 items-center gap-1.5 pr-10 ${
+        className={`min-h-5 items-center gap-1.5 ${
           dragTargetIndex === index ? "rounded-lg bg-zinc-800/70" : ""
         }`}
       >
@@ -528,28 +528,28 @@ const CarrotListItem = ({
             {item.label}
           </span>
         </Box>
-        <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
-          <IconButton
-            size="1"
-            variant="ghost"
-            className={`h-5 w-5 shrink-0 p-0 ${
-              item.pinned
-                ? "!text-red-500 hover:!text-red-400"
-                : "!text-zinc-400 hover:!text-zinc-300"
-            }`}
-            onClick={() => onPinnedToggle(item.id, !item.pinned)}
-          >
-            <FaThumbtack />
-          </IconButton>
-        </Tooltip>
-        <Box className="absolute right-2 top-1/2 hidden -translate-y-1/2 items-center md:inline-flex md:invisible md:pointer-events-none md:opacity-0 md:transition-opacity md:group-hover:pointer-events-auto md:group-hover:visible md:group-hover:opacity-100 md:group-focus-within:pointer-events-auto md:group-focus-within:visible md:group-focus-within:opacity-100">
+        <Flex className="ml-2 shrink-0 items-center gap-2">
+          <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
+            <IconButton
+              size="1"
+              variant="ghost"
+              className={`h-5 w-5 shrink-0 p-0 ${
+                item.pinned
+                  ? "!text-red-500 hover:!text-red-400"
+                  : "!text-zinc-400 hover:!text-zinc-300"
+              }`}
+              onClick={() => onPinnedToggle(item.id, !item.pinned)}
+            >
+              <FaThumbtack />
+            </IconButton>
+          </Tooltip>
           <DropdownMenu.Root>
             <Tooltip content="More actions">
               <DropdownMenu.Trigger>
                 <IconButton
                   size="1"
                   variant="ghost"
-                  className="h-8 w-8 p-0 text-zinc-300"
+                  className="h-5 w-5 shrink-0 p-0 text-zinc-300 hover:text-zinc-100"
                   aria-label="More actions"
                   onClick={(event) => event.stopPropagation()}
                 >
@@ -596,7 +596,7 @@ const CarrotListItem = ({
               </DropdownMenu.Item>
             </DropdownMenu.Content>
           </DropdownMenu.Root>
-        </Box>
+        </Flex>
       </Flex>
     </li>
   );
