@@ -549,7 +549,7 @@ const CarrotListItem = ({
                 <IconButton
                   size="1"
                   variant="ghost"
-                  className="h-5 w-5 shrink-0 p-0 text-zinc-300 hover:text-zinc-100"
+                  className="ml-1 h-5 w-5 shrink-0 p-0 pl-1 text-zinc-300 hover:text-zinc-100"
                   aria-label="More actions"
                   onClick={(event) => event.stopPropagation()}
                 >
