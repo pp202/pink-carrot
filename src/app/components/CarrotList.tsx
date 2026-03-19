@@ -528,7 +528,7 @@ const CarrotListItem = ({
             {item.label}
           </span>
         </Box>
-        <Flex className="ml-2 shrink-0 items-center gap-2">
+        <Flex className="ml-2 shrink-0 items-center gap-4">
           <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
             <IconButton
               size="1"
@@ -549,7 +549,7 @@ const CarrotListItem = ({
                 <IconButton
                   size="1"
                   variant="ghost"
-                  className="ml-1 h-5 w-5 shrink-0 p-0 pl-1 text-zinc-300 hover:text-zinc-100"
+                  className="h-5 w-5 shrink-0 p-0 pl-1 text-zinc-300 hover:text-zinc-100"
                   aria-label="More actions"
                   onClick={(event) => event.stopPropagation()}
                 >
@@ -578,7 +578,7 @@ const CarrotListItem = ({
                   event.stopPropagation();
                   onClone(item.id);
                 }}
-                className="!mt-2 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+                className="mt-3 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
               >
                 <FaClone />
                 Clone
@@ -589,7 +589,7 @@ const CarrotListItem = ({
                   event.stopPropagation();
                   onRemove(item.id);
                 }}
-                className="!mt-2 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+                className="mt-3 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
               >
                 <FaMinus />
                 Archive
