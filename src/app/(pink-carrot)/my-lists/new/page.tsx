@@ -39,9 +39,9 @@ const NewListForm = () => {
             <div className="container mx-auto flex min-h-[calc(100vh-5rem)] items-center justify-center px-6 py-12">
                 <div className="w-full max-w-md rounded-2xl border border-zinc-600/30 bg-zinc-800 px-8 py-10 shadow-2xl shadow-black/40 md:px-10 md:py-12">
                     <header className="mb-8 text-center">
-                        <h1 className="text-2xl font-semibold text-zinc-100">Create chest</h1>
+                        <h1 className="text-2xl font-semibold text-zinc-100">New Chest</h1>
                         <p className="mt-2 text-sm text-zinc-300">
-                            Save a new chest so you can keep track of your carrots.
+                            Add some carrots!
                         </p>
                     </header>
 
@@ -103,8 +103,8 @@ const NewListForm = () => {
                                 </span>
                             </Button>
                         </div>
-                        <div className='flex gap-3'>
-                            <Button color='green' disabled={isSubmitting}>Create Chest {isSubmitting && <Spinner />}</Button>
+                        <div className='flex justify-center gap-3'>
+                            <Button color='green' disabled={isSubmitting}>Create {isSubmitting && <Spinner />}</Button>
                             <Button
                                 type='button'
                                 variant='soft'
