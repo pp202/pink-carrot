@@ -34,3 +34,31 @@ export async function getUser(username: string) {
     },
   });
 }
+
+export async function deleteUserAccount() {
+  const user = await loggedUser();
+
+  const deletedAccount = await prisma.$transaction(async (tx) => {
+    await tx.carrot.deleteMany({
+      where: {
+        chest: {
+          userId: user.id,
+        },
+      },
+    });
+
+    await tx.chest.deleteMany({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    return tx.user.deleteMany({
+      where: {
+        id: user.id,
+      },
+    });
+  });
+
+  return deletedAccount.count > 0;
+}
