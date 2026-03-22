@@ -154,13 +154,13 @@ const NavBar = () => {
                                 <IoClose size={20} />
                             </button>
                         </div>
-                        <div className='flex flex-1 flex-col px-6 py-5'>
+                        <div className='flex flex-1 flex-col justify-center px-6 py-5'>
                             {deleteAccountError && (
                                 <div className='rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-100'>
                                     {deleteAccountError}
                                 </div>
                             )}
-                            <div className='mt-auto flex justify-end pt-4'>
+                            <div className='flex justify-end'>
                                 <button
                                     type='button'
                                     className='inline-flex items-center gap-2 rounded-lg border border-red-500/60 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-100 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50'
@@ -168,7 +168,7 @@ const NavBar = () => {
                                     disabled={isDeletingAccount}
                                 >
                                     <IoTrashOutline size={18} />
-                                    <span>{isDeletingAccount ? 'Deleting account…' : 'Delete user account'}</span>
+                                    <span>{isDeletingAccount ? 'Deleting account…' : 'Delete account'}</span>
                                 </button>
                             </div>
                         </div>
