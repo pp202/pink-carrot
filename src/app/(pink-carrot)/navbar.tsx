@@ -120,19 +120,19 @@ const NavBar = () => {
                                 type='button'
                                 role='menuitem'
                                 className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-zinc-200 transition hover:bg-zinc-800 hover:text-zinc-50'
-                                onClick={openSettings}
+                                onClick={() => signOut({ callbackUrl: '/login' })}
                             >
-                                <IoSettingsSharp size={18} />
-                                <span>Settings</span>
+                                <IoLogOut size={18} />
+                                <span>Sign out</span>
                             </button>
                             <button
                                 type='button'
                                 role='menuitem'
                                 className='mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-zinc-200 transition hover:bg-zinc-800 hover:text-zinc-50'
-                                onClick={() => signOut({ callbackUrl: '/login' })}
+                                onClick={openSettings}
                             >
-                                <IoLogOut size={18} />
-                                <span>Sign out</span>
+                                <IoSettingsSharp size={18} />
+                                <span>Settings</span>
                             </button>
                         </div>
                     )}
@@ -154,13 +154,15 @@ const NavBar = () => {
                                 <IoClose size={20} />
                             </button>
                         </div>
-                        <div className='flex flex-1 flex-col justify-center px-6 py-5'>
-                            {deleteAccountError && (
-                                <div className='rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-100'>
-                                    {deleteAccountError}
-                                </div>
-                            )}
-                            <div className='flex justify-end'>
+                        <div className='flex flex-1 flex-col px-6 py-5'>
+                            <div className='flex flex-1 flex-col justify-center'>
+                                {deleteAccountError && (
+                                    <div className='rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-100'>
+                                        {deleteAccountError}
+                                    </div>
+                                )}
+                            </div>
+                            <div className='flex justify-center pb-2'>
                                 <button
                                     type='button'
                                     className='inline-flex items-center gap-2 rounded-lg border border-red-500/60 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-100 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50'
