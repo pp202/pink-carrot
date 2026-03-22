@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import classNames from 'classnames'
 import { usePathname } from 'next/navigation'
 import { GiCarrot } from 'react-icons/gi'
-import { IoAlertCircleOutline, IoClose, IoLogOut, IoPersonCircle, IoSettingsSharp, IoTrashOutline } from 'react-icons/io5'
+import { IoClose, IoLogOut, IoPersonCircle, IoSettingsSharp, IoTrashOutline } from 'react-icons/io5'
 import { signOut } from 'next-auth/react'
 
 const DELETE_WARNING = 'Delete your account? This permanently removes all your chests, carrots, and sign-in access details. This action cannot be undone.'
@@ -141,14 +141,9 @@ const NavBar = () => {
 
             {isSettingsOpen && (
                 <div className='fixed inset-0 z-40 flex items-center justify-center bg-black/70 px-4'>
-                    <div className='flex w-full max-w-lg flex-col rounded-2xl border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/60'>
+                    <div className='flex h-[min(80vh,32rem)] w-full max-w-lg flex-col rounded-2xl border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/60'>
                         <div className='flex items-center justify-between border-b border-zinc-800 px-6 py-4'>
-                            <div>
-                                <h2 className='text-lg font-semibold text-zinc-50'>User settings</h2>
-                                <p className='mt-1 text-sm text-zinc-400'>
-                                    Manage your account actions and permanent deletion controls.
-                                </p>
-                            </div>
+                            <h2 className='text-lg font-semibold text-zinc-50'>User settings</h2>
                             <button
                                 type='button'
                                 aria-label='Close settings window'
@@ -159,49 +154,23 @@ const NavBar = () => {
                                 <IoClose size={20} />
                             </button>
                         </div>
-                        <div className='space-y-4 px-6 py-5 text-sm text-zinc-300'>
-                            <div className='rounded-xl border border-zinc-800 bg-zinc-950/70 p-4'>
-                                <p className='font-medium text-zinc-100'>Delete account</p>
-                                <p className='mt-2 text-zinc-400'>
-                                    Permanently remove your account and every saved chest and carrot.
-                                </p>
-                            </div>
-                            <div className='rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-100'>
-                                <div className='flex items-start gap-3'>
-                                    <IoAlertCircleOutline className='mt-0.5 shrink-0 text-red-300' size={20} />
-                                    <div>
-                                        <p className='font-medium'>Warning</p>
-                                        <p className='mt-1 text-sm text-red-100/90'>
-                                            This action is irreversible. Confirming account deletion will remove all user information,
-                                            including authentication details, chests, and carrots.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                        <div className='flex flex-1 flex-col px-6 py-5'>
                             {deleteAccountError && (
                                 <div className='rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-100'>
                                     {deleteAccountError}
                                 </div>
                             )}
-                        </div>
-                        <div className='mt-auto flex justify-between gap-3 border-t border-zinc-800 px-6 py-4'>
-                            <button
-                                type='button'
-                                className='rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-800 hover:text-zinc-50 disabled:cursor-not-allowed disabled:opacity-50'
-                                onClick={closeSettings}
-                                disabled={isDeletingAccount}
-                            >
-                                Close
-                            </button>
-                            <button
-                                type='button'
-                                className='inline-flex items-center gap-2 rounded-lg border border-red-500/60 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-100 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50'
-                                onClick={deleteAccount}
-                                disabled={isDeletingAccount}
-                            >
-                                <IoTrashOutline size={18} />
-                                <span>{isDeletingAccount ? 'Deleting account…' : 'Delete account'}</span>
-                            </button>
+                            <div className='mt-auto flex justify-end pt-4'>
+                                <button
+                                    type='button'
+                                    className='inline-flex items-center gap-2 rounded-lg border border-red-500/60 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-100 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50'
+                                    onClick={deleteAccount}
+                                    disabled={isDeletingAccount}
+                                >
+                                    <IoTrashOutline size={18} />
+                                    <span>{isDeletingAccount ? 'Deleting account…' : 'Delete user account'}</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
