@@ -1,6 +1,5 @@
 "use client";
 
-import { Chest } from "@/app/generated/prisma/client";
 import Spinner from "@/app/components/Spinner";
 import { Box, DropdownMenu, Flex, IconButton, Tooltip } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
@@ -11,12 +10,23 @@ import { GiChest } from "react-icons/gi";
 
 const SWIPE_DELETE_THRESHOLD = 90;
 const UNDO_VISIBLE_MS = 5000;
+type ListChest = {
+  id: number;
+  chestId: number;
+  label: string;
+  createdAt: string;
+  status: "NEW" | "ARCHIVED";
+  pinned: boolean;
+  listRank: string;
+  dashRank: string;
+};
+
 type RecentlyArchived = {
-  chest: Chest;
+  chest: ListChest;
 };
 
 const CarrotList = () => {
-  const [state, setState] = useState<Chest[]>([]);
+  const [state, setState] = useState<ListChest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [recentlyArchived, setRecentlyArchived] =
     useState<RecentlyArchived | null>(null);
@@ -39,7 +49,7 @@ const CarrotList = () => {
     };
   }, []);
 
-  function queueUndoBanner(chest: Chest): void {
+  function queueUndoBanner(chest: ListChest): void {
     if (undoTimerRef.current) {
       clearTimeout(undoTimerRef.current);
     }
@@ -75,7 +85,7 @@ const CarrotList = () => {
           return previous;
         }
 
-        const restored: Chest = { ...chest, status: "NEW" as Chest["status"] };
+        const restored: ListChest = { ...chest, status: "NEW" };
 
         return [...previous, restored];
       });
@@ -105,7 +115,7 @@ const CarrotList = () => {
 
   function handleClone(id: number): void {
     axios.patch(`/api/lists/${id}`, { action: "clone" }).then((response) => {
-      setState((previous) => [...previous, response.data as Chest]);
+      setState((previous) => [...previous, response.data as ListChest]);
     });
   }
 
@@ -198,7 +208,7 @@ const Carrots = ({
   onDragPreviewUpdate,
   onDragPreviewClear,
 }: {
-  carrotList: Chest[];
+  carrotList: ListChest[];
   isLoading: boolean;
   onRemove: (id: number) => void;
   onPinnedToggle: (id: number, pinned: boolean) => void;
@@ -258,7 +268,7 @@ const CarrotListItem = ({
   onDragPreviewUpdate,
   onDragPreviewClear,
 }: {
-  item: Chest;
+  item: ListChest;
   onRemove: (id: number) => void;
   onPinnedToggle: (id: number, pinned: boolean) => void;
   onClone: (id: number) => void;

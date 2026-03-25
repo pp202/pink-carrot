@@ -42,14 +42,26 @@ export async function deleteUserAccount() {
     await tx.carrot.deleteMany({
       where: {
         chest: {
-          userId: user.id,
+          chestPads: {
+            some: {
+              userId: user.id,
+            },
+          },
         },
+      },
+    });
+
+    await tx.chestPad.deleteMany({
+      where: {
+        userId: user.id,
       },
     });
 
     await tx.chest.deleteMany({
       where: {
-        userId: user.id,
+        chestPads: {
+          none: {},
+        },
       },
     });
 

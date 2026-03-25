@@ -28,90 +28,56 @@ export type AggregateChest = {
 
 export type ChestAvgAggregateOutputType = {
   id: number | null
-  userId: number | null
 }
 
 export type ChestSumAggregateOutputType = {
   id: number | null
-  userId: number | null
 }
 
 export type ChestMinAggregateOutputType = {
   id: number | null
   label: string | null
-  status: $Enums.Status | null
   createdAt: Date | null
-  pinned: boolean | null
-  listRank: string | null
-  dashRank: string | null
-  userId: number | null
 }
 
 export type ChestMaxAggregateOutputType = {
   id: number | null
   label: string | null
-  status: $Enums.Status | null
   createdAt: Date | null
-  pinned: boolean | null
-  listRank: string | null
-  dashRank: string | null
-  userId: number | null
 }
 
 export type ChestCountAggregateOutputType = {
   id: number
   label: number
-  status: number
   createdAt: number
-  pinned: number
-  listRank: number
-  dashRank: number
-  userId: number
   _all: number
 }
 
 
 export type ChestAvgAggregateInputType = {
   id?: true
-  userId?: true
 }
 
 export type ChestSumAggregateInputType = {
   id?: true
-  userId?: true
 }
 
 export type ChestMinAggregateInputType = {
   id?: true
   label?: true
-  status?: true
   createdAt?: true
-  pinned?: true
-  listRank?: true
-  dashRank?: true
-  userId?: true
 }
 
 export type ChestMaxAggregateInputType = {
   id?: true
   label?: true
-  status?: true
   createdAt?: true
-  pinned?: true
-  listRank?: true
-  dashRank?: true
-  userId?: true
 }
 
 export type ChestCountAggregateInputType = {
   id?: true
   label?: true
-  status?: true
   createdAt?: true
-  pinned?: true
-  listRank?: true
-  dashRank?: true
-  userId?: true
   _all?: true
 }
 
@@ -204,12 +170,7 @@ export type ChestGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type ChestGroupByOutputType = {
   id: number
   label: string
-  status: $Enums.Status
   createdAt: Date
-  pinned: boolean
-  listRank: string
-  dashRank: string
-  userId: number
   _count: ChestCountAggregateOutputType | null
   _avg: ChestAvgAggregateOutputType | null
   _sum: ChestSumAggregateOutputType | null
@@ -238,27 +199,17 @@ export type ChestWhereInput = {
   NOT?: Prisma.ChestWhereInput | Prisma.ChestWhereInput[]
   id?: Prisma.IntFilter<"Chest"> | number
   label?: Prisma.StringFilter<"Chest"> | string
-  status?: Prisma.EnumStatusFilter<"Chest"> | $Enums.Status
   createdAt?: Prisma.DateTimeFilter<"Chest"> | Date | string
-  pinned?: Prisma.BoolFilter<"Chest"> | boolean
-  listRank?: Prisma.StringFilter<"Chest"> | string
-  dashRank?: Prisma.StringFilter<"Chest"> | string
-  userId?: Prisma.IntFilter<"Chest"> | number
   carrots?: Prisma.CarrotListRelationFilter
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  chestPads?: Prisma.ChestPadListRelationFilter
 }
 
 export type ChestOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
-  status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  pinned?: Prisma.SortOrder
-  listRank?: Prisma.SortOrder
-  dashRank?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
   carrots?: Prisma.CarrotOrderByRelationAggregateInput
-  user?: Prisma.UserOrderByWithRelationInput
+  chestPads?: Prisma.ChestPadOrderByRelationAggregateInput
 }
 
 export type ChestWhereUniqueInput = Prisma.AtLeast<{
@@ -267,25 +218,15 @@ export type ChestWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ChestWhereInput[]
   NOT?: Prisma.ChestWhereInput | Prisma.ChestWhereInput[]
   label?: Prisma.StringFilter<"Chest"> | string
-  status?: Prisma.EnumStatusFilter<"Chest"> | $Enums.Status
   createdAt?: Prisma.DateTimeFilter<"Chest"> | Date | string
-  pinned?: Prisma.BoolFilter<"Chest"> | boolean
-  listRank?: Prisma.StringFilter<"Chest"> | string
-  dashRank?: Prisma.StringFilter<"Chest"> | string
-  userId?: Prisma.IntFilter<"Chest"> | number
   carrots?: Prisma.CarrotListRelationFilter
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  chestPads?: Prisma.ChestPadListRelationFilter
 }, "id">
 
 export type ChestOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
-  status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  pinned?: Prisma.SortOrder
-  listRank?: Prisma.SortOrder
-  dashRank?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
   _count?: Prisma.ChestCountOrderByAggregateInput
   _avg?: Prisma.ChestAvgOrderByAggregateInput
   _max?: Prisma.ChestMaxOrderByAggregateInput
@@ -299,142 +240,80 @@ export type ChestScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ChestScalarWhereWithAggregatesInput | Prisma.ChestScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Chest"> | number
   label?: Prisma.StringWithAggregatesFilter<"Chest"> | string
-  status?: Prisma.EnumStatusWithAggregatesFilter<"Chest"> | $Enums.Status
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Chest"> | Date | string
-  pinned?: Prisma.BoolWithAggregatesFilter<"Chest"> | boolean
-  listRank?: Prisma.StringWithAggregatesFilter<"Chest"> | string
-  dashRank?: Prisma.StringWithAggregatesFilter<"Chest"> | string
-  userId?: Prisma.IntWithAggregatesFilter<"Chest"> | number
 }
 
 export type ChestCreateInput = {
   label: string
-  status?: $Enums.Status
   createdAt?: Date | string
-  pinned?: boolean
-  listRank: string
-  dashRank: string
   carrots?: Prisma.CarrotCreateNestedManyWithoutChestInput
-  user: Prisma.UserCreateNestedOneWithoutChestsInput
+  chestPads?: Prisma.ChestPadCreateNestedManyWithoutChestInput
 }
 
 export type ChestUncheckedCreateInput = {
   id?: number
   label: string
-  status?: $Enums.Status
   createdAt?: Date | string
-  pinned?: boolean
-  listRank: string
-  dashRank: string
-  userId: number
   carrots?: Prisma.CarrotUncheckedCreateNestedManyWithoutChestInput
+  chestPads?: Prisma.ChestPadUncheckedCreateNestedManyWithoutChestInput
 }
 
 export type ChestUpdateInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  listRank?: Prisma.StringFieldUpdateOperationsInput | string
-  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   carrots?: Prisma.CarrotUpdateManyWithoutChestNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutChestsNestedInput
+  chestPads?: Prisma.ChestPadUpdateManyWithoutChestNestedInput
 }
 
 export type ChestUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  listRank?: Prisma.StringFieldUpdateOperationsInput | string
-  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.IntFieldUpdateOperationsInput | number
   carrots?: Prisma.CarrotUncheckedUpdateManyWithoutChestNestedInput
+  chestPads?: Prisma.ChestPadUncheckedUpdateManyWithoutChestNestedInput
 }
 
 export type ChestCreateManyInput = {
   id?: number
   label: string
-  status?: $Enums.Status
   createdAt?: Date | string
-  pinned?: boolean
-  listRank: string
-  dashRank: string
-  userId: number
 }
 
 export type ChestUpdateManyMutationInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  listRank?: Prisma.StringFieldUpdateOperationsInput | string
-  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ChestUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  listRank?: Prisma.StringFieldUpdateOperationsInput | string
-  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.IntFieldUpdateOperationsInput | number
-}
-
-export type ChestListRelationFilter = {
-  every?: Prisma.ChestWhereInput
-  some?: Prisma.ChestWhereInput
-  none?: Prisma.ChestWhereInput
-}
-
-export type ChestOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
 }
 
 export type ChestCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
-  status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  pinned?: Prisma.SortOrder
-  listRank?: Prisma.SortOrder
-  dashRank?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
 }
 
 export type ChestAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
 }
 
 export type ChestMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
-  status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  pinned?: Prisma.SortOrder
-  listRank?: Prisma.SortOrder
-  dashRank?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
 }
 
 export type ChestMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
-  status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  pinned?: Prisma.SortOrder
-  listRank?: Prisma.SortOrder
-  dashRank?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
 }
 
 export type ChestSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
 }
 
 export type ChestScalarRelationFilter = {
@@ -442,58 +321,22 @@ export type ChestScalarRelationFilter = {
   isNot?: Prisma.ChestWhereInput
 }
 
-export type ChestCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.ChestCreateWithoutUserInput, Prisma.ChestUncheckedCreateWithoutUserInput> | Prisma.ChestCreateWithoutUserInput[] | Prisma.ChestUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.ChestCreateOrConnectWithoutUserInput | Prisma.ChestCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.ChestCreateManyUserInputEnvelope
-  connect?: Prisma.ChestWhereUniqueInput | Prisma.ChestWhereUniqueInput[]
-}
-
-export type ChestUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.ChestCreateWithoutUserInput, Prisma.ChestUncheckedCreateWithoutUserInput> | Prisma.ChestCreateWithoutUserInput[] | Prisma.ChestUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.ChestCreateOrConnectWithoutUserInput | Prisma.ChestCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.ChestCreateManyUserInputEnvelope
-  connect?: Prisma.ChestWhereUniqueInput | Prisma.ChestWhereUniqueInput[]
-}
-
-export type ChestUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.ChestCreateWithoutUserInput, Prisma.ChestUncheckedCreateWithoutUserInput> | Prisma.ChestCreateWithoutUserInput[] | Prisma.ChestUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.ChestCreateOrConnectWithoutUserInput | Prisma.ChestCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.ChestUpsertWithWhereUniqueWithoutUserInput | Prisma.ChestUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.ChestCreateManyUserInputEnvelope
-  set?: Prisma.ChestWhereUniqueInput | Prisma.ChestWhereUniqueInput[]
-  disconnect?: Prisma.ChestWhereUniqueInput | Prisma.ChestWhereUniqueInput[]
-  delete?: Prisma.ChestWhereUniqueInput | Prisma.ChestWhereUniqueInput[]
-  connect?: Prisma.ChestWhereUniqueInput | Prisma.ChestWhereUniqueInput[]
-  update?: Prisma.ChestUpdateWithWhereUniqueWithoutUserInput | Prisma.ChestUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.ChestUpdateManyWithWhereWithoutUserInput | Prisma.ChestUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.ChestScalarWhereInput | Prisma.ChestScalarWhereInput[]
-}
-
-export type ChestUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.ChestCreateWithoutUserInput, Prisma.ChestUncheckedCreateWithoutUserInput> | Prisma.ChestCreateWithoutUserInput[] | Prisma.ChestUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.ChestCreateOrConnectWithoutUserInput | Prisma.ChestCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.ChestUpsertWithWhereUniqueWithoutUserInput | Prisma.ChestUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.ChestCreateManyUserInputEnvelope
-  set?: Prisma.ChestWhereUniqueInput | Prisma.ChestWhereUniqueInput[]
-  disconnect?: Prisma.ChestWhereUniqueInput | Prisma.ChestWhereUniqueInput[]
-  delete?: Prisma.ChestWhereUniqueInput | Prisma.ChestWhereUniqueInput[]
-  connect?: Prisma.ChestWhereUniqueInput | Prisma.ChestWhereUniqueInput[]
-  update?: Prisma.ChestUpdateWithWhereUniqueWithoutUserInput | Prisma.ChestUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.ChestUpdateManyWithWhereWithoutUserInput | Prisma.ChestUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.ChestScalarWhereInput | Prisma.ChestScalarWhereInput[]
-}
-
-export type EnumStatusFieldUpdateOperationsInput = {
-  set?: $Enums.Status
-}
-
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
+export type ChestCreateNestedOneWithoutChestPadsInput = {
+  create?: Prisma.XOR<Prisma.ChestCreateWithoutChestPadsInput, Prisma.ChestUncheckedCreateWithoutChestPadsInput>
+  connectOrCreate?: Prisma.ChestCreateOrConnectWithoutChestPadsInput
+  connect?: Prisma.ChestWhereUniqueInput
+}
+
+export type ChestUpdateOneRequiredWithoutChestPadsNestedInput = {
+  create?: Prisma.XOR<Prisma.ChestCreateWithoutChestPadsInput, Prisma.ChestUncheckedCreateWithoutChestPadsInput>
+  connectOrCreate?: Prisma.ChestCreateOrConnectWithoutChestPadsInput
+  upsert?: Prisma.ChestUpsertWithoutChestPadsInput
+  connect?: Prisma.ChestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ChestUpdateToOneWithWhereWithoutChestPadsInput, Prisma.ChestUpdateWithoutChestPadsInput>, Prisma.ChestUncheckedUpdateWithoutChestPadsInput>
 }
 
 export type ChestCreateNestedOneWithoutCarrotsInput = {
@@ -510,86 +353,59 @@ export type ChestUpdateOneRequiredWithoutCarrotsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ChestUpdateToOneWithWhereWithoutCarrotsInput, Prisma.ChestUpdateWithoutCarrotsInput>, Prisma.ChestUncheckedUpdateWithoutCarrotsInput>
 }
 
-export type ChestCreateWithoutUserInput = {
+export type ChestCreateWithoutChestPadsInput = {
   label: string
-  status?: $Enums.Status
   createdAt?: Date | string
-  pinned?: boolean
-  listRank: string
-  dashRank: string
   carrots?: Prisma.CarrotCreateNestedManyWithoutChestInput
 }
 
-export type ChestUncheckedCreateWithoutUserInput = {
+export type ChestUncheckedCreateWithoutChestPadsInput = {
   id?: number
   label: string
-  status?: $Enums.Status
   createdAt?: Date | string
-  pinned?: boolean
-  listRank: string
-  dashRank: string
   carrots?: Prisma.CarrotUncheckedCreateNestedManyWithoutChestInput
 }
 
-export type ChestCreateOrConnectWithoutUserInput = {
+export type ChestCreateOrConnectWithoutChestPadsInput = {
   where: Prisma.ChestWhereUniqueInput
-  create: Prisma.XOR<Prisma.ChestCreateWithoutUserInput, Prisma.ChestUncheckedCreateWithoutUserInput>
+  create: Prisma.XOR<Prisma.ChestCreateWithoutChestPadsInput, Prisma.ChestUncheckedCreateWithoutChestPadsInput>
 }
 
-export type ChestCreateManyUserInputEnvelope = {
-  data: Prisma.ChestCreateManyUserInput | Prisma.ChestCreateManyUserInput[]
-  skipDuplicates?: boolean
+export type ChestUpsertWithoutChestPadsInput = {
+  update: Prisma.XOR<Prisma.ChestUpdateWithoutChestPadsInput, Prisma.ChestUncheckedUpdateWithoutChestPadsInput>
+  create: Prisma.XOR<Prisma.ChestCreateWithoutChestPadsInput, Prisma.ChestUncheckedCreateWithoutChestPadsInput>
+  where?: Prisma.ChestWhereInput
 }
 
-export type ChestUpsertWithWhereUniqueWithoutUserInput = {
-  where: Prisma.ChestWhereUniqueInput
-  update: Prisma.XOR<Prisma.ChestUpdateWithoutUserInput, Prisma.ChestUncheckedUpdateWithoutUserInput>
-  create: Prisma.XOR<Prisma.ChestCreateWithoutUserInput, Prisma.ChestUncheckedCreateWithoutUserInput>
+export type ChestUpdateToOneWithWhereWithoutChestPadsInput = {
+  where?: Prisma.ChestWhereInput
+  data: Prisma.XOR<Prisma.ChestUpdateWithoutChestPadsInput, Prisma.ChestUncheckedUpdateWithoutChestPadsInput>
 }
 
-export type ChestUpdateWithWhereUniqueWithoutUserInput = {
-  where: Prisma.ChestWhereUniqueInput
-  data: Prisma.XOR<Prisma.ChestUpdateWithoutUserInput, Prisma.ChestUncheckedUpdateWithoutUserInput>
+export type ChestUpdateWithoutChestPadsInput = {
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  carrots?: Prisma.CarrotUpdateManyWithoutChestNestedInput
 }
 
-export type ChestUpdateManyWithWhereWithoutUserInput = {
-  where: Prisma.ChestScalarWhereInput
-  data: Prisma.XOR<Prisma.ChestUpdateManyMutationInput, Prisma.ChestUncheckedUpdateManyWithoutUserInput>
-}
-
-export type ChestScalarWhereInput = {
-  AND?: Prisma.ChestScalarWhereInput | Prisma.ChestScalarWhereInput[]
-  OR?: Prisma.ChestScalarWhereInput[]
-  NOT?: Prisma.ChestScalarWhereInput | Prisma.ChestScalarWhereInput[]
-  id?: Prisma.IntFilter<"Chest"> | number
-  label?: Prisma.StringFilter<"Chest"> | string
-  status?: Prisma.EnumStatusFilter<"Chest"> | $Enums.Status
-  createdAt?: Prisma.DateTimeFilter<"Chest"> | Date | string
-  pinned?: Prisma.BoolFilter<"Chest"> | boolean
-  listRank?: Prisma.StringFilter<"Chest"> | string
-  dashRank?: Prisma.StringFilter<"Chest"> | string
-  userId?: Prisma.IntFilter<"Chest"> | number
+export type ChestUncheckedUpdateWithoutChestPadsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  carrots?: Prisma.CarrotUncheckedUpdateManyWithoutChestNestedInput
 }
 
 export type ChestCreateWithoutCarrotsInput = {
   label: string
-  status?: $Enums.Status
   createdAt?: Date | string
-  pinned?: boolean
-  listRank: string
-  dashRank: string
-  user: Prisma.UserCreateNestedOneWithoutChestsInput
+  chestPads?: Prisma.ChestPadCreateNestedManyWithoutChestInput
 }
 
 export type ChestUncheckedCreateWithoutCarrotsInput = {
   id?: number
   label: string
-  status?: $Enums.Status
   createdAt?: Date | string
-  pinned?: boolean
-  listRank: string
-  dashRank: string
-  userId: number
+  chestPads?: Prisma.ChestPadUncheckedCreateNestedManyWithoutChestInput
 }
 
 export type ChestCreateOrConnectWithoutCarrotsInput = {
@@ -610,64 +426,15 @@ export type ChestUpdateToOneWithWhereWithoutCarrotsInput = {
 
 export type ChestUpdateWithoutCarrotsInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  listRank?: Prisma.StringFieldUpdateOperationsInput | string
-  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
-  user?: Prisma.UserUpdateOneRequiredWithoutChestsNestedInput
+  chestPads?: Prisma.ChestPadUpdateManyWithoutChestNestedInput
 }
 
 export type ChestUncheckedUpdateWithoutCarrotsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  listRank?: Prisma.StringFieldUpdateOperationsInput | string
-  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.IntFieldUpdateOperationsInput | number
-}
-
-export type ChestCreateManyUserInput = {
-  id?: number
-  label: string
-  status?: $Enums.Status
-  createdAt?: Date | string
-  pinned?: boolean
-  listRank: string
-  dashRank: string
-}
-
-export type ChestUpdateWithoutUserInput = {
-  label?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  listRank?: Prisma.StringFieldUpdateOperationsInput | string
-  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
-  carrots?: Prisma.CarrotUpdateManyWithoutChestNestedInput
-}
-
-export type ChestUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  label?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  listRank?: Prisma.StringFieldUpdateOperationsInput | string
-  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
-  carrots?: Prisma.CarrotUncheckedUpdateManyWithoutChestNestedInput
-}
-
-export type ChestUncheckedUpdateManyWithoutUserInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  label?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  listRank?: Prisma.StringFieldUpdateOperationsInput | string
-  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
+  chestPads?: Prisma.ChestPadUncheckedUpdateManyWithoutChestNestedInput
 }
 
 
@@ -677,10 +444,12 @@ export type ChestUncheckedUpdateManyWithoutUserInput = {
 
 export type ChestCountOutputType = {
   carrots: number
+  chestPads: number
 }
 
 export type ChestCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   carrots?: boolean | ChestCountOutputTypeCountCarrotsArgs
+  chestPads?: boolean | ChestCountOutputTypeCountChestPadsArgs
 }
 
 /**
@@ -700,84 +469,60 @@ export type ChestCountOutputTypeCountCarrotsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.CarrotWhereInput
 }
 
+/**
+ * ChestCountOutputType without action
+ */
+export type ChestCountOutputTypeCountChestPadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ChestPadWhereInput
+}
+
 
 export type ChestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   label?: boolean
-  status?: boolean
   createdAt?: boolean
-  pinned?: boolean
-  listRank?: boolean
-  dashRank?: boolean
-  userId?: boolean
   carrots?: boolean | Prisma.Chest$carrotsArgs<ExtArgs>
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  chestPads?: boolean | Prisma.Chest$chestPadsArgs<ExtArgs>
   _count?: boolean | Prisma.ChestCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["chest"]>
 
 export type ChestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   label?: boolean
-  status?: boolean
   createdAt?: boolean
-  pinned?: boolean
-  listRank?: boolean
-  dashRank?: boolean
-  userId?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["chest"]>
 
 export type ChestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   label?: boolean
-  status?: boolean
   createdAt?: boolean
-  pinned?: boolean
-  listRank?: boolean
-  dashRank?: boolean
-  userId?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["chest"]>
 
 export type ChestSelectScalar = {
   id?: boolean
   label?: boolean
-  status?: boolean
   createdAt?: boolean
-  pinned?: boolean
-  listRank?: boolean
-  dashRank?: boolean
-  userId?: boolean
 }
 
-export type ChestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "status" | "createdAt" | "pinned" | "listRank" | "dashRank" | "userId", ExtArgs["result"]["chest"]>
+export type ChestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "createdAt", ExtArgs["result"]["chest"]>
 export type ChestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   carrots?: boolean | Prisma.Chest$carrotsArgs<ExtArgs>
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  chestPads?: boolean | Prisma.Chest$chestPadsArgs<ExtArgs>
   _count?: boolean | Prisma.ChestCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type ChestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-}
-export type ChestIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-}
+export type ChestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ChestIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $ChestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Chest"
   objects: {
     carrots: Prisma.$CarrotPayload<ExtArgs>[]
-    user: Prisma.$UserPayload<ExtArgs>
+    chestPads: Prisma.$ChestPadPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     label: string
-    status: $Enums.Status
     createdAt: Date
-    pinned: boolean
-    listRank: string
-    dashRank: string
-    userId: number
   }, ExtArgs["result"]["chest"]>
   composites: {}
 }
@@ -1173,7 +918,7 @@ readonly fields: ChestFieldRefs;
 export interface Prisma__ChestClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   carrots<T extends Prisma.Chest$carrotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Chest$carrotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CarrotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  chestPads<T extends Prisma.Chest$chestPadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Chest$chestPadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChestPadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1205,12 +950,7 @@ export interface Prisma__ChestClient<T, Null = never, ExtArgs extends runtime.Ty
 export interface ChestFieldRefs {
   readonly id: Prisma.FieldRef<"Chest", 'Int'>
   readonly label: Prisma.FieldRef<"Chest", 'String'>
-  readonly status: Prisma.FieldRef<"Chest", 'Status'>
   readonly createdAt: Prisma.FieldRef<"Chest", 'DateTime'>
-  readonly pinned: Prisma.FieldRef<"Chest", 'Boolean'>
-  readonly listRank: Prisma.FieldRef<"Chest", 'String'>
-  readonly dashRank: Prisma.FieldRef<"Chest", 'String'>
-  readonly userId: Prisma.FieldRef<"Chest", 'Int'>
 }
     
 
@@ -1460,10 +1200,6 @@ export type ChestCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extension
    */
   data: Prisma.ChestCreateManyInput | Prisma.ChestCreateManyInput[]
   skipDuplicates?: boolean
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ChestIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1534,10 +1270,6 @@ export type ChestUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extension
    * Limit how many Chests to update.
    */
   limit?: number
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ChestIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1628,6 +1360,30 @@ export type Chest$carrotsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.CarrotScalarFieldEnum | Prisma.CarrotScalarFieldEnum[]
+}
+
+/**
+ * Chest.chestPads
+ */
+export type Chest$chestPadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ChestPad
+   */
+  select?: Prisma.ChestPadSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ChestPad
+   */
+  omit?: Prisma.ChestPadOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ChestPadInclude<ExtArgs> | null
+  where?: Prisma.ChestPadWhereInput
+  orderBy?: Prisma.ChestPadOrderByWithRelationInput | Prisma.ChestPadOrderByWithRelationInput[]
+  cursor?: Prisma.ChestPadWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ChestPadScalarFieldEnum | Prisma.ChestPadScalarFieldEnum[]
 }
 
 /**

@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
     if (!validation.success)
         return NextResponse.json(validation.error.issues, { status: 400 })
 
-    const [lastListRankedChest, lastDashRankedChest] = await Promise.all([
-        prisma.chest.findFirst({
+    const [lastListRankedChestPad, lastDashRankedChestPad] = await Promise.all([
+        prisma.chestPad.findFirst({
             where: {
                 userId: user.id,
             },
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
                 { id: "desc" },
             ],
         }),
-        prisma.chest.findFirst({
+        prisma.chestPad.findFirst({
             where: {
                 userId: user.id,
             },
@@ -39,22 +39,43 @@ export async function POST(request: NextRequest) {
         }),
     ]);
 
-    const newList = await prisma.chest.create({
+    const newList = await prisma.chestPad.create({
         data: {
-            label: validation.data.name,
-            userId: user.id,
-            pinned: validation.data.pinned,
-            listRank: nextLexoRank(lastListRankedChest?.listRank),
-            dashRank: nextLexoRank(lastDashRankedChest?.dashRank),
-            carrots: {
-                create: validation.data.carrots.map((carrot) => ({
-                    label: carrot.label,
-                    harvested: carrot.harvested,
-                })),
+            user: {
+                connect: {
+                    id: user.id,
+                },
             },
+            status: "NEW",
+            pinned: validation.data.pinned,
+            listRank: nextLexoRank(lastListRankedChestPad?.listRank),
+            dashRank: nextLexoRank(lastDashRankedChestPad?.dashRank),
+            chest: {
+                create: {
+                    label: validation.data.name,
+                    carrots: {
+                        create: validation.data.carrots.map((carrot) => ({
+                            label: carrot.label,
+                            harvested: carrot.harvested,
+                        })),
+                    },
+                },
+            }
+        },
+        include: {
+            chest: true,
         }
     })
-    return NextResponse.json(newList, { status: 201 })
+    return NextResponse.json({
+      id: Number(newList.id),
+      chestId: newList.chest.id,
+      label: newList.chest.label,
+      createdAt: newList.chest.createdAt,
+      status: newList.status,
+      pinned: newList.pinned,
+      listRank: newList.listRank,
+      dashRank: newList.dashRank,
+    }, { status: 201 })
 }
 
 

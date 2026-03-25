@@ -28,6 +28,16 @@ export type User = Prisma.UserModel
  */
 export type Chest = Prisma.ChestModel
 /**
+ * Model ChestPad
+ * 
+ */
+export type ChestPad = Prisma.ChestPadModel
+/**
+ * Model Connection
+ * 
+ */
+export type Connection = Prisma.ConnectionModel
+/**
  * Model Carrot
  * 
  */

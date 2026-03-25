@@ -53,6 +53,8 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Chest: 'Chest',
+  ChestPad: 'ChestPad',
+  Connection: 'Connection',
   Carrot: 'Carrot'
 } as const
 
@@ -74,7 +76,9 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const UserScalarFieldEnum = {
   id: 'id',
-  username: 'username'
+  username: 'username',
+  alias: 'alias',
+  uuid: 'uuid'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -83,15 +87,32 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 export const ChestScalarFieldEnum = {
   id: 'id',
   label: 'label',
-  status: 'status',
-  createdAt: 'createdAt',
-  pinned: 'pinned',
-  listRank: 'listRank',
-  dashRank: 'dashRank',
-  userId: 'userId'
+  createdAt: 'createdAt'
 } as const
 
 export type ChestScalarFieldEnum = (typeof ChestScalarFieldEnum)[keyof typeof ChestScalarFieldEnum]
+
+
+export const ChestPadScalarFieldEnum = {
+  id: 'id',
+  status: 'status',
+  pinned: 'pinned',
+  listRank: 'listRank',
+  dashRank: 'dashRank',
+  userId: 'userId',
+  chestId: 'chestId'
+} as const
+
+export type ChestPadScalarFieldEnum = (typeof ChestPadScalarFieldEnum)[keyof typeof ChestPadScalarFieldEnum]
+
+
+export const ConnectionScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  userId: 'userId'
+} as const
+
+export type ConnectionScalarFieldEnum = (typeof ConnectionScalarFieldEnum)[keyof typeof ConnectionScalarFieldEnum]
 
 
 export const CarrotScalarFieldEnum = {
@@ -118,4 +139,12 @@ export const QueryMode = {
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

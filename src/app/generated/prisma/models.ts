@@ -10,5 +10,7 @@
  */
 export type * from './models/User'
 export type * from './models/Chest'
+export type * from './models/ChestPad'
+export type * from './models/Connection'
 export type * from './models/Carrot'
 export type * from './commonInputTypes'

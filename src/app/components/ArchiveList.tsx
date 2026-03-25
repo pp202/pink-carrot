@@ -1,6 +1,5 @@
 "use client";
 
-import { Chest } from "@/app/generated/prisma/client";
 import Spinner from "@/app/components/Spinner";
 import { AlertDialog, Button, Flex } from "@radix-ui/themes";
 import axios from "axios";
@@ -8,7 +7,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { FaRedoAlt, FaTrash } from "react-icons/fa";
 
 const ArchiveList = () => {
-  const [state, setState] = useState<Chest[]>([]);
+  const [state, setState] = useState<ListChest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedArchiveIds, setSelectedArchiveIds] = useState<number[]>([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -163,6 +162,17 @@ const ArchiveList = () => {
       </div>
     </div>
   );
+};
+
+type ListChest = {
+  id: number;
+  chestId: number;
+  label: string;
+  createdAt: string;
+  status: "NEW" | "ARCHIVED";
+  pinned: boolean;
+  listRank: string;
+  dashRank: string;
 };
 
 export default ArchiveList;
