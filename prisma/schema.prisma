@@ -13,24 +13,44 @@ datasource db {
 model User {
   id       Int     @id @default(autoincrement())
   username String  @db.VarChar(250)
-  chests   Chest[]
+  alias    String? @db.VarChar(255)
+  uuid     String  @unique @default(uuid()) @db.Uuid
+  chestPads ChestPad[]
+  connections Connection[]
 }
 
 model Chest {
-  id        Int      @id @default(autoincrement())
-  label     String   @db.VarChar(100)
-  status    Status   @default(NEW)
+  id        Int       @id @default(autoincrement())
+  label     String    @db.VarChar(100)
   createdAt DateTime @default(now())
-  pinned    Boolean  @default(false)
-  listRank  String   @db.VarChar(16)
-  dashRank  String   @db.VarChar(16)
   carrots   Carrot[]
+  chestPads ChestPad[]
+}
+
+model ChestPad {
+  id       BigInt @id @default(autoincrement())
+  status   Status @default(NEW)
+  pinned   Boolean @default(false)
+  listRank String @db.VarChar(16)
+  dashRank String @db.VarChar(16)
 
   userId Int
-  user   User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  chestId Int
+  chest Chest @relation(fields: [chestId], references: [id])
 
   @@index([userId, listRank])
   @@index([userId, dashRank])
+  @@index([chestId])
+}
+
+model Connection {
+  id BigInt @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  userId Int
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Carrot {

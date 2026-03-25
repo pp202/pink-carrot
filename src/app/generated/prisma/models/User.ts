@@ -37,16 +37,22 @@ export type UserSumAggregateOutputType = {
 export type UserMinAggregateOutputType = {
   id: number | null
   username: string | null
+  alias: string | null
+  uuid: string | null
 }
 
 export type UserMaxAggregateOutputType = {
   id: number | null
   username: string | null
+  alias: string | null
+  uuid: string | null
 }
 
 export type UserCountAggregateOutputType = {
   id: number
   username: number
+  alias: number
+  uuid: number
   _all: number
 }
 
@@ -62,16 +68,22 @@ export type UserSumAggregateInputType = {
 export type UserMinAggregateInputType = {
   id?: true
   username?: true
+  alias?: true
+  uuid?: true
 }
 
 export type UserMaxAggregateInputType = {
   id?: true
   username?: true
+  alias?: true
+  uuid?: true
 }
 
 export type UserCountAggregateInputType = {
   id?: true
   username?: true
+  alias?: true
+  uuid?: true
   _all?: true
 }
 
@@ -164,6 +176,8 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type UserGroupByOutputType = {
   id: number
   username: string
+  alias: string | null
+  uuid: string
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -192,27 +206,38 @@ export type UserWhereInput = {
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   id?: Prisma.IntFilter<"User"> | number
   username?: Prisma.StringFilter<"User"> | string
-  chests?: Prisma.ChestListRelationFilter
+  alias?: Prisma.StringNullableFilter<"User"> | string | null
+  uuid?: Prisma.UuidFilter<"User"> | string
+  chestPads?: Prisma.ChestPadListRelationFilter
+  connections?: Prisma.ConnectionListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   username?: Prisma.SortOrder
-  chests?: Prisma.ChestOrderByRelationAggregateInput
+  alias?: Prisma.SortOrderInput | Prisma.SortOrder
+  uuid?: Prisma.SortOrder
+  chestPads?: Prisma.ChestPadOrderByRelationAggregateInput
+  connections?: Prisma.ConnectionOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  uuid?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   username?: Prisma.StringFilter<"User"> | string
-  chests?: Prisma.ChestListRelationFilter
-}, "id">
+  alias?: Prisma.StringNullableFilter<"User"> | string | null
+  chestPads?: Prisma.ChestPadListRelationFilter
+  connections?: Prisma.ConnectionListRelationFilter
+}, "id" | "uuid">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  alias?: Prisma.SortOrderInput | Prisma.SortOrder
+  uuid?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -226,47 +251,69 @@ export type UserScalarWhereWithAggregatesInput = {
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"User"> | number
   username?: Prisma.StringWithAggregatesFilter<"User"> | string
+  alias?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  uuid?: Prisma.UuidWithAggregatesFilter<"User"> | string
 }
 
 export type UserCreateInput = {
   username: string
-  chests?: Prisma.ChestCreateNestedManyWithoutUserInput
+  alias?: string | null
+  uuid?: string
+  chestPads?: Prisma.ChestPadCreateNestedManyWithoutUserInput
+  connections?: Prisma.ConnectionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
   id?: number
   username: string
-  chests?: Prisma.ChestUncheckedCreateNestedManyWithoutUserInput
+  alias?: string | null
+  uuid?: string
+  chestPads?: Prisma.ChestPadUncheckedCreateNestedManyWithoutUserInput
+  connections?: Prisma.ConnectionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
-  chests?: Prisma.ChestUpdateManyWithoutUserNestedInput
+  alias?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uuid?: Prisma.StringFieldUpdateOperationsInput | string
+  chestPads?: Prisma.ChestPadUpdateManyWithoutUserNestedInput
+  connections?: Prisma.ConnectionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
-  chests?: Prisma.ChestUncheckedUpdateManyWithoutUserNestedInput
+  alias?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uuid?: Prisma.StringFieldUpdateOperationsInput | string
+  chestPads?: Prisma.ChestPadUncheckedUpdateManyWithoutUserNestedInput
+  connections?: Prisma.ConnectionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
   id?: number
   username: string
+  alias?: string | null
+  uuid?: string
 }
 
 export type UserUpdateManyMutationInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  alias?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uuid?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  alias?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uuid?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  alias?: Prisma.SortOrder
+  uuid?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
@@ -276,11 +323,15 @@ export type UserAvgOrderByAggregateInput = {
 export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  alias?: Prisma.SortOrder
+  uuid?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  alias?: Prisma.SortOrder
+  uuid?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
@@ -296,6 +347,10 @@ export type StringFieldUpdateOperationsInput = {
   set?: string
 }
 
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
 export type IntFieldUpdateOperationsInput = {
   set?: number
   increment?: number
@@ -304,52 +359,124 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type UserCreateNestedOneWithoutChestsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutChestsInput, Prisma.UserUncheckedCreateWithoutChestsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChestsInput
+export type UserCreateNestedOneWithoutChestPadsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChestPadsInput, Prisma.UserUncheckedCreateWithoutChestPadsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChestPadsInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutChestsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutChestsInput, Prisma.UserUncheckedCreateWithoutChestsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChestsInput
-  upsert?: Prisma.UserUpsertWithoutChestsInput
+export type UserUpdateOneRequiredWithoutChestPadsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChestPadsInput, Prisma.UserUncheckedCreateWithoutChestPadsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChestPadsInput
+  upsert?: Prisma.UserUpsertWithoutChestPadsInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutChestsInput, Prisma.UserUpdateWithoutChestsInput>, Prisma.UserUncheckedUpdateWithoutChestsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutChestPadsInput, Prisma.UserUpdateWithoutChestPadsInput>, Prisma.UserUncheckedUpdateWithoutChestPadsInput>
 }
 
-export type UserCreateWithoutChestsInput = {
+export type UserCreateNestedOneWithoutConnectionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutConnectionsInput, Prisma.UserUncheckedCreateWithoutConnectionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutConnectionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutConnectionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutConnectionsInput, Prisma.UserUncheckedCreateWithoutConnectionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutConnectionsInput
+  upsert?: Prisma.UserUpsertWithoutConnectionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutConnectionsInput, Prisma.UserUpdateWithoutConnectionsInput>, Prisma.UserUncheckedUpdateWithoutConnectionsInput>
+}
+
+export type UserCreateWithoutChestPadsInput = {
   username: string
+  alias?: string | null
+  uuid?: string
+  connections?: Prisma.ConnectionCreateNestedManyWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutChestsInput = {
+export type UserUncheckedCreateWithoutChestPadsInput = {
   id?: number
   username: string
+  alias?: string | null
+  uuid?: string
+  connections?: Prisma.ConnectionUncheckedCreateNestedManyWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutChestsInput = {
+export type UserCreateOrConnectWithoutChestPadsInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutChestsInput, Prisma.UserUncheckedCreateWithoutChestsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutChestPadsInput, Prisma.UserUncheckedCreateWithoutChestPadsInput>
 }
 
-export type UserUpsertWithoutChestsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutChestsInput, Prisma.UserUncheckedUpdateWithoutChestsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutChestsInput, Prisma.UserUncheckedCreateWithoutChestsInput>
+export type UserUpsertWithoutChestPadsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutChestPadsInput, Prisma.UserUncheckedUpdateWithoutChestPadsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutChestPadsInput, Prisma.UserUncheckedCreateWithoutChestPadsInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutChestsInput = {
+export type UserUpdateToOneWithWhereWithoutChestPadsInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutChestsInput, Prisma.UserUncheckedUpdateWithoutChestsInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutChestPadsInput, Prisma.UserUncheckedUpdateWithoutChestPadsInput>
 }
 
-export type UserUpdateWithoutChestsInput = {
+export type UserUpdateWithoutChestPadsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  alias?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uuid?: Prisma.StringFieldUpdateOperationsInput | string
+  connections?: Prisma.ConnectionUpdateManyWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutChestsInput = {
+export type UserUncheckedUpdateWithoutChestPadsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  alias?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uuid?: Prisma.StringFieldUpdateOperationsInput | string
+  connections?: Prisma.ConnectionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutConnectionsInput = {
+  username: string
+  alias?: string | null
+  uuid?: string
+  chestPads?: Prisma.ChestPadCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutConnectionsInput = {
+  id?: number
+  username: string
+  alias?: string | null
+  uuid?: string
+  chestPads?: Prisma.ChestPadUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutConnectionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutConnectionsInput, Prisma.UserUncheckedCreateWithoutConnectionsInput>
+}
+
+export type UserUpsertWithoutConnectionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutConnectionsInput, Prisma.UserUncheckedUpdateWithoutConnectionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutConnectionsInput, Prisma.UserUncheckedCreateWithoutConnectionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutConnectionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutConnectionsInput, Prisma.UserUncheckedUpdateWithoutConnectionsInput>
+}
+
+export type UserUpdateWithoutConnectionsInput = {
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  alias?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uuid?: Prisma.StringFieldUpdateOperationsInput | string
+  chestPads?: Prisma.ChestPadUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutConnectionsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  alias?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uuid?: Prisma.StringFieldUpdateOperationsInput | string
+  chestPads?: Prisma.ChestPadUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -358,11 +485,13 @@ export type UserUncheckedUpdateWithoutChestsInput = {
  */
 
 export type UserCountOutputType = {
-  chests: number
+  chestPads: number
+  connections: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  chests?: boolean | UserCountOutputTypeCountChestsArgs
+  chestPads?: boolean | UserCountOutputTypeCountChestPadsArgs
+  connections?: boolean | UserCountOutputTypeCountConnectionsArgs
 }
 
 /**
@@ -378,36 +507,53 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountChestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ChestWhereInput
+export type UserCountOutputTypeCountChestPadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ChestPadWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountConnectionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ConnectionWhereInput
 }
 
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   username?: boolean
-  chests?: boolean | Prisma.User$chestsArgs<ExtArgs>
+  alias?: boolean
+  uuid?: boolean
+  chestPads?: boolean | Prisma.User$chestPadsArgs<ExtArgs>
+  connections?: boolean | Prisma.User$connectionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   username?: boolean
+  alias?: boolean
+  uuid?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   username?: boolean
+  alias?: boolean
+  uuid?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
   id?: boolean
   username?: boolean
+  alias?: boolean
+  uuid?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "username", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "username" | "alias" | "uuid", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  chests?: boolean | Prisma.User$chestsArgs<ExtArgs>
+  chestPads?: boolean | Prisma.User$chestPadsArgs<ExtArgs>
+  connections?: boolean | Prisma.User$connectionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -416,11 +562,14 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-    chests: Prisma.$ChestPayload<ExtArgs>[]
+    chestPads: Prisma.$ChestPadPayload<ExtArgs>[]
+    connections: Prisma.$ConnectionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     username: string
+    alias: string | null
+    uuid: string
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -815,7 +964,8 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  chests<T extends Prisma.User$chestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$chestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  chestPads<T extends Prisma.User$chestPadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$chestPadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChestPadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  connections<T extends Prisma.User$connectionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$connectionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConnectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -847,6 +997,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'Int'>
   readonly username: Prisma.FieldRef<"User", 'String'>
+  readonly alias: Prisma.FieldRef<"User", 'String'>
+  readonly uuid: Prisma.FieldRef<"User", 'String'>
 }
     
 
@@ -1235,27 +1387,51 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * User.chests
+ * User.chestPads
  */
-export type User$chestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$chestPadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Chest
+   * Select specific fields to fetch from the ChestPad
    */
-  select?: Prisma.ChestSelect<ExtArgs> | null
+  select?: Prisma.ChestPadSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Chest
+   * Omit specific fields from the ChestPad
    */
-  omit?: Prisma.ChestOmit<ExtArgs> | null
+  omit?: Prisma.ChestPadOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.ChestInclude<ExtArgs> | null
-  where?: Prisma.ChestWhereInput
-  orderBy?: Prisma.ChestOrderByWithRelationInput | Prisma.ChestOrderByWithRelationInput[]
-  cursor?: Prisma.ChestWhereUniqueInput
+  include?: Prisma.ChestPadInclude<ExtArgs> | null
+  where?: Prisma.ChestPadWhereInput
+  orderBy?: Prisma.ChestPadOrderByWithRelationInput | Prisma.ChestPadOrderByWithRelationInput[]
+  cursor?: Prisma.ChestPadWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.ChestScalarFieldEnum | Prisma.ChestScalarFieldEnum[]
+  distinct?: Prisma.ChestPadScalarFieldEnum | Prisma.ChestPadScalarFieldEnum[]
+}
+
+/**
+ * User.connections
+ */
+export type User$connectionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Connection
+   */
+  select?: Prisma.ConnectionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Connection
+   */
+  omit?: Prisma.ConnectionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConnectionInclude<ExtArgs> | null
+  where?: Prisma.ConnectionWhereInput
+  orderBy?: Prisma.ConnectionOrderByWithRelationInput | Prisma.ConnectionOrderByWithRelationInput[]
+  cursor?: Prisma.ConnectionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ConnectionScalarFieldEnum | Prisma.ConnectionScalarFieldEnum[]
 }
 
 /**
