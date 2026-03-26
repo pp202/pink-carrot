@@ -32,18 +32,18 @@ export type ConnectionAvgAggregateOutputType = {
 }
 
 export type ConnectionSumAggregateOutputType = {
-  id: bigint | null
+  id: number | null
   userId: number | null
 }
 
 export type ConnectionMinAggregateOutputType = {
-  id: bigint | null
+  id: number | null
   createdAt: Date | null
   userId: number | null
 }
 
 export type ConnectionMaxAggregateOutputType = {
-  id: bigint | null
+  id: number | null
   createdAt: Date | null
   userId: number | null
 }
@@ -172,7 +172,7 @@ export type ConnectionGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 export type ConnectionGroupByOutputType = {
-  id: bigint
+  id: number
   createdAt: Date
   userId: number
   _count: ConnectionCountAggregateOutputType | null
@@ -201,7 +201,7 @@ export type ConnectionWhereInput = {
   AND?: Prisma.ConnectionWhereInput | Prisma.ConnectionWhereInput[]
   OR?: Prisma.ConnectionWhereInput[]
   NOT?: Prisma.ConnectionWhereInput | Prisma.ConnectionWhereInput[]
-  id?: Prisma.BigIntFilter<"Connection"> | bigint | number
+  id?: Prisma.IntFilter<"Connection"> | number
   createdAt?: Prisma.DateTimeFilter<"Connection"> | Date | string
   userId?: Prisma.IntFilter<"Connection"> | number
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -215,7 +215,7 @@ export type ConnectionOrderByWithRelationInput = {
 }
 
 export type ConnectionWhereUniqueInput = Prisma.AtLeast<{
-  id?: bigint | number
+  id?: number
   AND?: Prisma.ConnectionWhereInput | Prisma.ConnectionWhereInput[]
   OR?: Prisma.ConnectionWhereInput[]
   NOT?: Prisma.ConnectionWhereInput | Prisma.ConnectionWhereInput[]
@@ -239,48 +239,45 @@ export type ConnectionScalarWhereWithAggregatesInput = {
   AND?: Prisma.ConnectionScalarWhereWithAggregatesInput | Prisma.ConnectionScalarWhereWithAggregatesInput[]
   OR?: Prisma.ConnectionScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ConnectionScalarWhereWithAggregatesInput | Prisma.ConnectionScalarWhereWithAggregatesInput[]
-  id?: Prisma.BigIntWithAggregatesFilter<"Connection"> | bigint | number
+  id?: Prisma.IntWithAggregatesFilter<"Connection"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Connection"> | Date | string
   userId?: Prisma.IntWithAggregatesFilter<"Connection"> | number
 }
 
 export type ConnectionCreateInput = {
-  id?: bigint | number
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutConnectionsInput
 }
 
 export type ConnectionUncheckedCreateInput = {
-  id?: bigint | number
+  id?: number
   createdAt?: Date | string
   userId: number
 }
 
 export type ConnectionUpdateInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutConnectionsNestedInput
 }
 
 export type ConnectionUncheckedUpdateInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ConnectionCreateManyInput = {
-  id?: bigint | number
+  id?: number
   createdAt?: Date | string
   userId: number
 }
 
 export type ConnectionUpdateManyMutationInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ConnectionUncheckedUpdateManyInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.IntFieldUpdateOperationsInput | number
 }
@@ -366,12 +363,11 @@ export type ConnectionUncheckedUpdateManyWithoutUserNestedInput = {
 }
 
 export type ConnectionCreateWithoutUserInput = {
-  id?: bigint | number
   createdAt?: Date | string
 }
 
 export type ConnectionUncheckedCreateWithoutUserInput = {
-  id?: bigint | number
+  id?: number
   createdAt?: Date | string
 }
 
@@ -405,28 +401,27 @@ export type ConnectionScalarWhereInput = {
   AND?: Prisma.ConnectionScalarWhereInput | Prisma.ConnectionScalarWhereInput[]
   OR?: Prisma.ConnectionScalarWhereInput[]
   NOT?: Prisma.ConnectionScalarWhereInput | Prisma.ConnectionScalarWhereInput[]
-  id?: Prisma.BigIntFilter<"Connection"> | bigint | number
+  id?: Prisma.IntFilter<"Connection"> | number
   createdAt?: Prisma.DateTimeFilter<"Connection"> | Date | string
   userId?: Prisma.IntFilter<"Connection"> | number
 }
 
 export type ConnectionCreateManyUserInput = {
-  id?: bigint | number
+  id?: number
   createdAt?: Date | string
 }
 
 export type ConnectionUpdateWithoutUserInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ConnectionUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ConnectionUncheckedUpdateManyWithoutUserInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -476,7 +471,7 @@ export type $ConnectionPayload<ExtArgs extends runtime.Types.Extensions.Internal
     user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
-    id: bigint
+    id: number
     createdAt: Date
     userId: number
   }, ExtArgs["result"]["connection"]>
@@ -903,7 +898,7 @@ export interface Prisma__ConnectionClient<T, Null = never, ExtArgs extends runti
  * Fields of the Connection model
  */
 export interface ConnectionFieldRefs {
-  readonly id: Prisma.FieldRef<"Connection", 'BigInt'>
+  readonly id: Prisma.FieldRef<"Connection", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Connection", 'DateTime'>
   readonly userId: Prisma.FieldRef<"Connection", 'Int'>
 }

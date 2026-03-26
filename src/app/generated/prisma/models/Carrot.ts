@@ -32,19 +32,19 @@ export type CarrotAvgAggregateOutputType = {
 }
 
 export type CarrotSumAggregateOutputType = {
-  id: bigint | null
+  id: number | null
   chestId: number | null
 }
 
 export type CarrotMinAggregateOutputType = {
-  id: bigint | null
+  id: number | null
   label: string | null
   harvested: boolean | null
   chestId: number | null
 }
 
 export type CarrotMaxAggregateOutputType = {
-  id: bigint | null
+  id: number | null
   label: string | null
   harvested: boolean | null
   chestId: number | null
@@ -178,7 +178,7 @@ export type CarrotGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 }
 
 export type CarrotGroupByOutputType = {
-  id: bigint
+  id: number
   label: string
   harvested: boolean
   chestId: number
@@ -208,7 +208,7 @@ export type CarrotWhereInput = {
   AND?: Prisma.CarrotWhereInput | Prisma.CarrotWhereInput[]
   OR?: Prisma.CarrotWhereInput[]
   NOT?: Prisma.CarrotWhereInput | Prisma.CarrotWhereInput[]
-  id?: Prisma.BigIntFilter<"Carrot"> | bigint | number
+  id?: Prisma.IntFilter<"Carrot"> | number
   label?: Prisma.StringFilter<"Carrot"> | string
   harvested?: Prisma.BoolFilter<"Carrot"> | boolean
   chestId?: Prisma.IntFilter<"Carrot"> | number
@@ -224,7 +224,7 @@ export type CarrotOrderByWithRelationInput = {
 }
 
 export type CarrotWhereUniqueInput = Prisma.AtLeast<{
-  id?: bigint | number
+  id?: number
   AND?: Prisma.CarrotWhereInput | Prisma.CarrotWhereInput[]
   OR?: Prisma.CarrotWhereInput[]
   NOT?: Prisma.CarrotWhereInput | Prisma.CarrotWhereInput[]
@@ -250,55 +250,52 @@ export type CarrotScalarWhereWithAggregatesInput = {
   AND?: Prisma.CarrotScalarWhereWithAggregatesInput | Prisma.CarrotScalarWhereWithAggregatesInput[]
   OR?: Prisma.CarrotScalarWhereWithAggregatesInput[]
   NOT?: Prisma.CarrotScalarWhereWithAggregatesInput | Prisma.CarrotScalarWhereWithAggregatesInput[]
-  id?: Prisma.BigIntWithAggregatesFilter<"Carrot"> | bigint | number
+  id?: Prisma.IntWithAggregatesFilter<"Carrot"> | number
   label?: Prisma.StringWithAggregatesFilter<"Carrot"> | string
   harvested?: Prisma.BoolWithAggregatesFilter<"Carrot"> | boolean
   chestId?: Prisma.IntWithAggregatesFilter<"Carrot"> | number
 }
 
 export type CarrotCreateInput = {
-  id?: bigint | number
   label: string
   harvested?: boolean
   chest: Prisma.ChestCreateNestedOneWithoutCarrotsInput
 }
 
 export type CarrotUncheckedCreateInput = {
-  id?: bigint | number
+  id?: number
   label: string
   harvested?: boolean
   chestId: number
 }
 
 export type CarrotUpdateInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   harvested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   chest?: Prisma.ChestUpdateOneRequiredWithoutCarrotsNestedInput
 }
 
 export type CarrotUncheckedUpdateInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   harvested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   chestId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type CarrotCreateManyInput = {
-  id?: bigint | number
+  id?: number
   label: string
   harvested?: boolean
   chestId: number
 }
 
 export type CarrotUpdateManyMutationInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   harvested?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type CarrotUncheckedUpdateManyInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   harvested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   chestId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -388,13 +385,12 @@ export type CarrotUncheckedUpdateManyWithoutChestNestedInput = {
 }
 
 export type CarrotCreateWithoutChestInput = {
-  id?: bigint | number
   label: string
   harvested?: boolean
 }
 
 export type CarrotUncheckedCreateWithoutChestInput = {
-  id?: bigint | number
+  id?: number
   label: string
   harvested?: boolean
 }
@@ -429,32 +425,31 @@ export type CarrotScalarWhereInput = {
   AND?: Prisma.CarrotScalarWhereInput | Prisma.CarrotScalarWhereInput[]
   OR?: Prisma.CarrotScalarWhereInput[]
   NOT?: Prisma.CarrotScalarWhereInput | Prisma.CarrotScalarWhereInput[]
-  id?: Prisma.BigIntFilter<"Carrot"> | bigint | number
+  id?: Prisma.IntFilter<"Carrot"> | number
   label?: Prisma.StringFilter<"Carrot"> | string
   harvested?: Prisma.BoolFilter<"Carrot"> | boolean
   chestId?: Prisma.IntFilter<"Carrot"> | number
 }
 
 export type CarrotCreateManyChestInput = {
-  id?: bigint | number
+  id?: number
   label: string
   harvested?: boolean
 }
 
 export type CarrotUpdateWithoutChestInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   harvested?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type CarrotUncheckedUpdateWithoutChestInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   harvested?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type CarrotUncheckedUpdateManyWithoutChestInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   harvested?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -509,7 +504,7 @@ export type $CarrotPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     chest: Prisma.$ChestPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
-    id: bigint
+    id: number
     label: string
     harvested: boolean
     chestId: number
@@ -937,7 +932,7 @@ export interface Prisma__CarrotClient<T, Null = never, ExtArgs extends runtime.T
  * Fields of the Carrot model
  */
 export interface CarrotFieldRefs {
-  readonly id: Prisma.FieldRef<"Carrot", 'BigInt'>
+  readonly id: Prisma.FieldRef<"Carrot", 'Int'>
   readonly label: Prisma.FieldRef<"Carrot", 'String'>
   readonly harvested: Prisma.FieldRef<"Carrot", 'Boolean'>
   readonly chestId: Prisma.FieldRef<"Carrot", 'Int'>

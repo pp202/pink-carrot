@@ -2,12 +2,8 @@ import { prisma } from '@/config/prisma'
 import { loggedUser } from './user';
 import { allocateLexoRanks, lexoRankBetween, nextLexoRank } from './lexoRank';
 
-function toChestPadId(id: number): bigint {
-    return BigInt(id);
-}
-
 function serializeChestPad(chestPad: {
-    id: bigint;
+    id: number;
     status: 'NEW' | 'ARCHIVED';
     pinned: boolean;
     listRank: string;
@@ -16,11 +12,11 @@ function serializeChestPad(chestPad: {
         id: number;
         label: string;
         createdAt: Date;
-        carrots?: Array<{ id: bigint; label: string; harvested: boolean }>;
+        carrots?: Array<{ id: number; label: string; harvested: boolean }>;
     };
 }) {
     return {
-        id: Number(chestPad.id),
+        id: chestPad.id,
         chestId: chestPad.chest.id,
         label: chestPad.chest.label,
         createdAt: chestPad.chest.createdAt,
@@ -29,7 +25,7 @@ function serializeChestPad(chestPad: {
         listRank: chestPad.listRank,
         dashRank: chestPad.dashRank,
         carrots: (chestPad.chest.carrots ?? []).map((carrot) => ({
-            id: Number(carrot.id),
+            id: carrot.id,
             label: carrot.label,
             harvested: carrot.harvested,
         })),
@@ -145,7 +141,7 @@ export async function getChest(id: number) {
     const user = await loggedUser();
     const chestPad = await prisma.chestPad.findFirst({
         where: {
-            id: toChestPadId(id),
+            id,
             userId: user.id,
             status: 'NEW',
         },
@@ -171,7 +167,7 @@ export async function getChest(id: number) {
     }
 
     return {
-        id: Number(chestPad.id),
+        id: chestPad.id,
         label: chestPad.chest.label,
         carrots: chestPad.chest.carrots,
     };
@@ -186,7 +182,7 @@ export async function updateChest(
 
     const chestPad = await prisma.chestPad.findFirst({
         where: {
-            id: toChestPadId(id),
+            id,
             userId: user.id,
             status: 'NEW',
         },
@@ -233,7 +229,7 @@ export async function updateChest(
     };
 }
 
-export async function setCarrotHarvested(carrotId: bigint, harvested: boolean) {
+export async function setCarrotHarvested(carrotId: number, harvested: boolean) {
     const user = await loggedUser();
 
     return prisma.carrot.updateMany({
@@ -258,7 +254,7 @@ export async function archiveList(id: number) {
     const user = await loggedUser();
     return prisma.chestPad.updateMany({
         where: {
-            id: toChestPadId(id),
+            id,
             userId: user.id,
             status: 'NEW',
         },
@@ -272,7 +268,7 @@ export async function unarchiveList(id: number) {
     const user = await loggedUser();
     return prisma.chestPad.updateMany({
         where: {
-            id: toChestPadId(id),
+            id,
             userId: user.id,
             status: 'ARCHIVED',
         },
@@ -286,7 +282,7 @@ export async function setPinned(id: number, pinned: boolean) {
     const user = await loggedUser();
     return prisma.chestPad.updateMany({
         where: {
-            id: toChestPadId(id),
+            id,
             userId: user.id,
             status: 'NEW',
         },
@@ -301,7 +297,7 @@ export async function deleteArchivedList(id: number) {
 
     const chestPad = await prisma.chestPad.findFirst({
         where: {
-            id: toChestPadId(id),
+            id,
             userId: user.id,
             status: 'ARCHIVED',
         },
@@ -364,7 +360,7 @@ export async function cloneChest(id: number) {
 
     const chestPad = await prisma.chestPad.findFirst({
         where: {
-            id: toChestPadId(id),
+            id,
             userId: user.id,
             status: 'NEW',
         },
@@ -460,8 +456,7 @@ export async function moveChestBetween(
     const user = await loggedUser();
 
     const idsToLoad = [chestId, previousChestId, nextChestId]
-        .filter((id): id is number => typeof id === 'number')
-        .map((id) => toChestPadId(id));
+        .filter((id): id is number => typeof id === 'number');
 
     const chestPads = await prisma.chestPad.findMany({
         where: {
@@ -478,7 +473,7 @@ export async function moveChestBetween(
         },
     });
 
-    const chestById = new Map(chestPads.map((chest) => [Number(chest.id), chest]));
+    const chestById = new Map(chestPads.map((chest) => [chest.id, chest]));
 
     if (!chestById.has(chestId)) {
         return false;
@@ -518,7 +513,7 @@ export async function moveChestBetween(
             },
         });
 
-        const refreshedById = new Map(refreshedChests.map((chest) => [Number(chest.id), chest]));
+        const refreshedById = new Map(refreshedChests.map((chest) => [chest.id, chest]));
         const refreshedPreviousRank = previousChestId === null
             ? null
             : refreshedById.get(previousChestId)?.[rankField];
@@ -539,7 +534,7 @@ export async function moveChestBetween(
 
     await prisma.chestPad.updateMany({
         where: {
-            id: toChestPadId(chestId),
+            id: chestId,
             userId: user.id,
             status: 'NEW',
         },

@@ -33,13 +33,13 @@ export type ChestPadAvgAggregateOutputType = {
 }
 
 export type ChestPadSumAggregateOutputType = {
-  id: bigint | null
+  id: number | null
   userId: number | null
   chestId: number | null
 }
 
 export type ChestPadMinAggregateOutputType = {
-  id: bigint | null
+  id: number | null
   status: $Enums.Status | null
   pinned: boolean | null
   listRank: string | null
@@ -49,7 +49,7 @@ export type ChestPadMinAggregateOutputType = {
 }
 
 export type ChestPadMaxAggregateOutputType = {
-  id: bigint | null
+  id: number | null
   status: $Enums.Status | null
   pinned: boolean | null
   listRank: string | null
@@ -200,7 +200,7 @@ export type ChestPadGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 export type ChestPadGroupByOutputType = {
-  id: bigint
+  id: number
   status: $Enums.Status
   pinned: boolean
   listRank: string
@@ -233,7 +233,7 @@ export type ChestPadWhereInput = {
   AND?: Prisma.ChestPadWhereInput | Prisma.ChestPadWhereInput[]
   OR?: Prisma.ChestPadWhereInput[]
   NOT?: Prisma.ChestPadWhereInput | Prisma.ChestPadWhereInput[]
-  id?: Prisma.BigIntFilter<"ChestPad"> | bigint | number
+  id?: Prisma.IntFilter<"ChestPad"> | number
   status?: Prisma.EnumStatusFilter<"ChestPad"> | $Enums.Status
   pinned?: Prisma.BoolFilter<"ChestPad"> | boolean
   listRank?: Prisma.StringFilter<"ChestPad"> | string
@@ -257,7 +257,7 @@ export type ChestPadOrderByWithRelationInput = {
 }
 
 export type ChestPadWhereUniqueInput = Prisma.AtLeast<{
-  id?: bigint | number
+  id?: number
   AND?: Prisma.ChestPadWhereInput | Prisma.ChestPadWhereInput[]
   OR?: Prisma.ChestPadWhereInput[]
   NOT?: Prisma.ChestPadWhereInput | Prisma.ChestPadWhereInput[]
@@ -290,7 +290,7 @@ export type ChestPadScalarWhereWithAggregatesInput = {
   AND?: Prisma.ChestPadScalarWhereWithAggregatesInput | Prisma.ChestPadScalarWhereWithAggregatesInput[]
   OR?: Prisma.ChestPadScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ChestPadScalarWhereWithAggregatesInput | Prisma.ChestPadScalarWhereWithAggregatesInput[]
-  id?: Prisma.BigIntWithAggregatesFilter<"ChestPad"> | bigint | number
+  id?: Prisma.IntWithAggregatesFilter<"ChestPad"> | number
   status?: Prisma.EnumStatusWithAggregatesFilter<"ChestPad"> | $Enums.Status
   pinned?: Prisma.BoolWithAggregatesFilter<"ChestPad"> | boolean
   listRank?: Prisma.StringWithAggregatesFilter<"ChestPad"> | string
@@ -300,7 +300,6 @@ export type ChestPadScalarWhereWithAggregatesInput = {
 }
 
 export type ChestPadCreateInput = {
-  id?: bigint | number
   status?: $Enums.Status
   pinned?: boolean
   listRank: string
@@ -310,7 +309,7 @@ export type ChestPadCreateInput = {
 }
 
 export type ChestPadUncheckedCreateInput = {
-  id?: bigint | number
+  id?: number
   status?: $Enums.Status
   pinned?: boolean
   listRank: string
@@ -320,7 +319,6 @@ export type ChestPadUncheckedCreateInput = {
 }
 
 export type ChestPadUpdateInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listRank?: Prisma.StringFieldUpdateOperationsInput | string
@@ -330,7 +328,7 @@ export type ChestPadUpdateInput = {
 }
 
 export type ChestPadUncheckedUpdateInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listRank?: Prisma.StringFieldUpdateOperationsInput | string
@@ -340,7 +338,7 @@ export type ChestPadUncheckedUpdateInput = {
 }
 
 export type ChestPadCreateManyInput = {
-  id?: bigint | number
+  id?: number
   status?: $Enums.Status
   pinned?: boolean
   listRank: string
@@ -350,7 +348,6 @@ export type ChestPadCreateManyInput = {
 }
 
 export type ChestPadUpdateManyMutationInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listRank?: Prisma.StringFieldUpdateOperationsInput | string
@@ -358,7 +355,7 @@ export type ChestPadUpdateManyMutationInput = {
 }
 
 export type ChestPadUncheckedUpdateManyInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listRank?: Prisma.StringFieldUpdateOperationsInput | string
@@ -503,14 +500,6 @@ export type ChestPadUncheckedUpdateManyWithoutChestNestedInput = {
   deleteMany?: Prisma.ChestPadScalarWhereInput | Prisma.ChestPadScalarWhereInput[]
 }
 
-export type BigIntFieldUpdateOperationsInput = {
-  set?: bigint | number
-  increment?: bigint | number
-  decrement?: bigint | number
-  multiply?: bigint | number
-  divide?: bigint | number
-}
-
 export type EnumStatusFieldUpdateOperationsInput = {
   set?: $Enums.Status
 }
@@ -520,7 +509,6 @@ export type BoolFieldUpdateOperationsInput = {
 }
 
 export type ChestPadCreateWithoutUserInput = {
-  id?: bigint | number
   status?: $Enums.Status
   pinned?: boolean
   listRank: string
@@ -529,7 +517,7 @@ export type ChestPadCreateWithoutUserInput = {
 }
 
 export type ChestPadUncheckedCreateWithoutUserInput = {
-  id?: bigint | number
+  id?: number
   status?: $Enums.Status
   pinned?: boolean
   listRank: string
@@ -567,7 +555,7 @@ export type ChestPadScalarWhereInput = {
   AND?: Prisma.ChestPadScalarWhereInput | Prisma.ChestPadScalarWhereInput[]
   OR?: Prisma.ChestPadScalarWhereInput[]
   NOT?: Prisma.ChestPadScalarWhereInput | Prisma.ChestPadScalarWhereInput[]
-  id?: Prisma.BigIntFilter<"ChestPad"> | bigint | number
+  id?: Prisma.IntFilter<"ChestPad"> | number
   status?: Prisma.EnumStatusFilter<"ChestPad"> | $Enums.Status
   pinned?: Prisma.BoolFilter<"ChestPad"> | boolean
   listRank?: Prisma.StringFilter<"ChestPad"> | string
@@ -577,7 +565,6 @@ export type ChestPadScalarWhereInput = {
 }
 
 export type ChestPadCreateWithoutChestInput = {
-  id?: bigint | number
   status?: $Enums.Status
   pinned?: boolean
   listRank: string
@@ -586,7 +573,7 @@ export type ChestPadCreateWithoutChestInput = {
 }
 
 export type ChestPadUncheckedCreateWithoutChestInput = {
-  id?: bigint | number
+  id?: number
   status?: $Enums.Status
   pinned?: boolean
   listRank: string
@@ -621,7 +608,7 @@ export type ChestPadUpdateManyWithWhereWithoutChestInput = {
 }
 
 export type ChestPadCreateManyUserInput = {
-  id?: bigint | number
+  id?: number
   status?: $Enums.Status
   pinned?: boolean
   listRank: string
@@ -630,7 +617,6 @@ export type ChestPadCreateManyUserInput = {
 }
 
 export type ChestPadUpdateWithoutUserInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listRank?: Prisma.StringFieldUpdateOperationsInput | string
@@ -639,7 +625,7 @@ export type ChestPadUpdateWithoutUserInput = {
 }
 
 export type ChestPadUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listRank?: Prisma.StringFieldUpdateOperationsInput | string
@@ -648,7 +634,7 @@ export type ChestPadUncheckedUpdateWithoutUserInput = {
 }
 
 export type ChestPadUncheckedUpdateManyWithoutUserInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listRank?: Prisma.StringFieldUpdateOperationsInput | string
@@ -657,7 +643,7 @@ export type ChestPadUncheckedUpdateManyWithoutUserInput = {
 }
 
 export type ChestPadCreateManyChestInput = {
-  id?: bigint | number
+  id?: number
   status?: $Enums.Status
   pinned?: boolean
   listRank: string
@@ -666,7 +652,6 @@ export type ChestPadCreateManyChestInput = {
 }
 
 export type ChestPadUpdateWithoutChestInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listRank?: Prisma.StringFieldUpdateOperationsInput | string
@@ -675,7 +660,7 @@ export type ChestPadUpdateWithoutChestInput = {
 }
 
 export type ChestPadUncheckedUpdateWithoutChestInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listRank?: Prisma.StringFieldUpdateOperationsInput | string
@@ -684,7 +669,7 @@ export type ChestPadUncheckedUpdateWithoutChestInput = {
 }
 
 export type ChestPadUncheckedUpdateManyWithoutChestInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listRank?: Prisma.StringFieldUpdateOperationsInput | string
@@ -761,7 +746,7 @@ export type $ChestPadPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     chest: Prisma.$ChestPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
-    id: bigint
+    id: number
     status: $Enums.Status
     pinned: boolean
     listRank: string
@@ -1193,7 +1178,7 @@ export interface Prisma__ChestPadClient<T, Null = never, ExtArgs extends runtime
  * Fields of the ChestPad model
  */
 export interface ChestPadFieldRefs {
-  readonly id: Prisma.FieldRef<"ChestPad", 'BigInt'>
+  readonly id: Prisma.FieldRef<"ChestPad", 'Int'>
   readonly status: Prisma.FieldRef<"ChestPad", 'Status'>
   readonly pinned: Prisma.FieldRef<"ChestPad", 'Boolean'>
   readonly listRank: Prisma.FieldRef<"ChestPad", 'String'>
