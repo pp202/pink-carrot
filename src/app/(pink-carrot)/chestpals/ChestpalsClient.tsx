@@ -108,13 +108,13 @@ const ChestpalsClient = ({ initialNickname, initialConnections }: Props) => {
 
           <div className="mb-8 rounded-xl border border-zinc-700 bg-zinc-900/80 p-4">
             <div className="flex items-center gap-2">
-              <p className="grow rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100">
-                Nickname: {nickname || 'n/a'}
+              <p className="grow px-3 py-2 text-zinc-100">
+                Name: {nickname || 'n/a'}
               </p>
               <button
                 type="button"
                 className="rounded-lg p-2 text-zinc-200 transition hover:bg-zinc-700 hover:text-zinc-100"
-                aria-label="Edit nickname"
+                aria-label="Edit name"
                 onClick={openNicknameEditor}
               >
                 <IoPencil size={18} />
@@ -128,7 +128,7 @@ const ChestpalsClient = ({ initialNickname, initialConnections }: Props) => {
                 onSubmit={saveNickname}
                 className="w-full max-w-md rounded-xl border border-zinc-700 bg-zinc-900 p-5 shadow-2xl shadow-black/50"
               >
-                <label className="mb-2 block text-sm font-medium text-zinc-200">Edit nickname</label>
+                <label className="mb-2 block text-sm font-medium text-zinc-200">Edit name</label>
                 <input
                   value={draftNickname}
                   onChange={event => setDraftNickname(event.target.value)}
