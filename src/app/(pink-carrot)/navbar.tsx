@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import classNames from 'classnames'
 import { usePathname } from 'next/navigation'
 import { GiCarrot } from 'react-icons/gi'
-import { IoClose, IoLogOut, IoPersonCircle, IoSettingsSharp, IoTrashOutline } from 'react-icons/io5'
+import { IoClose, IoLogOut, IoPeople, IoPersonCircle, IoSettingsSharp, IoTrashOutline } from 'react-icons/io5'
 import { signOut } from 'next-auth/react'
 
 const DELETE_WARNING = 'Delete your account? This permanently removes all your chests, carrots, and sign-in access details. This action cannot be undone.'
@@ -125,6 +125,15 @@ const NavBar = () => {
                                 <IoLogOut size={18} />
                                 <span>Sign out</span>
                             </button>
+                            <Link
+                                href='/chestpals'
+                                role='menuitem'
+                                className='mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-zinc-200 transition hover:bg-zinc-800 hover:text-zinc-50'
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                <IoPeople size={18} />
+                                <span>Chestpals</span>
+                            </Link>
                             <button
                                 type='button'
                                 role='menuitem'
