@@ -78,8 +78,7 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const UserScalarFieldEnum = {
   id: 'id',
   username: 'username',
-  alias: 'alias',
-  uuid: 'uuid'
+  alias: 'alias'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -110,7 +109,9 @@ export type ChestPadScalarFieldEnum = (typeof ChestPadScalarFieldEnum)[keyof typ
 export const ConnectionScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
-  userId: 'userId'
+  alias: 'alias',
+  userId: 'userId',
+  connectionUserId: 'connectionUserId'
 } as const
 
 export type ConnectionScalarFieldEnum = (typeof ConnectionScalarFieldEnum)[keyof typeof ConnectionScalarFieldEnum]

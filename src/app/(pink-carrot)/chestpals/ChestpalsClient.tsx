@@ -19,6 +19,10 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
   const [isDisconnecting, setIsDisconnecting] = useState(false)
   const [inviteMessage, setInviteMessage] = useState<string | null>(null)
   const [isInviting, setIsInviting] = useState(false)
+  const [editingConnectionId, setEditingConnectionId] = useState<number | null>(null)
+  const [aliasDraft, setAliasDraft] = useState('')
+  const [aliasError, setAliasError] = useState<string | null>(null)
+  const [isSavingAlias, setIsSavingAlias] = useState(false)
 
   const hasSelection = selectedConnectionIds.length > 0
 
@@ -113,6 +117,61 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
     setIsDisconnecting(false)
   }
 
+  const startEditingAlias = (connection: Connection) => {
+    setEditingConnectionId(connection.id)
+    setAliasDraft(connection.alias)
+    setAliasError(null)
+  }
+
+  const cancelEditingAlias = () => {
+    setEditingConnectionId(null)
+    setAliasDraft('')
+    setAliasError(null)
+  }
+
+  const saveConnectionAlias = async () => {
+    if (!editingConnectionId || isSavingAlias) {
+      return
+    }
+
+    setIsSavingAlias(true)
+    setAliasError(null)
+
+    try {
+      const response = await fetch('/api/chestpals', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          connectionId: editingConnectionId,
+          alias: aliasDraft,
+        }),
+      })
+
+      if (!response.ok) {
+        setAliasError('Unable to update alias. Please try again.')
+        return
+      }
+
+      const payload = (await response.json()) as { alias: string }
+
+      setConnections(currentConnections =>
+        currentConnections.map(connection => (
+          connection.id === editingConnectionId
+            ? { ...connection, alias: payload.alias }
+            : connection
+        ))
+      )
+
+      cancelEditingAlias()
+    } catch {
+      setAliasError('Unable to update alias. Please try again.')
+    } finally {
+      setIsSavingAlias(false)
+    }
+  }
+
   return (
     <section className="min-h-[calc(100vh-5rem)] bg-zinc-950">
       <div className="container mx-auto flex min-h-[calc(100vh-5rem)] items-stretch justify-center px-6 py-12">
@@ -135,22 +194,66 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
 
           <div className="space-y-3">
             {connections.map(connection => (
-              <label
+              <div
                 key={connection.id}
-                className="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-700 bg-zinc-900/70 px-4 py-3"
+                className="rounded-xl border border-zinc-700 bg-zinc-900/70 px-4 py-3"
               >
-                <input
-                  type="checkbox"
-                  checked={selectedConnectionIdSet.has(connection.id)}
-                  onChange={() => toggleConnection(connection.id)}
-                  className="h-4 w-4 rounded border-zinc-500 bg-zinc-950 text-zinc-100"
-                />
-                <span className="text-zinc-100">{connection.alias}</span>
-              </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedConnectionIdSet.has(connection.id)}
+                    onChange={() => toggleConnection(connection.id)}
+                    className="h-4 w-4 rounded border-zinc-500 bg-zinc-950 text-zinc-100"
+                  />
+                  {editingConnectionId === connection.id ? (
+                    <>
+                      <input
+                        type="text"
+                        value={aliasDraft}
+                        onChange={event => setAliasDraft(event.target.value)}
+                        className="min-w-0 flex-1 rounded-md border border-zinc-600 bg-zinc-950 px-3 py-1 text-sm text-zinc-100 focus:border-zinc-400 focus:outline-none"
+                        maxLength={255}
+                      />
+                      <button
+                        type="button"
+                        onClick={saveConnectionAlias}
+                        disabled={isSavingAlias}
+                        className="rounded-lg border border-zinc-400/50 bg-zinc-700/40 px-3 py-1 text-xs font-medium text-zinc-100 transition hover:bg-zinc-700/60 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isSavingAlias ? 'Saving…' : 'Save'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={cancelEditingAlias}
+                        disabled={isSavingAlias}
+                        className="rounded-lg border border-zinc-500/60 bg-zinc-800/30 px-3 py-1 text-xs font-medium text-zinc-200 transition hover:bg-zinc-700/50 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="min-w-0 flex-1 truncate text-zinc-100">{connection.alias}</span>
+                      <button
+                        type="button"
+                        onClick={() => startEditingAlias(connection)}
+                        className="rounded-lg border border-zinc-400/50 bg-zinc-700/40 px-3 py-1 text-xs font-medium text-zinc-100 transition hover:bg-zinc-700/60"
+                      >
+                        Edit alias
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
             ))}
             {connections.length === 0 && (
               <p className="rounded-xl border border-zinc-700 bg-zinc-900/70 px-4 py-3 text-sm text-zinc-300">
                 No linked accounts.
+              </p>
+            )}
+            {aliasError && (
+              <p className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+                {aliasError}
               </p>
             )}
           </div>
