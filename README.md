@@ -18,6 +18,7 @@ Set these in `.env` or `.env.local` before running the app:
 - NEXTAUTH_SECRET
 - GOOGLE_CLIENT_ID
 - GOOGLE_CLIENT_SECRET
+- NEXT_PUBLIC_APP_URL (optional, used to build invite links)
 
 First, run the development server:
 

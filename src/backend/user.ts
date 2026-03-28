@@ -1,6 +1,12 @@
 import { prisma } from "@/config/prisma";
 import { auth } from "@/";
 
+const CONNECTION_REQUEST_LIFESPAN_MS = 10 * 60 * 1000;
+
+type ConsumeInviteStatus =
+  | { status: "connected" }
+  | { status: "expired" }
+  | { status: "owner-active"; remainingMinutes: number };
 
 export async function loggedUser() {
   const data = await auth();
@@ -168,4 +174,85 @@ export async function disconnectConnections(connectionIds: number[]) {
   );
 
   return linkedUsers.length;
+}
+
+export async function createConnectionRequest() {
+  const user = await loggedUser();
+
+  const request = await prisma.connectionRequest.create({
+    data: {
+      userId: user.id,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return request.id;
+}
+
+export async function consumeConnectionRequest(requestId: string): Promise<ConsumeInviteStatus> {
+  const user = await loggedUser();
+
+  const connectionRequest = await prisma.connectionRequest.findUnique({
+    where: {
+      id: requestId,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          uuid: true,
+        },
+      },
+    },
+  });
+
+  if (!connectionRequest) {
+    return { status: "expired" };
+  }
+
+  const expiresAt = connectionRequest.createdAt.getTime() + CONNECTION_REQUEST_LIFESPAN_MS;
+  const now = Date.now();
+
+  if (expiresAt <= now) {
+    await prisma.connectionRequest.deleteMany({
+      where: {
+        id: requestId,
+      },
+    });
+
+    return { status: "expired" };
+  }
+
+  if (connectionRequest.userId === user.id) {
+    const remainingMinutes = Math.max(1, Math.ceil((expiresAt - now) / 60000));
+    return { status: "owner-active", remainingMinutes };
+  }
+
+  await prisma.$transaction([
+    prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        uuid: connectionRequest.user.uuid,
+      },
+    }),
+    prisma.user.update({
+      where: {
+        id: connectionRequest.userId,
+      },
+      data: {
+        uuid: connectionRequest.user.uuid,
+      },
+    }),
+    prisma.connectionRequest.deleteMany({
+      where: {
+        id: requestId,
+      },
+    }),
+  ]);
+
+  return { status: "connected" };
 }

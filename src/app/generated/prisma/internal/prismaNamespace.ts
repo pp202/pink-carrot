@@ -388,6 +388,7 @@ export const ModelName = {
   Chest: 'Chest',
   ChestPad: 'ChestPad',
   Connection: 'Connection',
+  ConnectionRequest: 'ConnectionRequest',
   Carrot: 'Carrot'
 } as const
 
@@ -404,7 +405,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "chest" | "chestPad" | "connection" | "carrot"
+    modelProps: "user" | "chest" | "chestPad" | "connection" | "connectionRequest" | "carrot"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -704,6 +705,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ConnectionRequest: {
+      payload: Prisma.$ConnectionRequestPayload<ExtArgs>
+      fields: Prisma.ConnectionRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ConnectionRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConnectionRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ConnectionRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConnectionRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.ConnectionRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConnectionRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ConnectionRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConnectionRequestPayload>
+        }
+        findMany: {
+          args: Prisma.ConnectionRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConnectionRequestPayload>[]
+        }
+        create: {
+          args: Prisma.ConnectionRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConnectionRequestPayload>
+        }
+        createMany: {
+          args: Prisma.ConnectionRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ConnectionRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConnectionRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.ConnectionRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConnectionRequestPayload>
+        }
+        update: {
+          args: Prisma.ConnectionRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConnectionRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.ConnectionRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ConnectionRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ConnectionRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConnectionRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.ConnectionRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConnectionRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.ConnectionRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateConnectionRequest>
+        }
+        groupBy: {
+          args: Prisma.ConnectionRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ConnectionRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ConnectionRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ConnectionRequestCountAggregateOutputType> | number
+        }
+      }
+    }
     Carrot: {
       payload: Prisma.$CarrotPayload<ExtArgs>
       fields: Prisma.CarrotFieldRefs
@@ -858,6 +933,15 @@ export const ConnectionScalarFieldEnum = {
 export type ConnectionScalarFieldEnum = (typeof ConnectionScalarFieldEnum)[keyof typeof ConnectionScalarFieldEnum]
 
 
+export const ConnectionRequestScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  userId: 'userId'
+} as const
+
+export type ConnectionRequestScalarFieldEnum = (typeof ConnectionRequestScalarFieldEnum)[keyof typeof ConnectionRequestScalarFieldEnum]
+
+
 export const CarrotScalarFieldEnum = {
   id: 'id',
   label: 'label',
@@ -882,14 +966,6 @@ export const QueryMode = {
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
-
-
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
 
@@ -1073,6 +1149,7 @@ export type GlobalOmitConfig = {
   chest?: Prisma.ChestOmit
   chestPad?: Prisma.ChestPadOmit
   connection?: Prisma.ConnectionOmit
+  connectionRequest?: Prisma.ConnectionRequestOmit
   carrot?: Prisma.CarrotOmit
 }
 

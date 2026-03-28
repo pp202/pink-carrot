@@ -38,6 +38,11 @@ export type ChestPad = Prisma.ChestPadModel
  */
 export type Connection = Prisma.ConnectionModel
 /**
+ * Model ConnectionRequest
+ * 
+ */
+export type ConnectionRequest = Prisma.ConnectionRequestModel
+/**
  * Model Carrot
  * 
  */

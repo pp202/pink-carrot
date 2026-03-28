@@ -17,6 +17,7 @@ model User {
   uuid     String  @unique @default(uuid()) @db.Uuid
   chestPads ChestPad[]
   connections Connection[]
+  connectionRequests ConnectionRequest[]
 }
 
 model Chest {
@@ -51,6 +52,16 @@ model Connection {
 
   userId Int
   user User @relation(fields: [userId], references: [id])
+}
+
+model ConnectionRequest {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  @@index([createdAt])
 }
 
 model Carrot {

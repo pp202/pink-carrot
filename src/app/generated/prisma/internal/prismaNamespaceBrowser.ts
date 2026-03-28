@@ -55,6 +55,7 @@ export const ModelName = {
   Chest: 'Chest',
   ChestPad: 'ChestPad',
   Connection: 'Connection',
+  ConnectionRequest: 'ConnectionRequest',
   Carrot: 'Carrot'
 } as const
 
@@ -115,6 +116,15 @@ export const ConnectionScalarFieldEnum = {
 export type ConnectionScalarFieldEnum = (typeof ConnectionScalarFieldEnum)[keyof typeof ConnectionScalarFieldEnum]
 
 
+export const ConnectionRequestScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  userId: 'userId'
+} as const
+
+export type ConnectionRequestScalarFieldEnum = (typeof ConnectionRequestScalarFieldEnum)[keyof typeof ConnectionRequestScalarFieldEnum]
+
+
 export const CarrotScalarFieldEnum = {
   id: 'id',
   label: 'label',
@@ -139,12 +149,4 @@ export const QueryMode = {
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
-
-
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
