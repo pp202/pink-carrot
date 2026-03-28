@@ -1,7 +1,6 @@
 'use client'
 
-import { FormEvent, useMemo, useState } from 'react'
-import { IoPencil } from 'react-icons/io5'
+import { useMemo, useState } from 'react'
 
 type Connection = {
   id: number
@@ -9,17 +8,12 @@ type Connection = {
 }
 
 type Props = {
-  initialNickname: string
   initialConnections: Connection[]
 }
 
-const ChestpalsClient = ({ initialNickname, initialConnections }: Props) => {
-  const [nickname, setNickname] = useState(initialNickname)
-  const [draftNickname, setDraftNickname] = useState(initialNickname)
-  const [isEditingNickname, setIsEditingNickname] = useState(false)
+const ChestpalsClient = ({ initialConnections }: Props) => {
   const [connections, setConnections] = useState<Connection[]>(initialConnections)
   const [selectedConnectionIds, setSelectedConnectionIds] = useState<number[]>([])
-  const [isSavingNickname, setIsSavingNickname] = useState(false)
   const [isDisconnecting, setIsDisconnecting] = useState(false)
 
   const hasSelection = selectedConnectionIds.length > 0
@@ -34,43 +28,6 @@ const ChestpalsClient = ({ initialNickname, initialConnections }: Props) => {
 
       return [...currentSelection, connectionId]
     })
-  }
-
-  const saveNickname = async (event: FormEvent) => {
-    event.preventDefault()
-
-    if (isSavingNickname) {
-      return
-    }
-
-    setIsSavingNickname(true)
-
-    const response = await fetch('/api/chestpals', {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ nickname: draftNickname }),
-    })
-
-    if (response.ok) {
-      const payload: { nickname: string } = await response.json()
-      setNickname(payload.nickname)
-      setDraftNickname(payload.nickname)
-      setIsEditingNickname(false)
-    }
-
-    setIsSavingNickname(false)
-  }
-
-  const openNicknameEditor = () => {
-    setDraftNickname(nickname)
-    setIsEditingNickname(true)
-  }
-
-  const cancelNicknameEdit = () => {
-    setDraftNickname(nickname)
-    setIsEditingNickname(false)
   }
 
   const disconnectSelectedConnections = async () => {
@@ -105,55 +62,6 @@ const ChestpalsClient = ({ initialNickname, initialConnections }: Props) => {
           <header className="mb-8 w-full text-center">
             <h1 className="text-2xl font-semibold text-zinc-100">Chestpals</h1>
           </header>
-
-          <div className="mb-8 rounded-xl border border-zinc-700 bg-zinc-900/80 p-4">
-            <div className="flex items-center gap-2">
-              <p className="grow px-3 py-2 text-zinc-100">
-                Name: {nickname || 'n/a'}
-              </p>
-              <button
-                type="button"
-                className="rounded-lg p-2 text-zinc-200 transition hover:bg-zinc-700 hover:text-zinc-100"
-                aria-label="Edit name"
-                onClick={openNicknameEditor}
-              >
-                <IoPencil size={18} />
-              </button>
-            </div>
-          </div>
-
-          {isEditingNickname && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-6">
-              <form
-                onSubmit={saveNickname}
-                className="w-full max-w-md rounded-xl border border-zinc-700 bg-zinc-900 p-5 shadow-2xl shadow-black/50"
-              >
-                <label className="mb-2 block text-sm font-medium text-zinc-200">Edit name</label>
-                <input
-                  value={draftNickname}
-                  onChange={event => setDraftNickname(event.target.value)}
-                  className="mb-4 w-full rounded-lg border border-zinc-600 bg-zinc-950 px-3 py-2 text-zinc-100 outline-none focus:border-zinc-400"
-                />
-                <div className="flex justify-end gap-2">
-                  <button
-                    type="button"
-                    className="rounded-md border border-zinc-500 px-3 py-2 text-sm font-medium text-zinc-100 transition hover:bg-zinc-800"
-                    onClick={cancelNicknameEdit}
-                    disabled={isSavingNickname}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="rounded-md bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60"
-                    disabled={isSavingNickname}
-                  >
-                    {isSavingNickname ? 'Saving…' : 'Save'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
 
           <div className="space-y-3">
             {connections.map(connection => (

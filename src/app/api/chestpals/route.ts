@@ -1,18 +1,9 @@
-import { disconnectConnections, getChestpalsData, updateNickname } from "@/backend/user";
+import { disconnectConnections, getChestpalsData } from "@/backend/user";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   const data = await getChestpalsData();
   return NextResponse.json(data);
-}
-
-export async function PATCH(request: Request) {
-  const body = await request.json().catch(() => null);
-  const nickname = typeof body?.nickname === "string" ? body.nickname : "";
-
-  const updatedNickname = await updateNickname(nickname);
-
-  return NextResponse.json({ nickname: updatedNickname });
 }
 
 export async function DELETE(request: Request) {

@@ -16,6 +16,10 @@ const NavBar = () => {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
     const [isDeletingAccount, setIsDeletingAccount] = useState(false)
     const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null)
+    const [alias, setAlias] = useState('Chest wizard')
+    const [isLoadingAlias, setIsLoadingAlias] = useState(false)
+    const [isSavingAlias, setIsSavingAlias] = useState(false)
+    const [aliasError, setAliasError] = useState<string | null>(null)
     const menuRef = useRef<HTMLDivElement>(null)
 
     const navItems = [
@@ -47,10 +51,26 @@ const NavBar = () => {
         }
     }, [])
 
-    const openSettings = () => {
+    const openSettings = async () => {
         setDeleteAccountError(null)
+        setAliasError(null)
         setIsMenuOpen(false)
         setIsSettingsOpen(true)
+
+        setIsLoadingAlias(true)
+        try {
+            const response = await fetch('/api/account')
+            if (!response.ok) {
+                throw new Error('Unable to load your profile.')
+            }
+            const payload: { alias: string } = await response.json()
+            setAlias(payload.alias)
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unable to load your profile.'
+            setAliasError(message)
+        } finally {
+            setIsLoadingAlias(false)
+        }
     }
 
     const closeSettings = () => {
@@ -59,7 +79,45 @@ const NavBar = () => {
         }
 
         setDeleteAccountError(null)
+        setAliasError(null)
         setIsSettingsOpen(false)
+    }
+
+    const saveAlias = async () => {
+        if (isSavingAlias) {
+            return
+        }
+
+        const trimmedAlias = alias.trim()
+        if (!trimmedAlias) {
+            setAliasError('Chestpaling name is required.')
+            return
+        }
+
+        setIsSavingAlias(true)
+        setAliasError(null)
+
+        try {
+            const response = await fetch('/api/account', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ alias: trimmedAlias }),
+            })
+
+            if (!response.ok) {
+                throw new Error('Unable to save your profile.')
+            }
+
+            const payload: { alias: string } = await response.json()
+            setAlias(payload.alias)
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unable to save your profile.'
+            setAliasError(message)
+        } finally {
+            setIsSavingAlias(false)
+        }
     }
 
     const deleteAccount = async () => {
@@ -164,7 +222,33 @@ const NavBar = () => {
                             </button>
                         </div>
                         <div className='flex flex-1 flex-col px-6 py-5'>
-                            <div className='flex flex-1 flex-col justify-center'>
+                            <div className='flex flex-1 flex-col gap-4'>
+                                <div>
+                                    <p className='mb-2 text-sm font-medium text-zinc-300'>Chestpaling name:</p>
+                                    <input
+                                        type='text'
+                                        value={alias}
+                                        onChange={event => setAlias(event.target.value)}
+                                        disabled={isLoadingAlias || isSavingAlias || isDeletingAccount}
+                                        className='w-full rounded-lg border border-zinc-600 bg-zinc-950 px-3 py-2 text-zinc-100 outline-none focus:border-zinc-400 disabled:cursor-not-allowed disabled:opacity-60'
+                                        required
+                                    />
+                                </div>
+                                <div className='flex justify-end'>
+                                    <button
+                                        type='button'
+                                        className='rounded-md bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60'
+                                        onClick={saveAlias}
+                                        disabled={isLoadingAlias || isSavingAlias || isDeletingAccount || alias.trim().length === 0}
+                                    >
+                                        {isSavingAlias ? 'Saving…' : 'Save profile'}
+                                    </button>
+                                </div>
+                                {aliasError && (
+                                    <div className='rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-100'>
+                                        {aliasError}
+                                    </div>
+                                )}
                                 {deleteAccountError && (
                                     <div className='rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-100'>
                                         {deleteAccountError}

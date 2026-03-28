@@ -9,7 +9,6 @@ const ChestpalsPage = async () => {
 
   return (
     <ChestpalsClient
-      initialNickname={data.nickname}
       initialConnections={data.connections}
     />
   )
