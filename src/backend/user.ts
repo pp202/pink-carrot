@@ -20,6 +20,7 @@ export async function createUserIfNew(username: string) {
     const newUser = await prisma.user.create({
       data: {
         username: lcUsername,
+        alias: "Chest wizard",
       },
     });
     console.log("New user registered, ID:", newUser.id);
@@ -96,7 +97,6 @@ export async function getChestpalsData() {
   });
 
   return {
-    nickname: user.alias ?? "",
     connections: linkedUsers.map((linkedUser) => ({
       id: linkedUser.id,
       alias: linkedUser.alias?.trim() ? linkedUser.alias : linkedUser.username,
@@ -104,22 +104,30 @@ export async function getChestpalsData() {
   };
 }
 
-export async function updateNickname(nickname: string) {
+export async function getUserProfile() {
   const user = await loggedUser();
+  return {
+    alias: user.alias?.trim() ? user.alias : "Chest wizard",
+  };
+}
+
+export async function updateAlias(alias: string) {
+  const user = await loggedUser();
+  const nextAlias = alias.trim() || "Chest wizard";
 
   const updatedUser = await prisma.user.update({
     where: {
       id: user.id,
     },
     data: {
-      alias: nickname.trim() || null,
+      alias: nextAlias,
     },
     select: {
       alias: true,
     },
   });
 
-  return updatedUser.alias ?? "";
+  return updatedUser.alias;
 }
 
 export async function disconnectConnections(connectionIds: number[]) {
