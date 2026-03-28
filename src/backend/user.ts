@@ -85,27 +85,27 @@ export async function deleteUserAccount() {
 export async function getChestpalsData() {
   const user = await loggedUser();
 
-  const linkedUsers = await prisma.user.findMany({
+  const connections = await prisma.connection.findMany({
     where: {
-      uuid: user.uuid,
-      id: {
-        not: user.id,
-      },
+      userId: user.id,
     },
     orderBy: {
-      id: "asc",
+      createdAt: "asc",
     },
     select: {
-      id: true,
       alias: true,
-      username: true,
+      connectionUser: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
 
   return {
-    connections: linkedUsers.map((linkedUser) => ({
-      id: linkedUser.id,
-      alias: linkedUser.alias?.trim() ? linkedUser.alias : linkedUser.username,
+    connections: connections.map(({ alias, connectionUser }) => ({
+      id: connectionUser.id,
+      alias: alias?.trim() ? alias : "Chest wizard",
     })),
   };
 }
@@ -143,37 +143,65 @@ export async function disconnectConnections(connectionIds: number[]) {
     return 0;
   }
 
-  const linkedUsers = await prisma.user.findMany({
+  const linkedConnections = await prisma.connection.findMany({
     where: {
-      uuid: user.uuid,
-      id: {
+      userId: user.id,
+      connectionUserId: {
         in: connectionIds,
-        not: user.id,
       },
     },
     select: {
-      id: true,
+      connectionUserId: true,
     },
   });
 
-  if (linkedUsers.length === 0) {
+  if (linkedConnections.length === 0) {
     return 0;
   }
 
-  await prisma.$transaction(
-    linkedUsers.map((linkedUser) =>
-      prisma.user.update({
-        where: {
-          id: linkedUser.id,
-        },
-        data: {
-          uuid: crypto.randomUUID(),
-        },
-      })
-    )
-  );
+  const linkedIds = linkedConnections.map((connection) => connection.connectionUserId);
 
-  return linkedUsers.length;
+  await prisma.connection.deleteMany({
+    where: {
+      OR: [
+        {
+          userId: user.id,
+          connectionUserId: {
+            in: linkedIds,
+          },
+        },
+        {
+          userId: {
+            in: linkedIds,
+          },
+          connectionUserId: user.id,
+        },
+      ],
+    },
+  });
+
+  return linkedIds.length;
+}
+
+export async function updateConnectionAlias(connectionId: number, alias: string) {
+  const user = await loggedUser();
+  const nextAlias = alias.trim() || "Chest wizard";
+
+  const connection = await prisma.connection.updateMany({
+    where: {
+      userId: user.id,
+      connectionUserId: connectionId,
+    },
+    data: {
+      alias: nextAlias,
+    },
+  });
+
+  if (connection.count === 0) {
+    throw new Error("Connection not found");
+  }
+
+  return nextAlias;
 }
 
 export async function createConnectionRequest() {
@@ -202,7 +230,7 @@ export async function consumeConnectionRequest(requestId: string): Promise<Consu
       user: {
         select: {
           id: true,
-          uuid: true,
+          alias: true,
         },
       },
     },
@@ -231,21 +259,20 @@ export async function consumeConnectionRequest(requestId: string): Promise<Consu
   }
 
   await prisma.$transaction([
-    prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        uuid: connectionRequest.user.uuid,
-      },
-    }),
-    prisma.user.update({
-      where: {
-        id: connectionRequest.userId,
-      },
-      data: {
-        uuid: connectionRequest.user.uuid,
-      },
+    prisma.connection.createMany({
+      data: [
+        {
+          userId: user.id,
+          connectionUserId: connectionRequest.userId,
+          alias: connectionRequest.user.alias?.trim() ? connectionRequest.user.alias : "Chest wizard",
+        },
+        {
+          userId: connectionRequest.userId,
+          connectionUserId: user.id,
+          alias: user.alias?.trim() ? user.alias : "Chest wizard",
+        },
+      ],
+      skipDuplicates: true,
     }),
     prisma.connectionRequest.deleteMany({
       where: {
