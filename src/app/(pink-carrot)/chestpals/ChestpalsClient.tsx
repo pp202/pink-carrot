@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 type Connection = {
   id: number
@@ -17,12 +17,11 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
   const [connections, setConnections] = useState<Connection[]>(initialConnections)
   const [selectedConnectionIds, setSelectedConnectionIds] = useState<number[]>([])
   const [isDisconnecting, setIsDisconnecting] = useState(false)
-  const [inviteMessage, setInviteMessage] = useState<string | null>(null)
   const [isInviting, setIsInviting] = useState(false)
   const [editingConnectionId, setEditingConnectionId] = useState<number | null>(null)
   const [aliasDraft, setAliasDraft] = useState('')
-  const [aliasError, setAliasError] = useState<string | null>(null)
   const [isSavingAlias, setIsSavingAlias] = useState(false)
+  const [modalMessage, setModalMessage] = useState<{ tone: 'success' | 'warning'; text: string } | null>(null)
 
   const hasSelection = selectedConnectionIds.length > 0
 
@@ -44,6 +43,19 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
     return null
   }, [initialNotice, initialRemainingMinutes])
 
+  useEffect(() => {
+    if (!noticeMessage) {
+      return
+    }
+
+    if (initialNotice === 'connected') {
+      setModalMessage({ tone: 'success', text: noticeMessage })
+      return
+    }
+
+    setModalMessage({ tone: 'warning', text: noticeMessage })
+  }, [initialNotice, noticeMessage])
+
   const createInviteLink = async () => {
     if (isInviting) {
       return
@@ -57,14 +69,14 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
       })
 
       if (!response.ok) {
-        setInviteMessage('Unable to create an invite link. Please try again.')
+        setModalMessage({ tone: 'warning', text: 'Unable to create an invite link. Please try again.' })
         return
       }
 
       const data = (await response.json()) as { requestId?: string }
 
       if (!data.requestId) {
-        setInviteMessage('Unable to create an invite link. Please try again.')
+        setModalMessage({ tone: 'warning', text: 'Unable to create an invite link. Please try again.' })
         return
       }
 
@@ -74,9 +86,9 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
       const inviteLink = `${normalizedBaseUrl}/connect/${data.requestId}`
 
       await navigator.clipboard.writeText(inviteLink)
-      setInviteMessage('Invite link copied. You can now share it.')
+      setModalMessage({ tone: 'success', text: 'Invite link copied. You can now share it.' })
     } catch {
-      setInviteMessage('Unable to create an invite link. Please try again.')
+      setModalMessage({ tone: 'warning', text: 'Unable to create an invite link. Please try again.' })
     } finally {
       setIsInviting(false)
     }
@@ -112,6 +124,9 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
         currentConnections.filter(connection => !selectedConnectionIdSet.has(connection.id))
       )
       setSelectedConnectionIds([])
+      setModalMessage({ tone: 'success', text: 'Selected connections were disconnected.' })
+    } else {
+      setModalMessage({ tone: 'warning', text: 'Unable to disconnect selected connections. Please try again.' })
     }
 
     setIsDisconnecting(false)
@@ -120,13 +135,11 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
   const startEditingAlias = (connection: Connection) => {
     setEditingConnectionId(connection.id)
     setAliasDraft(connection.alias)
-    setAliasError(null)
   }
 
   const cancelEditingAlias = () => {
     setEditingConnectionId(null)
     setAliasDraft('')
-    setAliasError(null)
   }
 
   const saveConnectionAlias = async () => {
@@ -135,7 +148,6 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
     }
 
     setIsSavingAlias(true)
-    setAliasError(null)
 
     try {
       const response = await fetch('/api/chestpals', {
@@ -150,7 +162,7 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
       })
 
       if (!response.ok) {
-        setAliasError('Unable to update alias. Please try again.')
+        setModalMessage({ tone: 'warning', text: 'Unable to update alias. Please try again.' })
         return
       }
 
@@ -165,8 +177,9 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
       )
 
       cancelEditingAlias()
+      setModalMessage({ tone: 'success', text: 'Alias updated.' })
     } catch {
-      setAliasError('Unable to update alias. Please try again.')
+      setModalMessage({ tone: 'warning', text: 'Unable to update alias. Please try again.' })
     } finally {
       setIsSavingAlias(false)
     }
@@ -179,18 +192,6 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
           <header className="mb-8 w-full text-center">
             <h1 className="text-2xl font-semibold text-zinc-100">Chestpals</h1>
           </header>
-
-          {noticeMessage && (
-            <p className="mb-6 rounded-xl border border-zinc-700 bg-zinc-900/70 px-4 py-3 text-sm text-zinc-200">
-              {noticeMessage}
-            </p>
-          )}
-
-          {inviteMessage && (
-            <p className="mb-6 rounded-xl border border-green-500/40 bg-green-500/10 px-4 py-3 text-sm text-green-100">
-              {inviteMessage}
-            </p>
-          )}
 
           <div className="space-y-3">
             {connections.map(connection => (
@@ -251,11 +252,6 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
                 No linked accounts.
               </p>
             )}
-            {aliasError && (
-              <p className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
-                {aliasError}
-              </p>
-            )}
           </div>
 
           <div className="mt-8 flex justify-between gap-3">
@@ -278,6 +274,34 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
           </div>
         </div>
       </div>
+      {modalMessage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-6"
+          onClick={() => setModalMessage(null)}
+        >
+          <div
+            className={`w-full max-w-md rounded-2xl border px-6 py-5 text-center shadow-2xl ${
+              modalMessage.tone === 'success'
+                ? 'border-green-400/70 bg-zinc-900 text-green-100 shadow-[0_0_32px_rgba(74,222,128,0.65)]'
+                : 'border-amber-400/70 bg-zinc-900 text-amber-100 shadow-[0_0_32px_rgba(251,146,60,0.65)]'
+            }`}
+            onClick={event => event.stopPropagation()}
+          >
+            <p className="text-sm">{modalMessage.text}</p>
+            <button
+              type="button"
+              className={`mt-5 rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                modalMessage.tone === 'success'
+                  ? 'border-green-300/60 bg-green-500/20 text-green-100 hover:bg-green-500/30'
+                  : 'border-amber-300/60 bg-amber-500/20 text-amber-100 hover:bg-amber-500/30'
+              }`}
+              onClick={() => setModalMessage(null)}
+            >
+              Noted
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
