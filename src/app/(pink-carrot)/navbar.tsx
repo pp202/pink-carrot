@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import classNames from 'classnames'
 import { usePathname } from 'next/navigation'
 import { GiCarrot } from 'react-icons/gi'
-import { IoClose, IoLogOut, IoPeople, IoPersonCircle, IoSettingsSharp, IoTrashOutline } from 'react-icons/io5'
+import { IoClose, IoCreateOutline, IoLogOut, IoPeople, IoPersonCircle, IoSettingsSharp, IoTrashOutline } from 'react-icons/io5'
 import { signOut } from 'next-auth/react'
 
 const DELETE_WARNING = 'Delete your account? This permanently removes all your chests, carrots, and sign-in access details. This action cannot be undone.'
@@ -20,6 +20,8 @@ const NavBar = () => {
     const [isLoadingAlias, setIsLoadingAlias] = useState(false)
     const [isSavingAlias, setIsSavingAlias] = useState(false)
     const [aliasError, setAliasError] = useState<string | null>(null)
+    const [isAliasModalOpen, setIsAliasModalOpen] = useState(false)
+    const [aliasDraft, setAliasDraft] = useState('')
     const menuRef = useRef<HTMLDivElement>(null)
 
     const navItems = [
@@ -65,6 +67,7 @@ const NavBar = () => {
             }
             const payload: { alias: string } = await response.json()
             setAlias(payload.alias)
+            setAliasDraft(payload.alias)
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Unable to load your profile.'
             setAliasError(message)
@@ -81,6 +84,22 @@ const NavBar = () => {
         setDeleteAccountError(null)
         setAliasError(null)
         setIsSettingsOpen(false)
+        setIsAliasModalOpen(false)
+    }
+
+    const openAliasModal = () => {
+        setAliasDraft(alias)
+        setAliasError(null)
+        setIsAliasModalOpen(true)
+    }
+
+    const closeAliasModal = () => {
+        if (isSavingAlias || isDeletingAccount || isLoadingAlias) {
+            return
+        }
+
+        setAliasError(null)
+        setIsAliasModalOpen(false)
     }
 
     const saveAlias = async () => {
@@ -88,7 +107,7 @@ const NavBar = () => {
             return
         }
 
-        const trimmedAlias = alias.trim()
+        const trimmedAlias = aliasDraft.trim()
         if (!trimmedAlias) {
             setAliasError('Chestpaling name is required.')
             return
@@ -112,6 +131,8 @@ const NavBar = () => {
 
             const payload: { alias: string } = await response.json()
             setAlias(payload.alias)
+            setAliasDraft(payload.alias)
+            setIsAliasModalOpen(false)
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Unable to save your profile.'
             setAliasError(message)
@@ -225,24 +246,18 @@ const NavBar = () => {
                             <div className='flex flex-1 flex-col gap-4'>
                                 <div>
                                     <p className='mb-2 text-sm font-medium text-zinc-300'>Chestpaling name:</p>
-                                    <input
-                                        type='text'
-                                        value={alias}
-                                        onChange={event => setAlias(event.target.value)}
-                                        disabled={isLoadingAlias || isSavingAlias || isDeletingAccount}
-                                        className='w-full rounded-lg border border-zinc-600 bg-zinc-950 px-3 py-2 text-zinc-100 outline-none focus:border-zinc-400 disabled:cursor-not-allowed disabled:opacity-60'
-                                        required
-                                    />
-                                </div>
-                                <div className='flex justify-end'>
-                                    <button
-                                        type='button'
-                                        className='rounded-md bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60'
-                                        onClick={saveAlias}
-                                        disabled={isLoadingAlias || isSavingAlias || isDeletingAccount || alias.trim().length === 0}
-                                    >
-                                        {isSavingAlias ? 'Saving…' : 'Save profile'}
-                                    </button>
+                                    <div className='flex items-center justify-between gap-3 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2'>
+                                        <span className='truncate text-zinc-100'>{alias}</span>
+                                        <button
+                                            type='button'
+                                            className='rounded-md p-1 text-zinc-300 transition hover:bg-zinc-800 hover:text-zinc-100 disabled:cursor-not-allowed disabled:opacity-60'
+                                            onClick={openAliasModal}
+                                            disabled={isLoadingAlias || isSavingAlias || isDeletingAccount}
+                                            aria-label='Edit chestpaling name'
+                                        >
+                                            <IoCreateOutline size={18} />
+                                        </button>
+                                    </div>
                                 </div>
                                 {aliasError && (
                                     <div className='rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-100'>
@@ -264,6 +279,54 @@ const NavBar = () => {
                                 >
                                     <IoTrashOutline size={18} />
                                     <span>{isDeletingAccount ? 'Deleting account…' : 'Delete account'}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isSettingsOpen && isAliasModalOpen && (
+                <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4'>
+                    <div className='w-full max-w-md rounded-2xl border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/60'>
+                        <div className='flex items-center justify-between border-b border-zinc-800 px-5 py-4'>
+                            <h3 className='text-base font-semibold text-zinc-50'>Edit chestpaling name</h3>
+                            <button
+                                type='button'
+                                aria-label='Close alias editor'
+                                className='rounded-full p-2 text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100 disabled:cursor-not-allowed disabled:opacity-50'
+                                onClick={closeAliasModal}
+                                disabled={isSavingAlias || isDeletingAccount || isLoadingAlias}
+                            >
+                                <IoClose size={18} />
+                            </button>
+                        </div>
+                        <div className='space-y-4 px-5 py-4'>
+                            <input
+                                type='text'
+                                value={aliasDraft}
+                                onChange={event => setAliasDraft(event.target.value)}
+                                disabled={isLoadingAlias || isSavingAlias || isDeletingAccount}
+                                className='w-full rounded-lg border border-zinc-600 bg-zinc-950 px-3 py-2 text-zinc-100 outline-none focus:border-zinc-400 disabled:cursor-not-allowed disabled:opacity-60'
+                                required
+                                autoFocus
+                            />
+                            <div className='flex justify-end gap-2'>
+                                <button
+                                    type='button'
+                                    className='rounded-md border border-zinc-600 px-3 py-2 text-sm font-medium text-zinc-200 transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60'
+                                    onClick={closeAliasModal}
+                                    disabled={isSavingAlias || isDeletingAccount || isLoadingAlias}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type='button'
+                                    className='rounded-md bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60'
+                                    onClick={saveAlias}
+                                    disabled={isLoadingAlias || isSavingAlias || isDeletingAccount || aliasDraft.trim().length === 0}
+                                >
+                                    {isSavingAlias ? 'Saving…' : 'Save'}
                                 </button>
                             </div>
                         </div>
