@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { IoClose, IoCreateOutline } from 'react-icons/io5'
 
 type Connection = {
   id: number
@@ -206,44 +207,16 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
                     onChange={() => toggleConnection(connection.id)}
                     className="h-4 w-4 rounded border-zinc-500 bg-zinc-950 text-zinc-100"
                   />
-                  {editingConnectionId === connection.id ? (
-                    <>
-                      <input
-                        type="text"
-                        value={aliasDraft}
-                        onChange={event => setAliasDraft(event.target.value)}
-                        className="min-w-0 flex-1 rounded-md border border-zinc-600 bg-zinc-950 px-3 py-1 text-sm text-zinc-100 focus:border-zinc-400 focus:outline-none"
-                        maxLength={255}
-                      />
-                      <button
-                        type="button"
-                        onClick={saveConnectionAlias}
-                        disabled={isSavingAlias}
-                        className="rounded-lg border border-zinc-400/50 bg-zinc-700/40 px-3 py-1 text-xs font-medium text-zinc-100 transition hover:bg-zinc-700/60 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {isSavingAlias ? 'Saving…' : 'Save'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={cancelEditingAlias}
-                        disabled={isSavingAlias}
-                        className="rounded-lg border border-zinc-500/60 bg-zinc-800/30 px-3 py-1 text-xs font-medium text-zinc-200 transition hover:bg-zinc-700/50 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <span className="min-w-0 flex-1 truncate text-zinc-100">{connection.alias}</span>
-                      <button
-                        type="button"
-                        onClick={() => startEditingAlias(connection)}
-                        className="rounded-lg border border-zinc-400/50 bg-zinc-700/40 px-3 py-1 text-xs font-medium text-zinc-100 transition hover:bg-zinc-700/60"
-                      >
-                        Edit alias
-                      </button>
-                    </>
-                  )}
+                  <span className="min-w-0 flex-1 truncate text-zinc-100">{connection.alias}</span>
+                  <button
+                    type="button"
+                    onClick={() => startEditingAlias(connection)}
+                    disabled={isSavingAlias}
+                    className="rounded-md p-1 text-zinc-300 transition hover:bg-zinc-800 hover:text-zinc-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    aria-label={`Edit alias for ${connection.alias}`}
+                  >
+                    <IoCreateOutline size={18} />
+                  </button>
                 </div>
               </div>
             ))}
@@ -299,6 +272,52 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
             >
               Noted
             </button>
+          </div>
+        </div>
+      )}
+      {editingConnectionId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4">
+          <div className="w-full max-w-md rounded-2xl border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/60">
+            <div className="flex items-center justify-between border-b border-zinc-800 px-5 py-4">
+              <h2 className="text-base font-semibold text-zinc-50">Edit chestpal alias</h2>
+              <button
+                type="button"
+                aria-label="Close alias editor"
+                className="rounded-full p-2 text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100 disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={cancelEditingAlias}
+                disabled={isSavingAlias}
+              >
+                <IoClose size={18} />
+              </button>
+            </div>
+            <div className="space-y-4 px-5 py-4">
+              <input
+                type="text"
+                value={aliasDraft}
+                onChange={event => setAliasDraft(event.target.value)}
+                className="w-full rounded-lg border border-zinc-600 bg-zinc-950 px-3 py-2 text-zinc-100 outline-none focus:border-zinc-400 disabled:cursor-not-allowed disabled:opacity-60"
+                maxLength={255}
+                autoFocus
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  className="rounded-md border border-zinc-600 px-3 py-2 text-sm font-medium text-zinc-200 transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  onClick={cancelEditingAlias}
+                  disabled={isSavingAlias}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="rounded-md bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60"
+                  onClick={saveConnectionAlias}
+                  disabled={isSavingAlias || aliasDraft.trim().length === 0}
+                >
+                  {isSavingAlias ? 'Saving…' : 'Save'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
