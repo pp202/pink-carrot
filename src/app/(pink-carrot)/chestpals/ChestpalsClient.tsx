@@ -16,17 +16,12 @@ type Props = {
 
 const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMinutes }: Props) => {
   const [connections, setConnections] = useState<Connection[]>(initialConnections)
-  const [selectedConnectionIds, setSelectedConnectionIds] = useState<number[]>([])
   const [isDisconnecting, setIsDisconnecting] = useState(false)
   const [isInviting, setIsInviting] = useState(false)
   const [editingConnectionId, setEditingConnectionId] = useState<number | null>(null)
   const [aliasDraft, setAliasDraft] = useState('')
   const [isSavingAlias, setIsSavingAlias] = useState(false)
   const [modalMessage, setModalMessage] = useState<{ tone: 'success' | 'warning'; text: string } | null>(null)
-
-  const hasSelection = selectedConnectionIds.length > 0
-
-  const selectedConnectionIdSet = useMemo(() => new Set(selectedConnectionIds), [selectedConnectionIds])
 
   const noticeMessage = useMemo(() => {
     if (initialNotice === 'connected') {
@@ -95,42 +90,42 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
     }
   }
 
-  const toggleConnection = (connectionId: number) => {
-    setSelectedConnectionIds(currentSelection => {
-      if (currentSelection.includes(connectionId)) {
-        return currentSelection.filter(id => id !== connectionId)
-      }
+  const disconnectEditingConnection = async () => {
+    if (!editingConnectionId || isDisconnecting || isSavingAlias) {
+      return
+    }
 
-      return [...currentSelection, connectionId]
-    })
-  }
-
-  const disconnectSelectedConnections = async () => {
-    if (!hasSelection || isDisconnecting) {
+    const shouldDisconnect = window.confirm('Do you really intend to disconnect this chestpal?')
+    if (!shouldDisconnect) {
       return
     }
 
     setIsDisconnecting(true)
 
-    const response = await fetch('/api/chestpals', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ connectionIds: selectedConnectionIds }),
-    })
+    try {
+      const response = await fetch('/api/chestpals', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ connectionIds: [editingConnectionId] }),
+      })
 
-    if (response.ok) {
+      if (!response.ok) {
+        setModalMessage({ tone: 'warning', text: 'Unable to disconnect this chestpal. Please try again.' })
+        return
+      }
+
       setConnections(currentConnections =>
-        currentConnections.filter(connection => !selectedConnectionIdSet.has(connection.id))
+        currentConnections.filter(connection => connection.id !== editingConnectionId)
       )
-      setSelectedConnectionIds([])
-      setModalMessage({ tone: 'success', text: 'Selected connections were disconnected.' })
-    } else {
-      setModalMessage({ tone: 'warning', text: 'Unable to disconnect selected connections. Please try again.' })
+      cancelEditingAlias()
+      setModalMessage({ tone: 'success', text: 'Chestpal disconnected.' })
+    } catch {
+      setModalMessage({ tone: 'warning', text: 'Unable to disconnect this chestpal. Please try again.' })
+    } finally {
+      setIsDisconnecting(false)
     }
-
-    setIsDisconnecting(false)
   }
 
   const startEditingAlias = (connection: Connection) => {
@@ -178,7 +173,6 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
       )
 
       cancelEditingAlias()
-      setModalMessage({ tone: 'success', text: 'Alias updated.' })
     } catch {
       setModalMessage({ tone: 'warning', text: 'Unable to update alias. Please try again.' })
     } finally {
@@ -201,12 +195,6 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
                 className="rounded-xl border border-zinc-700 bg-zinc-900/70 px-4 py-3"
               >
                 <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedConnectionIdSet.has(connection.id)}
-                    onChange={() => toggleConnection(connection.id)}
-                    className="h-4 w-4 rounded border-zinc-500 bg-zinc-950 text-zinc-100"
-                  />
                   <span className="min-w-0 flex-1 truncate text-zinc-100">{connection.alias}</span>
                   <button
                     type="button"
@@ -227,22 +215,14 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
             )}
           </div>
 
-          <div className="mt-8 flex justify-between gap-3">
+          <div className="mt-8 flex justify-center">
             <button
               type="button"
-              className="rounded-lg border border-zinc-400/50 bg-zinc-700/40 px-4 py-2 text-sm font-medium text-zinc-100 transition hover:bg-zinc-700/60 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-lg border border-green-400/70 bg-green-500/15 px-4 py-2 text-sm font-medium text-green-100 shadow-[0_0_20px_rgba(74,222,128,0.5)] transition hover:bg-green-500/25 disabled:cursor-not-allowed disabled:opacity-60"
               disabled={isInviting}
               onClick={createInviteLink}
             >
               {isInviting ? 'Creating invite…' : 'Invite'}
-            </button>
-            <button
-              type="button"
-              className="rounded-lg border border-red-500/60 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-100 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
-              disabled={!hasSelection || isDisconnecting}
-              onClick={disconnectSelectedConnections}
-            >
-              {isDisconnecting ? 'Disconnecting…' : 'Disconnect'}
             </button>
           </div>
         </div>
@@ -299,23 +279,33 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
                 maxLength={255}
                 autoFocus
               />
-              <div className="flex justify-end gap-2">
+              <div className="flex items-center justify-between gap-3">
                 <button
                   type="button"
-                  className="rounded-md border border-zinc-600 px-3 py-2 text-sm font-medium text-zinc-200 transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
-                  onClick={cancelEditingAlias}
-                  disabled={isSavingAlias}
+                  className="rounded-md border border-red-400/70 bg-red-500/15 px-3 py-2 text-sm font-medium text-red-100 shadow-[0_0_18px_rgba(239,68,68,0.55)] transition hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+                  onClick={disconnectEditingConnection}
+                  disabled={isSavingAlias || isDisconnecting}
                 >
-                  Cancel
+                  {isDisconnecting ? 'Disconnecting…' : 'Disconnect'}
                 </button>
-                <button
-                  type="button"
-                  className="rounded-md bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60"
-                  onClick={saveConnectionAlias}
-                  disabled={isSavingAlias || aliasDraft.trim().length === 0}
-                >
-                  {isSavingAlias ? 'Saving…' : 'Save'}
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    className="rounded-md border border-zinc-600 px-3 py-2 text-sm font-medium text-zinc-200 transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    onClick={cancelEditingAlias}
+                    disabled={isSavingAlias || isDisconnecting}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-md border border-green-400/70 bg-green-500/20 px-3 py-2 text-sm font-medium text-green-100 shadow-[0_0_18px_rgba(74,222,128,0.55)] transition hover:bg-green-500/30 disabled:cursor-not-allowed disabled:opacity-60"
+                    onClick={saveConnectionAlias}
+                    disabled={isSavingAlias || isDisconnecting || aliasDraft.trim().length === 0}
+                  >
+                    {isSavingAlias ? 'Saving…' : 'Save'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
