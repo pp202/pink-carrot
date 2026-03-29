@@ -57,6 +57,20 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
     setModalMessage({ tone: 'warning', text: noticeMessage })
   }, [initialNotice, noticeMessage])
 
+  useEffect(() => {
+    if (!initialNotice || typeof window === 'undefined') {
+      return
+    }
+
+    const currentUrl = new URL(window.location.href)
+    currentUrl.searchParams.delete('notice')
+    currentUrl.searchParams.delete('minutes')
+    currentUrl.searchParams.delete('alias')
+
+    const nextUrl = `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`
+    window.history.replaceState(window.history.state, '', nextUrl)
+  }, [initialNotice])
+
   const createInviteLink = async () => {
     if (isInviting) {
       return
