@@ -218,7 +218,7 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
           <div className="mt-8 flex justify-center">
             <button
               type="button"
-              className="rounded-lg border border-green-400/70 bg-green-500/15 px-4 py-2 text-sm font-medium text-green-100 shadow-[0_0_20px_rgba(74,222,128,0.5)] transition hover:bg-green-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-lg border border-zinc-300 bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60"
               disabled={isInviting}
               onClick={createInviteLink}
             >
@@ -282,7 +282,7 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
               <div className="flex items-center justify-between gap-3">
                 <button
                   type="button"
-                  className="rounded-md border border-red-400/70 bg-red-500/15 px-3 py-2 text-sm font-medium text-red-100 shadow-[0_0_18px_rgba(239,68,68,0.55)] transition hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-md border border-red-400/70 bg-red-500/15 px-3 py-2 text-sm font-medium text-red-100 transition hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-60"
                   onClick={disconnectEditingConnection}
                   disabled={isSavingAlias || isDisconnecting}
                 >
@@ -299,7 +299,7 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
                   </button>
                   <button
                     type="button"
-                    className="rounded-md border border-green-400/70 bg-green-500/20 px-3 py-2 text-sm font-medium text-green-100 shadow-[0_0_18px_rgba(74,222,128,0.55)] transition hover:bg-green-500/30 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="rounded-md border border-zinc-300 bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60"
                     onClick={saveConnectionAlias}
                     disabled={isSavingAlias || isDisconnecting || aliasDraft.trim().length === 0}
                   >
