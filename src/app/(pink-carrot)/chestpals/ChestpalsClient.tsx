@@ -12,9 +12,10 @@ type Props = {
   initialConnections: Connection[]
   initialNotice: string | null
   initialRemainingMinutes: number | null
+  initialNoticeAlias: string | null
 }
 
-const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMinutes }: Props) => {
+const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMinutes, initialNoticeAlias }: Props) => {
   const [connections, setConnections] = useState<Connection[]>(initialConnections)
   const [isDisconnecting, setIsDisconnecting] = useState(false)
   const [isInviting, setIsInviting] = useState(false)
@@ -25,7 +26,11 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
 
   const noticeMessage = useMemo(() => {
     if (initialNotice === 'connected') {
-      return 'Connected successfully. You can now manage this connection in Chestpals.'
+      return `Successfully connected with ${initialNoticeAlias || 'Chest wizard'}.`
+    }
+
+    if (initialNotice === 'already-connected') {
+      return `Already connected with ${initialNoticeAlias || 'Chest wizard'}.`
     }
 
     if (initialNotice === 'owner-active' && initialRemainingMinutes) {
@@ -37,14 +42,14 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
     }
 
     return null
-  }, [initialNotice, initialRemainingMinutes])
+  }, [initialNotice, initialRemainingMinutes, initialNoticeAlias])
 
   useEffect(() => {
     if (!noticeMessage) {
       return
     }
 
-    if (initialNotice === 'connected') {
+    if (initialNotice === 'connected' || initialNotice === 'already-connected') {
       setModalMessage({ tone: 'success', text: noticeMessage })
       return
     }
