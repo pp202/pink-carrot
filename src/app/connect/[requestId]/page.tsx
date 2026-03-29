@@ -12,7 +12,13 @@ const ConnectController = async ({ params }: Props) => {
   const result = await consumeConnectionRequest(requestId);
 
   if (result.status === "connected") {
-    redirect("/chestpals?notice=connected");
+    const alias = encodeURIComponent(result.alias);
+    redirect(`/chestpals?notice=connected&alias=${alias}`);
+  }
+
+  if (result.status === "already-connected") {
+    const alias = encodeURIComponent(result.alias);
+    redirect(`/chestpals?notice=already-connected&alias=${alias}`);
   }
 
   if (result.status === "owner-active") {

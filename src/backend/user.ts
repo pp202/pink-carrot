@@ -4,7 +4,8 @@ import { auth } from "@/";
 const CONNECTION_REQUEST_LIFESPAN_MS = 10 * 60 * 1000;
 
 type ConsumeInviteStatus =
-  | { status: "connected" }
+  | { status: "connected"; alias: string }
+  | { status: "already-connected"; alias: string }
   | { status: "expired" }
   | { status: "owner-active"; remainingMinutes: number };
 
@@ -258,13 +259,35 @@ export async function consumeConnectionRequest(requestId: string): Promise<Consu
     return { status: "owner-active", remainingMinutes };
   }
 
+  const connectionAlias = connectionRequest.user.alias?.trim() ? connectionRequest.user.alias : "Chest wizard";
+
+  const existingConnection = await prisma.connection.findFirst({
+    where: {
+      userId: user.id,
+      connectionUserId: connectionRequest.userId,
+    },
+    select: {
+      userId: true,
+    },
+  });
+
+  if (existingConnection) {
+    await prisma.connectionRequest.deleteMany({
+      where: {
+        id: requestId,
+      },
+    });
+
+    return { status: "already-connected", alias: connectionAlias };
+  }
+
   await prisma.$transaction([
     prisma.connection.createMany({
       data: [
         {
           userId: user.id,
           connectionUserId: connectionRequest.userId,
-          alias: connectionRequest.user.alias?.trim() ? connectionRequest.user.alias : "Chest wizard",
+          alias: connectionAlias,
         },
         {
           userId: connectionRequest.userId,
@@ -281,5 +304,5 @@ export async function consumeConnectionRequest(requestId: string): Promise<Consu
     }),
   ]);
 
-  return { status: "connected" };
+  return { status: "connected", alias: connectionAlias };
 }

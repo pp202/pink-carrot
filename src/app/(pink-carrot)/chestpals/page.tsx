@@ -8,6 +8,7 @@ type Props = {
   searchParams?: Promise<{
     notice?: string
     minutes?: string
+    alias?: string
   }>
 }
 
@@ -25,6 +26,7 @@ const ChestpalsPage = async ({ searchParams }: Props) => {
       initialConnections={data.connections}
       initialNotice={params?.notice ?? null}
       initialRemainingMinutes={initialRemainingMinutes}
+      initialNoticeAlias={params?.alias ?? null}
     />
   )
 }
