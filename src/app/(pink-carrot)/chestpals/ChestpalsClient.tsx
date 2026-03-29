@@ -269,7 +269,7 @@ const ChestpalsClient = ({ initialConnections, initialNotice, initialRemainingMi
               }`}
               onClick={() => setModalMessage(null)}
             >
-              Noted
+              Ok
             </button>
           </div>
         </div>
