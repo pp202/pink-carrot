@@ -13,6 +13,9 @@ function serializeChestPad(chestPad: {
         label: string;
         createdAt: Date;
         carrots?: Array<{ id: number; label: string; harvested: boolean }>;
+        _count?: {
+            chestPads: number;
+        };
     };
 }) {
     return {
@@ -24,6 +27,7 @@ function serializeChestPad(chestPad: {
         pinned: chestPad.pinned,
         listRank: chestPad.listRank,
         dashRank: chestPad.dashRank,
+        isShared: (chestPad.chest._count?.chestPads ?? 0) > 1,
         carrots: (chestPad.chest.carrots ?? []).map((carrot) => ({
             id: carrot.id,
             label: carrot.label,
@@ -79,7 +83,15 @@ export async function getChests() {
             status: 'NEW',
         },
         include: {
-            chest: true,
+            chest: {
+                include: {
+                    _count: {
+                        select: {
+                            chestPads: true,
+                        },
+                    },
+                },
+            },
         },
         orderBy: [
             { listRank: 'asc' },
@@ -98,7 +110,15 @@ export async function getArchivedChests() {
             status: 'ARCHIVED',
         },
         include: {
-            chest: true,
+            chest: {
+                include: {
+                    _count: {
+                        select: {
+                            chestPads: true,
+                        },
+                    },
+                },
+            },
         },
         orderBy: [
             { listRank: 'asc' },
@@ -123,6 +143,11 @@ export async function getPinnedChestsWithCarrots() {
                     carrots: {
                         orderBy: {
                             id: 'asc',
+                        },
+                    },
+                    _count: {
+                        select: {
+                            chestPads: true,
                         },
                     },
                 },
@@ -155,6 +180,11 @@ export async function getChest(id: number) {
                         },
                         orderBy: {
                             id: 'asc',
+                        },
+                    },
+                    _count: {
+                        select: {
+                            chestPads: true,
                         },
                     },
                 },
@@ -372,6 +402,11 @@ export async function cloneChest(id: number) {
                             id: 'asc',
                         },
                     },
+                    _count: {
+                        select: {
+                            chestPads: true,
+                        },
+                    },
                 },
             },
         },
@@ -445,6 +480,249 @@ export async function cloneChest(id: number) {
     });
 
     return serializeChestPad(cloned);
+}
+
+export async function getChestShareTargets(id: number) {
+    const user = await loggedUser();
+
+    const chestPad = await prisma.chestPad.findFirst({
+        where: {
+            id,
+            userId: user.id,
+            status: 'NEW',
+        },
+        select: {
+            chestId: true,
+        },
+    });
+
+    if (!chestPad) {
+        return null;
+    }
+
+    const [connections, sharedPads] = await Promise.all([
+        prisma.connection.findMany({
+            where: {
+                userId: user.id,
+            },
+            orderBy: {
+                createdAt: 'asc',
+            },
+            select: {
+                connectionUserId: true,
+                alias: true,
+            },
+        }),
+        prisma.chestPad.findMany({
+            where: {
+                chestId: chestPad.chestId,
+            },
+            select: {
+                userId: true,
+            },
+        }),
+    ]);
+
+    const sharedByUserId = new Set(sharedPads.map((pad) => pad.userId));
+
+    return connections.map((connection) => ({
+        id: connection.connectionUserId,
+        alias: connection.alias?.trim() ? connection.alias : 'Chest wizard',
+        shared: sharedByUserId.has(connection.connectionUserId),
+    }));
+}
+
+export async function shareChestWithConnections(id: number, connectionIds: number[]) {
+    const user = await loggedUser();
+
+    if (connectionIds.length === 0) {
+        return { shared: 0 };
+    }
+
+    const chestPad = await prisma.chestPad.findFirst({
+        where: {
+            id,
+            userId: user.id,
+            status: 'NEW',
+        },
+        select: {
+            chestId: true,
+        },
+    });
+
+    if (!chestPad) {
+        return null;
+    }
+
+    const validConnections = await prisma.connection.findMany({
+        where: {
+            userId: user.id,
+            connectionUserId: {
+                in: connectionIds,
+            },
+        },
+        select: {
+            connectionUserId: true,
+        },
+    });
+
+    const candidateUserIds = validConnections.map((connection) => connection.connectionUserId);
+    if (candidateUserIds.length === 0) {
+        return { shared: 0 };
+    }
+
+    const existingPads = await prisma.chestPad.findMany({
+        where: {
+            chestId: chestPad.chestId,
+            userId: {
+                in: candidateUserIds,
+            },
+            status: 'NEW',
+        },
+        select: {
+            userId: true,
+        },
+    });
+
+    const existingUsers = new Set(existingPads.map((pad) => pad.userId));
+    const usersToShare = candidateUserIds.filter((userId) => !existingUsers.has(userId));
+
+    await Promise.all(usersToShare.map(async (targetUserId) => {
+        const [lastListRankedChestPad, lastDashRankedChestPad] = await Promise.all([
+            prisma.chestPad.findFirst({
+                where: {
+                    userId: targetUserId,
+                },
+                select: {
+                    listRank: true,
+                },
+                orderBy: [
+                    { listRank: 'desc' },
+                    { id: 'desc' },
+                ],
+            }),
+            prisma.chestPad.findFirst({
+                where: {
+                    userId: targetUserId,
+                },
+                select: {
+                    dashRank: true,
+                },
+                orderBy: [
+                    { dashRank: 'desc' },
+                    { id: 'desc' },
+                ],
+            }),
+        ]);
+
+        await prisma.chestPad.create({
+            data: {
+                status: 'NEW',
+                pinned: false,
+                userId: targetUserId,
+                chestId: chestPad.chestId,
+                listRank: nextLexoRank(lastListRankedChestPad?.listRank),
+                dashRank: nextLexoRank(lastDashRankedChestPad?.dashRank),
+            },
+        });
+    }));
+
+    return { shared: usersToShare.length };
+}
+
+export async function unshareChestFromConnections(id: number, connectionIds: number[]) {
+    const user = await loggedUser();
+
+    if (connectionIds.length === 0) {
+        return { unshared: 0 };
+    }
+
+    const chestPad = await prisma.chestPad.findFirst({
+        where: {
+            id,
+            userId: user.id,
+            status: 'NEW',
+        },
+        select: {
+            chestId: true,
+            chest: {
+                include: {
+                    carrots: {
+                        orderBy: {
+                            id: 'asc',
+                        },
+                    },
+                },
+            },
+        },
+    });
+
+    if (!chestPad) {
+        return null;
+    }
+
+    const validConnections = await prisma.connection.findMany({
+        where: {
+            userId: user.id,
+            connectionUserId: {
+                in: connectionIds,
+            },
+        },
+        select: {
+            connectionUserId: true,
+        },
+    });
+
+    const candidateUserIds = validConnections.map((connection) => connection.connectionUserId);
+    if (candidateUserIds.length === 0) {
+        return { unshared: 0 };
+    }
+
+    const sharedPads = await prisma.chestPad.findMany({
+        where: {
+            chestId: chestPad.chestId,
+            status: 'NEW',
+            userId: {
+                in: candidateUserIds,
+            },
+        },
+        select: {
+            userId: true,
+        },
+    });
+
+    const usersToUnshare = Array.from(new Set(sharedPads.map((pad) => pad.userId)));
+
+    await Promise.all(usersToUnshare.map(async (targetUserId) => {
+        await prisma.$transaction(async (tx) => {
+            const clonedChest = await tx.chest.create({
+                data: {
+                    label: chestPad.chest.label,
+                    carrots: {
+                        create: chestPad.chest.carrots.map((carrot) => ({
+                            label: carrot.label,
+                            harvested: carrot.harvested,
+                        })),
+                    },
+                },
+                select: {
+                    id: true,
+                },
+            });
+
+            await tx.chestPad.updateMany({
+                where: {
+                    userId: targetUserId,
+                    chestId: chestPad.chestId,
+                },
+                data: {
+                    chestId: clonedChest.id,
+                },
+            });
+        });
+    }));
+
+    return { unshared: usersToUnshare.length };
 }
 
 export async function moveChestBetween(

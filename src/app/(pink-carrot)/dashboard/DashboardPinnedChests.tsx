@@ -4,8 +4,9 @@ import axios from "axios";
 import { Box, DropdownMenu, IconButton, Tooltip } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FaBars, FaClone, FaEdit, FaMinus } from "react-icons/fa";
+import { FaBars, FaClone, FaEdit, FaMinus, FaUsers } from "react-icons/fa";
 import { GiCarrot, GiChest } from "react-icons/gi";
+import ChestShareDialog from "@/app/components/ChestShareDialog";
 
 type DashboardCarrot = {
   id: string;
@@ -18,6 +19,7 @@ type DashboardChest = {
   label: string;
   carrots: DashboardCarrot[];
   pinned?: boolean;
+  isShared?: boolean;
 };
 
 export default function DashboardPinnedChests({
@@ -31,6 +33,7 @@ export default function DashboardPinnedChests({
   const [dragTargetIndex, setDragTargetIndex] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isTouchReordering, setIsTouchReordering] = useState(false);
+  const [sharingChestId, setSharingChestId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!isTouchReordering) {
@@ -169,8 +172,9 @@ export default function DashboardPinnedChests({
   }
 
   return (
-    <ul className="space-y-3">
-      {pinnedChests.map((chest, index) => {
+    <>
+      <ul className="space-y-3">
+        {pinnedChests.map((chest, index) => {
         const shouldShowDropIndicator = dragTargetIndex === index && dragSourceIndex !== index;
         const isDraggingDown =
           shouldShowDropIndicator && dragSourceIndex !== null && dragSourceIndex < index;
@@ -260,6 +264,13 @@ export default function DashboardPinnedChests({
                   <h2 className="truncate text-sm font-semibold text-zinc-100">{chest.label}</h2>
                 </div>
                 <Box className="items-center">
+                  {chest.isShared ? (
+                    <Tooltip content="Shared chest">
+                      <span className="mr-2 inline-flex text-emerald-400">
+                        <FaUsers />
+                      </span>
+                    </Tooltip>
+                  ) : null}
                   <DropdownMenu.Root>
                     <Tooltip content="More actions">
                       <DropdownMenu.Trigger>
@@ -289,6 +300,16 @@ export default function DashboardPinnedChests({
                       >
                         <FaEdit />
                         Edit
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setSharingChestId(chest.id);
+                        }}
+                        className="mt-3 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+                      >
+                        <FaUsers />
+                        Share
                       </DropdownMenu.Item>
                       <DropdownMenu.Item
                         onClick={(event) => {
@@ -348,7 +369,22 @@ export default function DashboardPinnedChests({
             </article>
           </li>
         );
-      })}
-    </ul>
+        })}
+      </ul>
+      <ChestShareDialog
+        chestId={sharingChestId ?? 0}
+        open={sharingChestId !== null}
+        onClose={() => setSharingChestId(null)}
+        onSharedStateChange={(isShared) => {
+          if (!sharingChestId) {
+            return;
+          }
+
+          setPinnedChests((previous) =>
+            previous.map((chest) => (chest.id === sharingChestId ? { ...chest, isShared } : chest)),
+          );
+        }}
+      />
+    </>
   );
 }
