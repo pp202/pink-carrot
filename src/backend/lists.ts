@@ -6,6 +6,7 @@ function serializeChestPad(chestPad: {
     id: number;
     status: 'NEW' | 'ARCHIVED';
     pinned: boolean;
+    shared: 'NO' | 'SHARED' | 'UNSHARED';
     listRank: string;
     dashRank: string;
     chest: {
@@ -27,7 +28,7 @@ function serializeChestPad(chestPad: {
         pinned: chestPad.pinned,
         listRank: chestPad.listRank,
         dashRank: chestPad.dashRank,
-        isShared: (chestPad.chest._count?.chestPads ?? 0) > 1,
+        shared: chestPad.shared,
         carrots: (chestPad.chest.carrots ?? []).map((carrot) => ({
             id: carrot.id,
             label: carrot.label,
@@ -85,11 +86,6 @@ export async function getChests() {
         include: {
             chest: {
                 include: {
-                    _count: {
-                        select: {
-                            chestPads: true,
-                        },
-                    },
                 },
             },
         },
@@ -112,11 +108,6 @@ export async function getArchivedChests() {
         include: {
             chest: {
                 include: {
-                    _count: {
-                        select: {
-                            chestPads: true,
-                        },
-                    },
                 },
             },
         },
@@ -143,11 +134,6 @@ export async function getPinnedChestsWithCarrots() {
                     carrots: {
                         orderBy: {
                             id: 'asc',
-                        },
-                    },
-                    _count: {
-                        select: {
-                            chestPads: true,
                         },
                     },
                 },
@@ -180,11 +166,6 @@ export async function getChest(id: number) {
                         },
                         orderBy: {
                             id: 'asc',
-                        },
-                    },
-                    _count: {
-                        select: {
-                            chestPads: true,
                         },
                     },
                 },
@@ -358,6 +339,15 @@ export async function deleteArchivedList(id: number) {
         });
 
         if (remainingRefs > 0) {
+            await tx.chestPad.updateMany({
+                where: {
+                    chestId: chestPad.chestId,
+                },
+                data: {
+                    shared: remainingRefs > 1 ? 'SHARED' : 'UNSHARED',
+                },
+            });
+
             return {
                 deletedChests: { count: 1 },
                 deletedCarrots: { count: 0 },
@@ -619,6 +609,7 @@ export async function shareChestWithConnections(id: number, connectionIds: numbe
             data: {
                 status: 'NEW',
                 pinned: false,
+                shared: 'SHARED',
                 userId: targetUserId,
                 chestId: chestPad.chestId,
                 listRank: nextLexoRank(lastListRankedChestPad?.listRank),
@@ -626,6 +617,18 @@ export async function shareChestWithConnections(id: number, connectionIds: numbe
             },
         });
     }));
+
+    if (usersToShare.length > 0) {
+        await prisma.chestPad.updateMany({
+            where: {
+                id,
+                userId: user.id,
+            },
+            data: {
+                shared: 'SHARED',
+            },
+        });
+    }
 
     return { shared: usersToShare.length };
 }
@@ -717,10 +720,32 @@ export async function unshareChestFromConnections(id: number, connectionIds: num
                 },
                 data: {
                     chestId: clonedChest.id,
+                    shared: 'UNSHARED',
                 },
             });
         });
     }));
+
+    const remainingSharedPads = await prisma.chestPad.count({
+        where: {
+            chestId: chestPad.chestId,
+            status: 'NEW',
+            userId: {
+                not: user.id,
+            },
+        },
+    });
+
+    await prisma.chestPad.updateMany({
+        where: {
+            id,
+            userId: user.id,
+            status: 'NEW',
+        },
+        data: {
+            shared: remainingSharedPads > 0 ? 'SHARED' : 'UNSHARED',
+        },
+    });
 
     return { unshared: usersToUnshare.length };
 }

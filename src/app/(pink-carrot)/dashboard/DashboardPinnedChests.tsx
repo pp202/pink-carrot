@@ -19,7 +19,7 @@ type DashboardChest = {
   label: string;
   carrots: DashboardCarrot[];
   pinned?: boolean;
-  isShared?: boolean;
+  shared?: "NO" | "SHARED" | "UNSHARED";
 };
 
 export default function DashboardPinnedChests({
@@ -264,9 +264,9 @@ export default function DashboardPinnedChests({
                   <h2 className="truncate text-sm font-semibold text-zinc-100">{chest.label}</h2>
                 </div>
                 <Box className="items-center">
-                  {chest.isShared ? (
-                    <Tooltip content="Shared chest">
-                      <span className="mr-2 inline-flex text-emerald-400">
+                  {chest.shared && chest.shared !== "NO" ? (
+                    <Tooltip content={chest.shared === "SHARED" ? "Shared chest" : "Previously shared chest"}>
+                      <span className={`mr-2 inline-flex ${chest.shared === "SHARED" ? "text-emerald-400" : "text-zinc-500"}`}>
                         <FaUsers />
                       </span>
                     </Tooltip>
@@ -381,7 +381,14 @@ export default function DashboardPinnedChests({
           }
 
           setPinnedChests((previous) =>
-            previous.map((chest) => (chest.id === sharingChestId ? { ...chest, isShared } : chest)),
+            previous.map((chest) =>
+              chest.id === sharingChestId
+                ? {
+                    ...chest,
+                    shared: isShared ? "SHARED" : (chest.shared === "NO" ? "NO" : "UNSHARED"),
+                  }
+                : chest,
+            ),
           );
         }}
       />

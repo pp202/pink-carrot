@@ -15,7 +15,7 @@ export default async function DashboardPage() {
   const serializablePinnedChests = pinnedChests.map((chest: PinnedChest) => ({
     id: chest.id,
     label: chest.label,
-    isShared: chest.isShared,
+    shared: chest.shared,
     carrots: chest.carrots.map((carrot: PinnedChest['carrots'][number]) => ({
       id: carrot.id.toString(),
       label: carrot.label,

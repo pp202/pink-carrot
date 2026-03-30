@@ -111,6 +111,13 @@ export type BoolFilter<$PrismaModel = never> = {
   not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
 }
 
+export type EnumSharedFilter<$PrismaModel = never> = {
+  equals?: $Enums.Shared | Prisma.EnumSharedFieldRefInput<$PrismaModel>
+  in?: $Enums.Shared[] | Prisma.ListEnumSharedFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Shared[] | Prisma.ListEnumSharedFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSharedFilter<$PrismaModel> | $Enums.Shared
+}
+
 export type EnumStatusWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.Status | Prisma.EnumStatusFieldRefInput<$PrismaModel>
   in?: $Enums.Status[] | Prisma.ListEnumStatusFieldRefInput<$PrismaModel>
@@ -127,6 +134,16 @@ export type BoolWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedBoolFilter<$PrismaModel>
   _max?: Prisma.NestedBoolFilter<$PrismaModel>
+}
+
+export type EnumSharedWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Shared | Prisma.EnumSharedFieldRefInput<$PrismaModel>
+  in?: $Enums.Shared[] | Prisma.ListEnumSharedFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Shared[] | Prisma.ListEnumSharedFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSharedWithAggregatesFilter<$PrismaModel> | $Enums.Shared
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSharedFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSharedFilter<$PrismaModel>
 }
 
 export type UuidFilter<$PrismaModel = never> = {
@@ -262,6 +279,13 @@ export type NestedBoolFilter<$PrismaModel = never> = {
   not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
 }
 
+export type NestedEnumSharedFilter<$PrismaModel = never> = {
+  equals?: $Enums.Shared | Prisma.EnumSharedFieldRefInput<$PrismaModel>
+  in?: $Enums.Shared[] | Prisma.ListEnumSharedFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Shared[] | Prisma.ListEnumSharedFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSharedFilter<$PrismaModel> | $Enums.Shared
+}
+
 export type NestedEnumStatusWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.Status | Prisma.EnumStatusFieldRefInput<$PrismaModel>
   in?: $Enums.Status[] | Prisma.ListEnumStatusFieldRefInput<$PrismaModel>
@@ -278,6 +302,16 @@ export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedBoolFilter<$PrismaModel>
   _max?: Prisma.NestedBoolFilter<$PrismaModel>
+}
+
+export type NestedEnumSharedWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Shared | Prisma.EnumSharedFieldRefInput<$PrismaModel>
+  in?: $Enums.Shared[] | Prisma.ListEnumSharedFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Shared[] | Prisma.ListEnumSharedFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSharedWithAggregatesFilter<$PrismaModel> | $Enums.Shared
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSharedFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSharedFilter<$PrismaModel>
 }
 
 export type NestedUuidFilter<$PrismaModel = never> = {

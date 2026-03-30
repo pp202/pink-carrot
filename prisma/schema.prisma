@@ -32,6 +32,7 @@ model ChestPad {
   id       Int @id @default(autoincrement())
   status   Status @default(NEW)
   pinned   Boolean @default(false)
+  shared   Shared @default(NO)
   listRank String @db.VarChar(16)
   dashRank String @db.VarChar(16)
 
@@ -83,4 +84,10 @@ model Carrot {
 enum Status {
   NEW
   ARCHIVED
+}
+
+enum Shared {
+  NO
+  SHARED
+  UNSHARED
 }

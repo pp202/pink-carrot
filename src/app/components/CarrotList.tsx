@@ -20,7 +20,7 @@ type ListChest = {
   pinned: boolean;
   listRank: string;
   dashRank: string;
-  isShared?: boolean;
+  shared?: "NO" | "SHARED" | "UNSHARED";
 };
 
 type RecentlyArchived = {
@@ -191,7 +191,14 @@ const CarrotList = () => {
           }
 
           setState((previous) =>
-            previous.map((item) => (item.id === sharingChestId ? { ...item, isShared } : item)),
+            previous.map((item) =>
+              item.id === sharingChestId
+                ? {
+                    ...item,
+                    shared: isShared ? "SHARED" : (item.shared === "NO" ? "NO" : "UNSHARED"),
+                  }
+                : item,
+            ),
           );
         }}
       />
@@ -562,9 +569,9 @@ const CarrotListItem = ({
           </span>
         </Box>
         <Flex className="ml-2 shrink-0 items-center gap-4">
-          {item.isShared ? (
-            <Tooltip content="Shared chest">
-              <span className="text-emerald-400">
+          {item.shared && item.shared !== "NO" ? (
+            <Tooltip content={item.shared === "SHARED" ? "Shared chest" : "Previously shared chest"}>
+              <span className={item.shared === "SHARED" ? "text-emerald-400" : "text-zinc-500"}>
                 <FaUsers />
               </span>
             </Tooltip>
