@@ -1,11 +1,12 @@
 "use client";
 
 import Spinner from "@/app/components/Spinner";
+import ChestShareDialog from "@/app/components/ChestShareDialog";
 import { Box, DropdownMenu, Flex, IconButton, Tooltip } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FaBars, FaClone, FaEdit, FaMinus, FaThumbtack } from "react-icons/fa";
+import { FaBars, FaClone, FaEdit, FaMinus, FaThumbtack, FaUsers } from "react-icons/fa";
 import { GiChest } from "react-icons/gi";
 
 const SWIPE_DELETE_THRESHOLD = 90;
@@ -19,6 +20,7 @@ type ListChest = {
   pinned: boolean;
   listRank: string;
   dashRank: string;
+  isShared?: boolean;
 };
 
 type RecentlyArchived = {
@@ -27,6 +29,7 @@ type RecentlyArchived = {
 
 const CarrotList = () => {
   const [state, setState] = useState<ListChest[]>([]);
+  const [sharingChestId, setSharingChestId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [recentlyArchived, setRecentlyArchived] =
     useState<RecentlyArchived | null>(null);
@@ -176,6 +179,21 @@ const CarrotList = () => {
         onDragPreviewStart={startDragPreview}
         onDragPreviewUpdate={updateDragPreview}
         onDragPreviewClear={clearDragPreview}
+        onShare={setSharingChestId}
+      />
+      <ChestShareDialog
+        chestId={sharingChestId ?? 0}
+        open={sharingChestId !== null}
+        onClose={() => setSharingChestId(null)}
+        onSharedStateChange={(isShared) => {
+          if (!sharingChestId) {
+            return;
+          }
+
+          setState((previous) =>
+            previous.map((item) => (item.id === sharingChestId ? { ...item, isShared } : item)),
+          );
+        }}
       />
       {recentlyArchived ? (
         <div className="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center px-4">
@@ -207,6 +225,7 @@ const Carrots = ({
   onDragPreviewStart,
   onDragPreviewUpdate,
   onDragPreviewClear,
+  onShare,
 }: {
   carrotList: ListChest[];
   isLoading: boolean;
@@ -219,6 +238,7 @@ const Carrots = ({
   onDragPreviewStart: (sourceIndex: number) => void;
   onDragPreviewUpdate: (targetIndex: number) => void;
   onDragPreviewClear: () => void;
+  onShare: (id: number) => void;
 }) => {
   if (isLoading) {
     return (
@@ -249,6 +269,7 @@ const Carrots = ({
           onDragPreviewStart={onDragPreviewStart}
           onDragPreviewUpdate={onDragPreviewUpdate}
           onDragPreviewClear={onDragPreviewClear}
+          onShare={onShare}
         />
       ))}
     </ul>
@@ -267,6 +288,7 @@ const CarrotListItem = ({
   onDragPreviewStart,
   onDragPreviewUpdate,
   onDragPreviewClear,
+  onShare,
 }: {
   item: ListChest;
   onRemove: (id: number) => void;
@@ -279,6 +301,7 @@ const CarrotListItem = ({
   onDragPreviewStart: (sourceIndex: number) => void;
   onDragPreviewUpdate: (targetIndex: number) => void;
   onDragPreviewClear: () => void;
+  onShare: (id: number) => void;
 }) => {
   const router = useRouter();
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
@@ -539,6 +562,13 @@ const CarrotListItem = ({
           </span>
         </Box>
         <Flex className="ml-2 shrink-0 items-center gap-4">
+          {item.isShared ? (
+            <Tooltip content="Shared chest">
+              <span className="text-emerald-400">
+                <FaUsers />
+              </span>
+            </Tooltip>
+          ) : null}
           <Tooltip content={item.pinned ? "Unpin" : "Pin"}>
             <IconButton
               size="1"
@@ -582,6 +612,16 @@ const CarrotListItem = ({
               >
                 <FaEdit />
                 Edit
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onShare(item.id);
+                }}
+                className="mt-3 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+              >
+                <FaUsers />
+                Share
               </DropdownMenu.Item>
               <DropdownMenu.Item
                 onClick={(event) => {

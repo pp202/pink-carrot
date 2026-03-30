@@ -1,4 +1,15 @@
-import { archiveList, cloneChest, deleteArchivedList, getChest, setPinned, unarchiveList, updateChest } from "@/backend/lists";
+import {
+  archiveList,
+  cloneChest,
+  deleteArchivedList,
+  getChest,
+  getChestShareTargets,
+  setPinned,
+  shareChestWithConnections,
+  unarchiveList,
+  unshareChestFromConnections,
+  updateChest,
+} from "@/backend/lists";
 import { NextRequest, NextResponse } from "next/server";
 import { createListSchema } from "@/app/schema/createListSchema";
 
@@ -7,6 +18,15 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  if (request.nextUrl.searchParams.get("shareOptions") === "1") {
+    const options = await getChestShareTargets(parseInt(id));
+    if (!options) {
+      return NextResponse.json({ message: "List not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ connections: options }, { status: 200 });
+  }
+
   const chest = await getChest(parseInt(id));
 
   if (!chest) {
@@ -61,6 +81,32 @@ export async function PATCH(
     }
 
     return NextResponse.json(cloned, { status: 201 });
+  }
+
+  if (body?.action === "share") {
+    const connectionIds = Array.isArray(body?.connectionIds)
+      ? body.connectionIds.filter((value: unknown) => typeof value === "number")
+      : [];
+
+    const shared = await shareChestWithConnections(parseInt(id), connectionIds);
+    if (!shared) {
+      return NextResponse.json({ message: "List not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(shared, { status: 200 });
+  }
+
+  if (body?.action === "unshare") {
+    const connectionIds = Array.isArray(body?.connectionIds)
+      ? body.connectionIds.filter((value: unknown) => typeof value === "number")
+      : [];
+
+    const unshared = await unshareChestFromConnections(parseInt(id), connectionIds);
+    if (!unshared) {
+      return NextResponse.json({ message: "List not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(unshared, { status: 200 });
   }
 
   const validation = createListSchema.safeParse(body);
