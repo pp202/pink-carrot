@@ -11,6 +11,7 @@ import { GiChest } from "react-icons/gi";
 
 const SWIPE_DELETE_THRESHOLD = 90;
 const UNDO_VISIBLE_MS = 5000;
+const SHARED_TOOLTIP_VISIBLE_MS = 2500;
 type ListChest = {
   id: number;
   chestId: number;
@@ -21,6 +22,7 @@ type ListChest = {
   listRank: string;
   dashRank: string;
   shared?: "NO" | "SHARED" | "UNSHARED";
+  sharedWithAliases?: string[];
 };
 
 type RecentlyArchived = {
@@ -320,8 +322,15 @@ const CarrotListItem = ({
     shouldShowDropIndicator && dragSourceIndex !== null && dragSourceIndex < index;
   const [isDragging, setIsDragging] = useState(false);
   const [isTouchReordering, setIsTouchReordering] = useState(false);
+  const [isSharedTooltipOpen, setIsSharedTooltipOpen] = useState(false);
   const bodyScrollWasLockedRef = useRef(false);
   const isTouchReorderingRef = useRef(false);
+  const sharedWithText = item.sharedWithAliases?.length
+    ? item.sharedWithAliases.join(", ")
+    : "";
+  const sharedTooltip = item.shared === "SHARED"
+    ? (sharedWithText ? `Shared with ${sharedWithText}` : "Shared chest")
+    : (sharedWithText ? `Previously shared with ${sharedWithText}` : "Previously shared chest");
 
   useEffect(() => {
     isTouchReorderingRef.current = isTouchReordering;
@@ -331,6 +340,18 @@ const CarrotListItem = ({
     document.body.style.overflow = "";
     document.documentElement.style.overscrollBehavior = "";
   }, []);
+
+  useEffect(() => {
+    if (!isSharedTooltipOpen) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setIsSharedTooltipOpen(false);
+    }, SHARED_TOOLTIP_VISIBLE_MS);
+
+    return () => clearTimeout(timer);
+  }, [isSharedTooltipOpen]);
 
   function setPageScrollLock(locked: boolean): void {
     if (locked) {
@@ -570,10 +591,22 @@ const CarrotListItem = ({
         </Box>
         <Flex className="ml-2 shrink-0 items-center gap-4">
           {item.shared && item.shared !== "NO" ? (
-            <Tooltip content={item.shared === "SHARED" ? "Shared chest" : "Previously shared chest"}>
-              <span className={item.shared === "SHARED" ? "text-emerald-400" : "text-zinc-500"}>
+            <Tooltip content={sharedTooltip} open={isSharedTooltipOpen} onOpenChange={setIsSharedTooltipOpen}>
+              <button
+                type="button"
+                className={item.shared === "SHARED" ? "text-emerald-400" : "text-zinc-500"}
+                aria-label={sharedTooltip}
+                onTouchStart={(event) => {
+                  event.stopPropagation();
+                  setIsSharedTooltipOpen(true);
+                }}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setIsSharedTooltipOpen((previous) => !previous);
+                }}
+              >
                 <FaUsers />
-              </span>
+              </button>
             </Tooltip>
           ) : null}
           <Tooltip content={item.pinned ? "Unpin" : "Pin"}>

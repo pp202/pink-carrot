@@ -18,6 +18,7 @@ function serializeChestPad(chestPad: {
             chestPads: number;
         };
     };
+    sharedWithAliases?: string[];
 }) {
     return {
         id: chestPad.id,
@@ -29,12 +30,50 @@ function serializeChestPad(chestPad: {
         listRank: chestPad.listRank,
         dashRank: chestPad.dashRank,
         shared: chestPad.shared,
+        sharedWithAliases: chestPad.sharedWithAliases ?? [],
         carrots: (chestPad.chest.carrots ?? []).map((carrot) => ({
             id: carrot.id,
             label: carrot.label,
             harvested: carrot.harvested,
         })),
     };
+}
+
+async function hydrateSharedAliasesForUser<T extends { chestId: number; userId: number }>(
+    userId: number,
+    chestPads: T[],
+) {
+    const relatedUserIds = Array.from(
+        new Set(
+            chestPads
+                .map((chestPad) => chestPad.userId)
+                .filter((relatedUserId) => relatedUserId !== userId),
+        ),
+    );
+
+    if (relatedUserIds.length === 0) {
+        return new Map<number, string>();
+    }
+
+    const connections = await prisma.connection.findMany({
+        where: {
+            userId,
+            connectionUserId: {
+                in: relatedUserIds,
+            },
+        },
+        select: {
+            connectionUserId: true,
+            alias: true,
+        },
+    });
+
+    return new Map(
+        connections.map((connection) => [
+            connection.connectionUserId,
+            connection.alias?.trim() ? connection.alias : "Chest wizard",
+        ]),
+    );
 }
 
 async function rebalanceChestRanks(userId: number, rankField: 'listRank' | 'dashRank') {
@@ -95,7 +134,47 @@ export async function getChests() {
         ],
     });
 
-    return chestPads.map(serializeChestPad);
+    const chestIds = chestPads.map((chestPad) => chestPad.chestId);
+    const sharedPads = chestIds.length > 0
+        ? await prisma.chestPad.findMany({
+            where: {
+                chestId: {
+                    in: chestIds,
+                },
+                status: "NEW",
+            },
+            select: {
+                chestId: true,
+                userId: true,
+            },
+        })
+        : [];
+    const aliasByUserId = await hydrateSharedAliasesForUser(user.id, sharedPads);
+
+    const sharedAliasesByChestId = new Map<number, string[]>();
+    for (const sharedPad of sharedPads) {
+        if (sharedPad.userId === user.id) {
+            continue;
+        }
+
+        const alias = aliasByUserId.get(sharedPad.userId);
+        if (!alias) {
+            continue;
+        }
+
+        const existing = sharedAliasesByChestId.get(sharedPad.chestId) ?? [];
+        if (!existing.includes(alias)) {
+            existing.push(alias);
+        }
+        sharedAliasesByChestId.set(sharedPad.chestId, existing);
+    }
+
+    return chestPads.map((chestPad) =>
+        serializeChestPad({
+            ...chestPad,
+            sharedWithAliases: sharedAliasesByChestId.get(chestPad.chestId) ?? [],
+        }),
+    );
 }
 
 export async function getArchivedChests() {
@@ -145,7 +224,47 @@ export async function getPinnedChestsWithCarrots() {
         ],
     });
 
-    return chestPads.map(serializeChestPad);
+    const chestIds = chestPads.map((chestPad) => chestPad.chestId);
+    const sharedPads = chestIds.length > 0
+        ? await prisma.chestPad.findMany({
+            where: {
+                chestId: {
+                    in: chestIds,
+                },
+                status: "NEW",
+            },
+            select: {
+                chestId: true,
+                userId: true,
+            },
+        })
+        : [];
+    const aliasByUserId = await hydrateSharedAliasesForUser(user.id, sharedPads);
+
+    const sharedAliasesByChestId = new Map<number, string[]>();
+    for (const sharedPad of sharedPads) {
+        if (sharedPad.userId === user.id) {
+            continue;
+        }
+
+        const alias = aliasByUserId.get(sharedPad.userId);
+        if (!alias) {
+            continue;
+        }
+
+        const existing = sharedAliasesByChestId.get(sharedPad.chestId) ?? [];
+        if (!existing.includes(alias)) {
+            existing.push(alias);
+        }
+        sharedAliasesByChestId.set(sharedPad.chestId, existing);
+    }
+
+    return chestPads.map((chestPad) =>
+        serializeChestPad({
+            ...chestPad,
+            sharedWithAliases: sharedAliasesByChestId.get(chestPad.chestId) ?? [],
+        }),
+    );
 }
 
 export async function getChest(id: number) {

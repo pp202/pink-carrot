@@ -16,6 +16,7 @@ export default async function DashboardPage() {
     id: chest.id,
     label: chest.label,
     shared: chest.shared,
+    sharedWithAliases: chest.sharedWithAliases,
     carrots: chest.carrots.map((carrot: PinnedChest['carrots'][number]) => ({
       id: carrot.id.toString(),
       label: carrot.label,
