@@ -158,7 +158,6 @@ const EditListPage = () => {
                 </Button>
               </div>
               <div className="flex justify-center gap-3">
-                <Button className="!bg-zinc-100 !text-zinc-900 hover:!bg-zinc-200" disabled={isSubmitting}>Save {isSubmitting && <Spinner />}</Button>
                 <Button
                   type="button"
                   variant="soft"
@@ -168,6 +167,7 @@ const EditListPage = () => {
                 >
                   Cancel
                 </Button>
+                <Button className="!bg-zinc-100 !text-zinc-900 hover:!bg-zinc-200" disabled={isSubmitting}>Save {isSubmitting && <Spinner />}</Button>
               </div>
             </form>
           )}

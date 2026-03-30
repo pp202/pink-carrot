@@ -104,7 +104,6 @@ const NewListForm = () => {
                             </Button>
                         </div>
                         <div className='flex justify-center gap-3'>
-                            <Button color='green' disabled={isSubmitting}>Create {isSubmitting && <Spinner />}</Button>
                             <Button
                                 type='button'
                                 variant='soft'
@@ -113,6 +112,12 @@ const NewListForm = () => {
                                 onClick={() => router.push(returnPath)}
                             >
                                 Cancel
+                            </Button>
+                            <Button
+                                className='!bg-zinc-100 !text-zinc-900 hover:!bg-zinc-200'
+                                disabled={isSubmitting}
+                            >
+                                Create {isSubmitting && <Spinner />}
                             </Button>
                         </div>
                     </form>
