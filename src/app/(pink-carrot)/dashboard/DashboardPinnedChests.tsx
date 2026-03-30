@@ -8,6 +8,8 @@ import { FaBars, FaClone, FaEdit, FaMinus, FaUsers } from "react-icons/fa";
 import { GiCarrot, GiChest } from "react-icons/gi";
 import ChestShareDialog from "@/app/components/ChestShareDialog";
 
+const SHARED_TOOLTIP_VISIBLE_MS = 2500;
+
 type DashboardCarrot = {
   id: string;
   label: string;
@@ -20,7 +22,60 @@ type DashboardChest = {
   carrots: DashboardCarrot[];
   pinned?: boolean;
   shared?: "NO" | "SHARED" | "UNSHARED";
+  sharedWithAliases?: string[];
 };
+
+function SharedStatusIcon({
+  shared,
+  sharedWithAliases,
+}: {
+  shared: DashboardChest["shared"];
+  sharedWithAliases?: string[];
+}) {
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+  const sharedWithText = sharedWithAliases?.length
+    ? sharedWithAliases.join(", ")
+    : "";
+  const sharedTooltip = shared === "SHARED"
+    ? (sharedWithText ? `Shared with ${sharedWithText}` : "Shared chest")
+    : (sharedWithText ? `Previously shared with ${sharedWithText}` : "Previously shared chest");
+
+  useEffect(() => {
+    if (!isTooltipOpen) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setIsTooltipOpen(false);
+    }, SHARED_TOOLTIP_VISIBLE_MS);
+
+    return () => clearTimeout(timer);
+  }, [isTooltipOpen]);
+
+  if (!shared || shared === "NO") {
+    return null;
+  }
+
+  return (
+    <Tooltip content={sharedTooltip} open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
+      <button
+        type="button"
+        className={`mr-2 inline-flex ${shared === "SHARED" ? "text-emerald-400" : "text-zinc-500"}`}
+        aria-label={sharedTooltip}
+        onTouchStart={(event) => {
+          event.stopPropagation();
+          setIsTooltipOpen(true);
+        }}
+        onClick={(event) => {
+          event.stopPropagation();
+          setIsTooltipOpen((previous) => !previous);
+        }}
+      >
+        <FaUsers />
+      </button>
+    </Tooltip>
+  );
+}
 
 export default function DashboardPinnedChests({
   initialPinnedChests,
@@ -264,13 +319,10 @@ export default function DashboardPinnedChests({
                   <h2 className="truncate text-sm font-semibold text-zinc-100">{chest.label}</h2>
                 </div>
                 <Box className="items-center">
-                  {chest.shared && chest.shared !== "NO" ? (
-                    <Tooltip content={chest.shared === "SHARED" ? "Shared chest" : "Previously shared chest"}>
-                      <span className={`mr-2 inline-flex ${chest.shared === "SHARED" ? "text-emerald-400" : "text-zinc-500"}`}>
-                        <FaUsers />
-                      </span>
-                    </Tooltip>
-                  ) : null}
+                  <SharedStatusIcon
+                    shared={chest.shared}
+                    sharedWithAliases={chest.sharedWithAliases}
+                  />
                   <DropdownMenu.Root>
                     <Tooltip content="More actions">
                       <DropdownMenu.Trigger>
