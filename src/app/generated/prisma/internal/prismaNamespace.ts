@@ -914,6 +914,7 @@ export const ChestPadScalarFieldEnum = {
   id: 'id',
   status: 'status',
   pinned: 'pinned',
+  shared: 'shared',
   listRank: 'listRank',
   dashRank: 'dashRank',
   userId: 'userId',
@@ -1035,6 +1036,20 @@ export type ListEnumStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'Shared'
+ */
+export type EnumSharedFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Shared'>
+    
+
+
+/**
+ * Reference to a field of type 'Shared[]'
+ */
+export type ListEnumSharedFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Shared[]'>
     
 
 

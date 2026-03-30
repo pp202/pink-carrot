@@ -1,0 +1,4 @@
+CREATE TYPE "Shared" AS ENUM ('NO', 'SHARED', 'UNSHARED');
+
+ALTER TABLE "ChestPad"
+ADD COLUMN "shared" "Shared" NOT NULL DEFAULT 'NO';

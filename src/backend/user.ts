@@ -162,6 +162,121 @@ export async function disconnectConnections(connectionIds: number[]) {
 
   const linkedIds = linkedConnections.map((connection) => connection.connectionUserId);
 
+  const ownedSharedPads = await prisma.chestPad.findMany({
+    where: {
+      userId: user.id,
+      status: "NEW",
+      chest: {
+        chestPads: {
+          some: {
+            userId: {
+              in: linkedIds,
+            },
+            status: "NEW",
+          },
+        },
+      },
+    },
+    select: {
+      id: true,
+      chestId: true,
+      chest: {
+        include: {
+          carrots: {
+            orderBy: {
+              id: "asc",
+            },
+          },
+        },
+      },
+    },
+  });
+
+  await Promise.all(ownedSharedPads.map(async (ownedPad) => {
+    await prisma.$transaction(async (tx) => {
+      const clonedChest = await tx.chest.create({
+        data: {
+          label: ownedPad.chest.label,
+          carrots: {
+            create: ownedPad.chest.carrots.map((carrot) => ({
+              label: carrot.label,
+              harvested: carrot.harvested,
+            })),
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      await tx.chestPad.update({
+        where: {
+          id: ownedPad.id,
+        },
+        data: {
+          chestId: clonedChest.id,
+          shared: "UNSHARED",
+        },
+      });
+    });
+  }));
+
+  const ownedChestIds = Array.from(new Set(ownedSharedPads.map((pad) => pad.chestId)));
+  if (ownedChestIds.length > 0) {
+    const remainingSharedCounts = await prisma.chestPad.groupBy({
+      by: ["chestId"],
+      where: {
+        chestId: {
+          in: ownedChestIds,
+        },
+        status: "NEW",
+        userId: {
+          not: user.id,
+        },
+      },
+      _count: {
+        chestId: true,
+      },
+    });
+
+    const stillSharedChestIds = new Set(
+      remainingSharedCounts
+        .filter((row) => row._count.chestId > 1)
+        .map((row) => row.chestId),
+    );
+
+    await prisma.$transaction([
+      prisma.chestPad.updateMany({
+        where: {
+          userId: {
+            not: user.id,
+          },
+          status: "NEW",
+          chestId: {
+            in: ownedChestIds.filter((chestId) => stillSharedChestIds.has(chestId)),
+          },
+        },
+        data: {
+          shared: "SHARED",
+        },
+      }),
+      prisma.chestPad.updateMany({
+        where: {
+          userId: {
+            not: user.id,
+          },
+          status: "NEW",
+          chestId: {
+            in: ownedChestIds.filter((chestId) => !stillSharedChestIds.has(chestId)),
+          },
+        },
+        data: {
+          shared: "UNSHARED",
+        },
+      }),
+    ]);
+  }
+
   await prisma.connection.deleteMany({
     where: {
       OR: [

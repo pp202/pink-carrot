@@ -15,3 +15,12 @@ export const Status = {
 } as const
 
 export type Status = (typeof Status)[keyof typeof Status]
+
+
+export const Shared = {
+  NO: 'NO',
+  SHARED: 'SHARED',
+  UNSHARED: 'UNSHARED'
+} as const
+
+export type Shared = (typeof Shared)[keyof typeof Shared]
