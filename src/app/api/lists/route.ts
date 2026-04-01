@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma}  from "@/config/prisma"
 import { loggedUser } from "@/backend/user"
 import { createListSchema } from "../../schema/createListSchema"
-import { getArchivedChests, getChests, moveChestBetween } from "@/backend/lists"
+import { getArchivedChests, getChests, getPinnedChestsWithCarrots, moveChestBetween } from "@/backend/lists"
 import { nextLexoRank } from "@/backend/lexoRank"
 
 export async function POST(request: NextRequest) {
@@ -119,8 +119,13 @@ export async function PATCH(request: NextRequest) {
 
 export async function GET(request: NextRequest) {  
   const status = request.nextUrl.searchParams.get('status');
+  const pinned = request.nextUrl.searchParams.get('pinned');
   if (status === 'ARCHIVED') {
     return NextResponse.json(await getArchivedChests(), { status: 200 })
+  }
+
+  if (pinned === 'true') {
+    return NextResponse.json(await getPinnedChestsWithCarrots(), { status: 200 })
   }
 
   return NextResponse.json(await getChests(), { status: 200 })

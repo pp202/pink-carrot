@@ -9,6 +9,7 @@ import { GiCarrot, GiChest } from "react-icons/gi";
 import ChestShareDialog from "@/app/components/ChestShareDialog";
 
 const SHARED_TOOLTIP_VISIBLE_MS = 2500;
+const DASHBOARD_REFRESH_INTERVAL_MS = 3000;
 
 type DashboardCarrot = {
   id: string;
@@ -89,6 +90,75 @@ export default function DashboardPinnedChests({
   const [isDragging, setIsDragging] = useState(false);
   const [isTouchReordering, setIsTouchReordering] = useState(false);
   const [sharingChestId, setSharingChestId] = useState<number | null>(null);
+  const hasSharedChests = pinnedChests.some(
+    (chest) => chest.shared === "SHARED" || chest.sharedWithAliases?.length,
+  );
+
+  useEffect(() => {
+    setPinnedChests(initialPinnedChests);
+  }, [initialPinnedChests]);
+
+  useEffect(() => {
+    if (!hasSharedChests) {
+      return;
+    }
+
+    let isMounted = true;
+
+    const refreshPinnedChests = async () => {
+      if (isDragging || isTouchReordering) {
+        return;
+      }
+
+      try {
+        const response = await axios.get("/api/lists?pinned=true");
+        const latestPinnedChests = (response.data as Array<{
+          id: number;
+          label: string;
+          pinned?: boolean;
+          shared?: "NO" | "SHARED" | "UNSHARED";
+          sharedWithAliases?: string[];
+          carrots?: Array<{ id: number; label: string; harvested: boolean }>;
+        }>)
+          .filter((chest) => chest.pinned)
+          .map((chest) => ({
+            id: chest.id,
+            label: chest.label,
+            pinned: chest.pinned,
+            shared: chest.shared,
+            sharedWithAliases: chest.sharedWithAliases,
+            carrots: (chest.carrots ?? []).map((carrot) => ({
+              id: carrot.id.toString(),
+              label: carrot.label,
+              harvested: carrot.harvested,
+            })),
+          }));
+
+        if (isMounted) {
+          setPinnedChests(latestPinnedChests);
+        }
+      } catch {
+        // keep current dashboard state when sync fails
+      }
+    };
+
+    const intervalId = setInterval(refreshPinnedChests, DASHBOARD_REFRESH_INTERVAL_MS);
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        void refreshPinnedChests();
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    void refreshPinnedChests();
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [hasSharedChests, isDragging, isTouchReordering]);
 
   useEffect(() => {
     if (!isTouchReordering) {
