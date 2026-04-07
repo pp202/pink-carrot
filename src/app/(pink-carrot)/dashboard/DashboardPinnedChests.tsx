@@ -1,12 +1,20 @@
 "use client";
 
-import axios from "axios";
+import ChestShareDialog from "@/app/components/ChestShareDialog";
 import { Box, DropdownMenu, IconButton, Tooltip } from "@radix-ui/themes";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FaBars, FaClone, FaEdit, FaMinus, FaUsers } from "react-icons/fa";
+import {
+  FaBars,
+  FaCaretDown,
+  FaCaretRight,
+  FaClone,
+  FaEdit,
+  FaMinus,
+  FaUsers,
+} from "react-icons/fa";
 import { GiCarrot, GiChest } from "react-icons/gi";
-import ChestShareDialog from "@/app/components/ChestShareDialog";
 
 const SHARED_TOOLTIP_VISIBLE_MS = 2500;
 const DASHBOARD_REFRESH_INTERVAL_MS = 3000;
@@ -34,12 +42,15 @@ function SharedStatusIcon({
   sharedWithAliases?: string[];
 }) {
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
-  const sharedWithText = sharedWithAliases?.length
-    ? sharedWithAliases.join(", ")
-    : "";
-  const sharedTooltip = shared === "SHARED"
-    ? (sharedWithText ? `Shared with ${sharedWithText}` : "Shared chest")
-    : (sharedWithText ? `Previously shared with ${sharedWithText}` : "Previously shared chest");
+  const sharedWithText = sharedWithAliases?.length ? sharedWithAliases.join(", ") : "";
+  const sharedTooltip =
+    shared === "SHARED"
+      ? sharedWithText
+        ? `Shared with ${sharedWithText}`
+        : "Shared chest"
+      : sharedWithText
+        ? `Previously shared with ${sharedWithText}`
+        : "Previously shared chest";
 
   useEffect(() => {
     if (!isTooltipOpen) {
@@ -84,101 +95,74 @@ export default function DashboardPinnedChests({
   initialPinnedChests: DashboardChest[];
 }) {
   const router = useRouter();
-  const [pinnedChests, setPinnedChests] = useState(initialPinnedChests);
+  const [chests, setChests] = useState(initialPinnedChests);
   const [dragSourceIndex, setDragSourceIndex] = useState<number | null>(null);
   const [dragTargetIndex, setDragTargetIndex] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [isTouchReordering, setIsTouchReordering] = useState(false);
   const [sharingChestId, setSharingChestId] = useState<number | null>(null);
-  const hasSharedChests = pinnedChests.some(
-    (chest) => chest.shared === "SHARED" || chest.sharedWithAliases?.length,
-  );
 
   useEffect(() => {
-    setPinnedChests(initialPinnedChests);
+    setChests(initialPinnedChests);
   }, [initialPinnedChests]);
 
   useEffect(() => {
-    if (!hasSharedChests) {
-      return;
-    }
-
     let isMounted = true;
 
-    const refreshPinnedChests = async () => {
-      if (isDragging || isTouchReordering) {
+    const refreshChests = async () => {
+      if (isDragging) {
         return;
       }
 
       try {
-        const response = await axios.get("/api/lists?pinned=true");
-        const latestPinnedChests = (response.data as Array<{
+        const response = await axios.get("/api/lists");
+        const latestChests = (response.data as Array<{
           id: number;
           label: string;
           pinned?: boolean;
           shared?: "NO" | "SHARED" | "UNSHARED";
           sharedWithAliases?: string[];
           carrots?: Array<{ id: number; label: string; harvested: boolean }>;
-        }>)
-          .filter((chest) => chest.pinned)
-          .map((chest) => ({
-            id: chest.id,
-            label: chest.label,
-            pinned: chest.pinned,
-            shared: chest.shared,
-            sharedWithAliases: chest.sharedWithAliases,
-            carrots: (chest.carrots ?? []).map((carrot) => ({
-              id: carrot.id.toString(),
-              label: carrot.label,
-              harvested: carrot.harvested,
-            })),
-          }));
+        }>).map((chest) => ({
+          id: chest.id,
+          label: chest.label,
+          pinned: chest.pinned,
+          shared: chest.shared,
+          sharedWithAliases: chest.sharedWithAliases,
+          carrots: (chest.carrots ?? []).map((carrot) => ({
+            id: carrot.id.toString(),
+            label: carrot.label,
+            harvested: carrot.harvested,
+          })),
+        }));
 
         if (isMounted) {
-          setPinnedChests(latestPinnedChests);
+          setChests(latestChests);
         }
       } catch {
         // keep current dashboard state when sync fails
       }
     };
 
-    const intervalId = setInterval(refreshPinnedChests, DASHBOARD_REFRESH_INTERVAL_MS);
+    const intervalId = setInterval(refreshChests, DASHBOARD_REFRESH_INTERVAL_MS);
 
     const onVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        void refreshPinnedChests();
+        void refreshChests();
       }
     };
 
     document.addEventListener("visibilitychange", onVisibilityChange);
-    void refreshPinnedChests();
+    void refreshChests();
 
     return () => {
       isMounted = false;
       clearInterval(intervalId);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [hasSharedChests, isDragging, isTouchReordering]);
-
-  useEffect(() => {
-    if (!isTouchReordering) {
-      return;
-    }
-
-    const previousOverflow = document.body.style.overflow;
-    const previousTouchAction = document.body.style.touchAction;
-
-    document.body.style.overflow = "hidden";
-    document.body.style.touchAction = "none";
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.body.style.touchAction = previousTouchAction;
-    };
-  }, [isTouchReordering]);
+  }, [isDragging]);
 
   function handleHarvestedToggle(chestId: number, carrotId: string, harvested: boolean): void {
-    setPinnedChests((previous) =>
+    setChests((previous) =>
       previous.map((chest) =>
         chest.id !== chestId
           ? chest
@@ -192,7 +176,7 @@ export default function DashboardPinnedChests({
     );
 
     axios.patch(`/api/carrots/${carrotId}`, { harvested }).catch(() => {
-      setPinnedChests((previous) =>
+      setChests((previous) =>
         previous.map((chest) =>
           chest.id !== chestId
             ? chest
@@ -207,16 +191,30 @@ export default function DashboardPinnedChests({
     });
   }
 
+  function handleExpandToggle(chestId: number, pinned: boolean): void {
+    setChests((previous) =>
+      previous.map((chest) => (chest.id === chestId ? { ...chest, pinned } : chest)),
+    );
+
+    axios.patch(`/api/lists/${chestId}`, { pinned }).catch(() => {
+      setChests((previous) =>
+        previous.map((chest) =>
+          chest.id === chestId ? { ...chest, pinned: !pinned } : chest,
+        ),
+      );
+    });
+  }
+
   function handleArchive(chestId: number): void {
-    const archivedChest = pinnedChests.find((chest) => chest.id === chestId);
+    const archivedChest = chests.find((chest) => chest.id === chestId);
     if (!archivedChest) {
       return;
     }
 
-    setPinnedChests((previous) => previous.filter((chest) => chest.id !== chestId));
+    setChests((previous) => previous.filter((chest) => chest.id !== chestId));
 
     axios.patch(`/api/lists/${chestId}`, { status: "ARCHIVED" }).catch(() => {
-      setPinnedChests((previous) => {
+      setChests((previous) => {
         if (previous.some((chest) => chest.id === chestId)) {
           return previous;
         }
@@ -229,12 +227,7 @@ export default function DashboardPinnedChests({
   function handleClone(chestId: number): void {
     axios.patch(`/api/lists/${chestId}`, { action: "clone" }).then((response) => {
       const clonedChest = response.data as DashboardChest;
-
-      if (!clonedChest.pinned) {
-        return;
-      }
-
-      setPinnedChests((previous) => [...previous, clonedChest]);
+      setChests((previous) => [...previous, clonedChest]);
     });
   }
 
@@ -249,12 +242,12 @@ export default function DashboardPinnedChests({
   }
 
   function handleReorder(startIndex: number, targetIndex: number): void {
-    if (startIndex === targetIndex || targetIndex < 0 || targetIndex >= pinnedChests.length) {
+    if (startIndex === targetIndex || targetIndex < 0 || targetIndex >= chests.length) {
       return;
     }
 
-    const previousState = [...pinnedChests];
-    const nextState = [...pinnedChests];
+    const previousState = [...chests];
+    const nextState = [...chests];
     const [dragged] = nextState.splice(startIndex, 1);
 
     if (!dragged) {
@@ -262,36 +255,28 @@ export default function DashboardPinnedChests({
     }
 
     nextState.splice(targetIndex, 0, dragged);
-    setPinnedChests(nextState);
+    setChests(nextState);
 
     const movedChest = nextState[targetIndex];
     const previousChest = targetIndex > 0 ? nextState[targetIndex - 1] : null;
-    const nextChest = targetIndex < (nextState.length - 1) ? nextState[targetIndex + 1] : null;
+    const nextChest = targetIndex < nextState.length - 1 ? nextState[targetIndex + 1] : null;
 
-    axios.patch("/api/lists", {
-      chestId: movedChest?.id,
-      previousChestId: previousChest?.id ?? null,
-      nextChestId: nextChest?.id ?? null,
-      rankField: "dashRank",
-    }).catch(() => {
-      setPinnedChests(previousState);
-    });
+    axios
+      .patch("/api/lists", {
+        chestId: movedChest?.id,
+        previousChestId: previousChest?.id ?? null,
+        nextChestId: nextChest?.id ?? null,
+        rankField: "dashRank",
+      })
+      .catch(() => {
+        setChests(previousState);
+      });
   }
 
-  function finishTouchReorder(): void {
-    if (dragSourceIndex !== null && dragTargetIndex !== null) {
-      handleReorder(dragSourceIndex, dragTargetIndex);
-    }
-
-    setIsTouchReordering(false);
-    clearDragPreview();
-    setTimeout(() => setIsDragging(false), 0);
-  }
-
-  if (pinnedChests.length === 0) {
+  if (chests.length === 0) {
     return (
       <p className="rounded-xl border border-zinc-600/40 bg-zinc-900/60 px-4 py-6 text-center text-sm text-zinc-400">
-        No pinned chests yet. Create one with the plus button.
+        No chests yet. Create one with the plus button.
       </p>
     );
   }
@@ -299,198 +284,190 @@ export default function DashboardPinnedChests({
   return (
     <>
       <ul className="space-y-3">
-        {pinnedChests.map((chest, index) => {
-        const shouldShowDropIndicator = dragTargetIndex === index && dragSourceIndex !== index;
-        const isDraggingDown =
-          shouldShowDropIndicator && dragSourceIndex !== null && dragSourceIndex < index;
+        {chests.map((chest, index) => {
+          const isExpanded = Boolean(chest.pinned);
+          const shouldShowDropIndicator = dragTargetIndex === index && dragSourceIndex !== index;
+          const isDraggingDown =
+            shouldShowDropIndicator && dragSourceIndex !== null && dragSourceIndex < index;
 
-        return (
-          <li
-            key={chest.id}
-            className="group relative rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-5 py-4"
-            data-reorder-index={index}
-            style={{
-              opacity: dragSourceIndex === index ? 0.45 : 1,
-            }}
-            onDragEnter={(event) => {
-              event.preventDefault();
-              if (dragSourceIndex !== null) {
-                setDragTargetIndex(index);
-              }
-            }}
-            onDragOver={(event) => event.preventDefault()}
-            onDrop={(event) => {
-              event.preventDefault();
-              const sourceIndex = Number(event.dataTransfer.getData("text/plain"));
-              if (!Number.isNaN(sourceIndex)) {
-                handleReorder(sourceIndex, index);
-              }
+          return (
+            <li
+              key={chest.id}
+              className={`group relative rounded-xl border border-zinc-600/40 bg-zinc-900/70 ${
+                isExpanded ? "px-5 py-4" : "px-3 py-2.5"
+              }`}
+              data-reorder-index={index}
+              style={{
+                opacity: dragSourceIndex === index ? 0.45 : 1,
+              }}
+              onDragEnter={(event) => {
+                event.preventDefault();
+                if (dragSourceIndex !== null) {
+                  setDragTargetIndex(index);
+                }
+              }}
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={(event) => {
+                event.preventDefault();
+                const sourceIndex = Number(event.dataTransfer.getData("text/plain"));
+                if (!Number.isNaN(sourceIndex)) {
+                  handleReorder(sourceIndex, index);
+                }
 
-              clearDragPreview();
-            }}
-          >
-            {shouldShowDropIndicator ? (
-              <div
-                className={`pointer-events-none absolute inset-x-4 h-1 rounded-full bg-amber-400/80 ${
-                  isDraggingDown ? "-bottom-1" : "-top-1"
-                }`}
-              />
-            ) : null}
-            <article>
-              <div
-                className={`flex items-center justify-between gap-3 ${
-                  dragTargetIndex === index ? "rounded-lg bg-zinc-800/70" : ""
-                }`}
-              >
-                <div className="flex min-w-0 items-center gap-2">
-                  <button
-                    type="button"
-                    aria-label="Drag chest"
-                    className="-m-1 cursor-grab rounded p-1 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
-                    draggable
-                    onDragStart={(event) => {
-                      setIsDragging(true);
-                      startDragPreview(index);
-                      event.dataTransfer.setData("text/plain", String(index));
-                      event.dataTransfer.effectAllowed = "move";
-                    }}
-                    onDragEnd={() => {
-                      clearDragPreview();
-                      setTimeout(() => setIsDragging(false), 0);
-                    }}
-                    onTouchStart={(event) => {
-                      event.stopPropagation();
-                      setIsDragging(true);
-                      setIsTouchReordering(true);
-                      startDragPreview(index);
-                    }}
-                    onTouchMove={(event) => {
-                      const touch = event.touches[0];
-                      if (!touch || !isTouchReordering) {
-                        return;
-                      }
-
-                      event.preventDefault();
-                      const touchTarget = document
-                        .elementFromPoint(touch.clientX, touch.clientY)
-                        ?.closest("[data-reorder-index]");
-
-                      const targetIndex = Number(touchTarget?.getAttribute("data-reorder-index"));
-                      if (!Number.isNaN(targetIndex)) {
-                        setDragTargetIndex(targetIndex);
-                      }
-                    }}
-                    onTouchEnd={finishTouchReorder}
-                    onTouchCancel={finishTouchReorder}
-                    onClick={(event) => event.stopPropagation()}
-                  >
-                    <GiChest aria-hidden />
-                  </button>
-                  <h2 className="truncate text-sm font-semibold text-zinc-100">{chest.label}</h2>
-                </div>
-                <Box className="items-center">
-                  <SharedStatusIcon
-                    shared={chest.shared}
-                    sharedWithAliases={chest.sharedWithAliases}
-                  />
-                  <DropdownMenu.Root>
-                    <Tooltip content="More actions">
-                      <DropdownMenu.Trigger>
-                        <IconButton
-                          size="1"
-                          variant="ghost"
-                          className="h-8 w-8 p-0 text-zinc-300"
-                          aria-label="More actions"
-                          onClick={(event) => event.stopPropagation()}
-                        >
-                          <FaBars />
-                        </IconButton>
-                      </DropdownMenu.Trigger>
-                    </Tooltip>
-                    <DropdownMenu.Content
-                      size="1"
-                      align="end"
-                      className="space-y-2"
+                clearDragPreview();
+              }}
+            >
+              {shouldShowDropIndicator ? (
+                <div
+                  className={`pointer-events-none absolute inset-x-4 h-1 rounded-full bg-amber-400/80 ${
+                    isDraggingDown ? "-bottom-1" : "-top-1"
+                  }`}
+                />
+              ) : null}
+              <article>
+                <div
+                  className={`flex items-center justify-between gap-2 ${
+                    dragTargetIndex === index ? "rounded-lg bg-zinc-800/70" : ""
+                  }`}
+                >
+                  <div className="flex min-w-0 items-center gap-2">
+                    <button
+                      type="button"
+                      aria-label={isExpanded ? "Collapse chest" : "Expand chest"}
+                      className="-m-1 rounded p-1 text-zinc-300 hover:text-zinc-100"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleExpandToggle(chest.id, !isExpanded);
+                      }}
+                    >
+                      {isExpanded ? <FaCaretDown aria-hidden /> : <FaCaretRight aria-hidden />}
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Drag chest"
+                      className="-m-1 cursor-grab rounded p-1 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
+                      draggable
+                      onDragStart={(event) => {
+                        setIsDragging(true);
+                        startDragPreview(index);
+                        event.dataTransfer.setData("text/plain", String(index));
+                        event.dataTransfer.effectAllowed = "move";
+                      }}
+                      onDragEnd={() => {
+                        clearDragPreview();
+                        setTimeout(() => setIsDragging(false), 0);
+                      }}
                       onClick={(event) => event.stopPropagation()}
                     >
-                      <DropdownMenu.Item
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          router.push(`/my-lists/${chest.id}/edit?from=dashboard`);
-                        }}
-                        className="!py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+                      <GiChest aria-hidden />
+                    </button>
+                    <h2 className="truncate text-sm font-semibold text-zinc-100">{chest.label}</h2>
+                  </div>
+                  <Box className="items-center">
+                    <SharedStatusIcon
+                      shared={chest.shared}
+                      sharedWithAliases={chest.sharedWithAliases}
+                    />
+                    <DropdownMenu.Root>
+                      <Tooltip content="More actions">
+                        <DropdownMenu.Trigger>
+                          <IconButton
+                            size="1"
+                            variant="ghost"
+                            className="h-8 w-8 p-0 text-zinc-300"
+                            aria-label="More actions"
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            <FaBars />
+                          </IconButton>
+                        </DropdownMenu.Trigger>
+                      </Tooltip>
+                      <DropdownMenu.Content
+                        size="1"
+                        align="end"
+                        className="space-y-2"
+                        onClick={(event) => event.stopPropagation()}
                       >
-                        <FaEdit />
-                        Edit
-                      </DropdownMenu.Item>
-                      <DropdownMenu.Item
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          setSharingChestId(chest.id);
-                        }}
-                        className="mt-3 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
-                      >
-                        <FaUsers />
-                        Share
-                      </DropdownMenu.Item>
-                      <DropdownMenu.Item
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleClone(chest.id);
-                        }}
-                        className="mt-3 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
-                      >
-                        <FaClone />
-                        Clone
-                      </DropdownMenu.Item>
-                      <DropdownMenu.Item
-                        color="red"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleArchive(chest.id);
-                        }}
-                        className="mt-3 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
-                      >
-                        <FaMinus />
-                        Archive
-                      </DropdownMenu.Item>
-                    </DropdownMenu.Content>
-                  </DropdownMenu.Root>
-                </Box>
-              </div>
-              {chest.carrots.length === 0 ? (
-                <p className="mt-2 text-xs text-zinc-400">No carrots in this chest yet.</p>
-              ) : (
-                <ul className="mt-3 space-y-1 text-sm text-zinc-200">
-                  {chest.carrots.map((carrot) => (
-                    <li key={carrot.id} className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        disabled={isDragging}
-                        onClick={() =>
-                          handleHarvestedToggle(chest.id, carrot.id, !carrot.harvested)
-                        }
-                        className="inline-flex items-center gap-2 rounded px-1 py-0.5 text-left transition hover:bg-zinc-800/70 disabled:pointer-events-none"
-                        aria-pressed={carrot.harvested}
-                        aria-label={`${carrot.harvested ? "Unharvest" : "Harvest"} ${carrot.label}`}
-                      >
-                        <GiCarrot
-                          aria-hidden
-                          className={`text-xs ${carrot.harvested ? "text-zinc-500" : "text-pink-400"}`}
-                        />
-                        <span
-                          className={carrot.harvested ? "text-zinc-400 line-through" : "text-zinc-200"}
+                        <DropdownMenu.Item
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            router.push(`/my-lists/${chest.id}/edit?from=dashboard`);
+                          }}
+                          className="!py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
                         >
-                          {carrot.label}
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </article>
-          </li>
-        );
+                          <FaEdit />
+                          Edit
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setSharingChestId(chest.id);
+                          }}
+                          className="mt-3 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+                        >
+                          <FaUsers />
+                          Share
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleClone(chest.id);
+                          }}
+                          className="mt-3 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+                        >
+                          <FaClone />
+                          Clone
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item
+                          color="red"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleArchive(chest.id);
+                          }}
+                          className="mt-3 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+                        >
+                          <FaMinus />
+                          Archive
+                        </DropdownMenu.Item>
+                      </DropdownMenu.Content>
+                    </DropdownMenu.Root>
+                  </Box>
+                </div>
+                {isExpanded ? (
+                  chest.carrots.length === 0 ? (
+                    <p className="mt-2 text-xs text-zinc-400">No carrots in this chest yet.</p>
+                  ) : (
+                    <ul className="mt-3 space-y-1 text-sm text-zinc-200">
+                      {chest.carrots.map((carrot) => (
+                        <li key={carrot.id} className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            disabled={isDragging}
+                            onClick={() =>
+                              handleHarvestedToggle(chest.id, carrot.id, !carrot.harvested)
+                            }
+                            className="inline-flex items-center gap-2 rounded px-1 py-0.5 text-left transition hover:bg-zinc-800/70 disabled:pointer-events-none"
+                            aria-pressed={carrot.harvested}
+                            aria-label={`${carrot.harvested ? "Unharvest" : "Harvest"} ${carrot.label}`}
+                          >
+                            <GiCarrot
+                              aria-hidden
+                              className={`text-xs ${carrot.harvested ? "text-zinc-500" : "text-pink-400"}`}
+                            />
+                            <span
+                              className={carrot.harvested ? "text-zinc-400 line-through" : "text-zinc-200"}
+                            >
+                              {carrot.label}
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )
+                ) : null}
+              </article>
+            </li>
+          );
         })}
       </ul>
       <ChestShareDialog
@@ -502,12 +479,12 @@ export default function DashboardPinnedChests({
             return;
           }
 
-          setPinnedChests((previous) =>
+          setChests((previous) =>
             previous.map((chest) =>
               chest.id === sharingChestId
                 ? {
                     ...chest,
-                    shared: isShared ? "SHARED" : (chest.shared === "NO" ? "NO" : "UNSHARED"),
+                    shared: isShared ? "SHARED" : chest.shared === "NO" ? "NO" : "UNSHARED",
                   }
                 : chest,
             ),

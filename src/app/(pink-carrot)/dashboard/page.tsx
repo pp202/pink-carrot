@@ -1,16 +1,14 @@
-import { getPinnedChestsWithCarrots } from '@/backend/lists';
+import { getChests } from '@/backend/lists';
 import Link from 'next/link';
 import DashboardPinnedChests from './DashboardPinnedChests';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-type PinnedChest = Awaited<ReturnType<typeof getPinnedChestsWithCarrots>>[number];
+type PinnedChest = Awaited<ReturnType<typeof getChests>>[number];
 
 export default async function DashboardPage() {
-  const pinnedChests: PinnedChest[] = (await getPinnedChestsWithCarrots()).filter(
-    (chest: PinnedChest) => chest.status === 'NEW'
-  );
+  const pinnedChests: PinnedChest[] = (await getChests()).filter((chest: PinnedChest) => chest.status === 'NEW');
 
   const serializablePinnedChests = pinnedChests.map((chest: PinnedChest) => ({
     id: chest.id,
@@ -31,7 +29,7 @@ export default async function DashboardPage() {
           <header className="mb-8 w-full text-center">
             <h1 className="text-2xl font-semibold text-zinc-100">Dashboard</h1>
             <p className="mt-2 text-sm text-zinc-300">
-              Your pinned chests and their carrots.
+              All your chests in one place. Expand to work with carrots, collapse to keep things tidy.
             </p>
           </header>
 
