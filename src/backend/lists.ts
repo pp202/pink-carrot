@@ -125,6 +125,11 @@ export async function getChests() {
         include: {
             chest: {
                 include: {
+                    carrots: {
+                        orderBy: {
+                            id: 'asc',
+                        },
+                    },
                 },
             },
         },
