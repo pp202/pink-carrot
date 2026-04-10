@@ -7,14 +7,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   FaBars,
-  FaCaretDown,
-  FaCaretRight,
   FaClone,
   FaEdit,
   FaMinus,
   FaUsers,
 } from "react-icons/fa";
-import { GiCarrot, GiChest } from "react-icons/gi";
+import { GiCarrot, GiChest, GiOpenChest } from "react-icons/gi";
 
 const SHARED_TOOLTIP_VISIBLE_MS = 2500;
 const DASHBOARD_REFRESH_INTERVAL_MS = 3000;
@@ -340,7 +338,7 @@ export default function DashboardPinnedChests({
                         handleExpandToggle(chest.id, !isExpanded);
                       }}
                     >
-                      {isExpanded ? <FaCaretDown aria-hidden /> : <FaCaretRight aria-hidden />}
+                      {isExpanded ? <GiOpenChest aria-hidden /> : <GiChest aria-hidden />}
                     </button>
                     <button
                       type="button"
