@@ -9,6 +9,7 @@ import {
   FaBars,
   FaClone,
   FaEdit,
+  FaGripLines,
   FaMinus,
   FaUsers,
 } from "react-icons/fa";
@@ -331,17 +332,6 @@ export default function DashboardPinnedChests({
                   <div className="flex min-w-0 items-center gap-2">
                     <button
                       type="button"
-                      aria-label={isExpanded ? "Collapse chest" : "Expand chest"}
-                      className="-m-1 rounded p-1 text-zinc-300 hover:text-zinc-100"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        handleExpandToggle(chest.id, !isExpanded);
-                      }}
-                    >
-                      {isExpanded ? <GiOpenChest aria-hidden /> : <GiChest aria-hidden />}
-                    </button>
-                    <button
-                      type="button"
                       aria-label="Drag chest"
                       className="-m-1 cursor-grab rounded p-1 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
                       draggable
@@ -357,9 +347,29 @@ export default function DashboardPinnedChests({
                       }}
                       onClick={(event) => event.stopPropagation()}
                     >
-                      <GiChest aria-hidden />
+                      <FaGripLines aria-hidden />
                     </button>
-                    <h2 className="truncate text-sm font-semibold text-zinc-100">{chest.label}</h2>
+                    <button
+                      type="button"
+                      aria-label={isExpanded ? "Collapse chest" : "Expand chest"}
+                      className="-m-1 rounded p-1 text-zinc-300 hover:text-zinc-100"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleExpandToggle(chest.id, !isExpanded);
+                      }}
+                    >
+                      {isExpanded ? <GiOpenChest aria-hidden /> : <GiChest aria-hidden />}
+                    </button>
+                    <button
+                      type="button"
+                      className="truncate text-left text-sm font-semibold text-zinc-100 hover:text-zinc-50"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleExpandToggle(chest.id, !isExpanded);
+                      }}
+                    >
+                      {chest.label}
+                    </button>
                   </div>
                   <Box className="items-center">
                     <SharedStatusIcon

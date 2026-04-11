@@ -6,7 +6,7 @@ import { Box, DropdownMenu, Flex, IconButton, Tooltip } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FaBars, FaClone, FaEdit, FaMinus, FaThumbtack, FaUsers } from "react-icons/fa";
+import { FaBars, FaClone, FaEdit, FaGripLines, FaMinus, FaThumbtack, FaUsers } from "react-icons/fa";
 import { GiChest } from "react-icons/gi";
 
 const SWIPE_DELETE_THRESHOLD = 90;
@@ -581,7 +581,7 @@ const CarrotListItem = ({
             onTouchCancel={finishTouchReorder}
             onClick={(event) => event.stopPropagation()}
           >
-            <GiChest aria-hidden />
+            <FaGripLines aria-hidden />
           </button>
         </Tooltip>
         <Box className="flex min-h-4 grow items-center self-stretch">
