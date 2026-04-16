@@ -265,7 +265,6 @@ export default function DashboardPinnedChests({
         chestId: movedChest?.id,
         previousChestId: previousChest?.id ?? null,
         nextChestId: nextChest?.id ?? null,
-        rankField: "dashRank",
       })
       .catch(() => {
         setChests(previousState);

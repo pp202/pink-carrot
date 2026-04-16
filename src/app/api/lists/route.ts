@@ -86,7 +86,6 @@ export async function PATCH(request: NextRequest) {
   const chestId = body?.chestId;
   const previousChestId = body?.previousChestId ?? null;
   const nextChestId = body?.nextChestId ?? null;
-  const rankField = body?.rankField ?? "listRank";
 
   if (!Number.isInteger(chestId)) {
     return NextResponse.json({ message: "Invalid chest id" }, { status: 400 });
@@ -100,15 +99,11 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ message: "Invalid next chest id" }, { status: 400 });
   }
 
-  if (rankField !== "listRank" && rankField !== "dashRank") {
-    return NextResponse.json({ message: "Invalid rank field" }, { status: 400 });
-  }
-
   if (chestId === previousChestId || chestId === nextChestId) {
     return NextResponse.json({ message: "Invalid reorder bounds" }, { status: 400 });
   }
 
-  const reordered = await moveChestBetween(chestId, previousChestId, nextChestId, rankField);
+  const reordered = await moveChestBetween(chestId, previousChestId, nextChestId);
 
   if (!reordered) {
     return NextResponse.json({ message: "Unable to reorder chest" }, { status: 404 });
