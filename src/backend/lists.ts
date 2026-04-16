@@ -76,7 +76,7 @@ async function hydrateSharedAliasesForUser<T extends { chestId: number; userId: 
     );
 }
 
-async function rebalanceChestRanks(userId: number, rankField: 'listRank' | 'dashRank') {
+async function rebalanceChestRanks(userId: number) {
     const chestPads = await prisma.chestPad.findMany({
         where: {
             userId,
@@ -88,7 +88,7 @@ async function rebalanceChestRanks(userId: number, rankField: 'listRank' | 'dash
             dashRank: true,
         },
         orderBy: [
-            { [rankField]: 'asc' },
+            { listRank: 'asc' },
             { id: 'asc' },
         ],
     });
@@ -108,7 +108,7 @@ async function rebalanceChestRanks(userId: number, rankField: 'listRank' | 'dash
                     status: 'NEW',
                 },
                 data: {
-                    [rankField]: allocatedRanks[index],
+                    listRank: allocatedRanks[index],
                 },
             }),
         ),
@@ -224,7 +224,7 @@ export async function getPinnedChestsWithCarrots() {
             },
         },
         orderBy: [
-            { dashRank: 'asc' },
+            { listRank: 'asc' },
             { id: 'asc' },
         ],
     });
@@ -878,7 +878,6 @@ export async function moveChestBetween(
     chestId: number,
     previousChestId: number | null,
     nextChestId: number | null,
-    rankField: 'listRank' | 'dashRank' = 'listRank',
 ) {
     const user = await loggedUser();
 
@@ -908,11 +907,11 @@ export async function moveChestBetween(
 
     const previousRank = previousChestId === null
         ? null
-        : chestById.get(previousChestId)?.[rankField];
+        : chestById.get(previousChestId)?.listRank;
 
     const nextRank = nextChestId === null
         ? null
-        : chestById.get(nextChestId)?.[rankField];
+        : chestById.get(nextChestId)?.listRank;
 
     if ((previousChestId !== null && !previousRank) || (nextChestId !== null && !nextRank)) {
         return false;
@@ -923,7 +922,7 @@ export async function moveChestBetween(
     try {
         nextRankValue = lexoRankBetween(previousRank, nextRank);
     } catch {
-        await rebalanceChestRanks(user.id, rankField);
+        await rebalanceChestRanks(user.id);
 
         const refreshedChests = await prisma.chestPad.findMany({
             where: {
@@ -943,10 +942,10 @@ export async function moveChestBetween(
         const refreshedById = new Map(refreshedChests.map((chest) => [chest.id, chest]));
         const refreshedPreviousRank = previousChestId === null
             ? null
-            : refreshedById.get(previousChestId)?.[rankField];
+            : refreshedById.get(previousChestId)?.listRank;
         const refreshedNextRank = nextChestId === null
             ? null
-            : refreshedById.get(nextChestId)?.[rankField];
+            : refreshedById.get(nextChestId)?.listRank;
 
         if ((previousChestId !== null && !refreshedPreviousRank) || (nextChestId !== null && !refreshedNextRank)) {
             return false;
@@ -966,7 +965,7 @@ export async function moveChestBetween(
             status: 'NEW',
         },
         data: {
-            [rankField]: nextRankValue,
+            listRank: nextRankValue,
         },
     });
 
