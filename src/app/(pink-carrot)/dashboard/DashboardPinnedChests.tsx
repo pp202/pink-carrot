@@ -113,7 +113,7 @@ export default function DashboardPinnedChests({
       }
 
       try {
-        const response = await axios.get("/api/lists?pinned=true");
+        const response = await axios.get("/api/lists");
         const latestChests = (response.data as Array<{
           id: number;
           label: string;
