@@ -4,12 +4,11 @@ import ChestShareDialog from "@/app/components/ChestShareDialog";
 import { Box, DropdownMenu, IconButton, Tooltip } from "@radix-ui/themes";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FaBars,
   FaClone,
   FaEdit,
-  FaGripLines,
   FaMinus,
   FaUsers,
 } from "react-icons/fa";
@@ -99,6 +98,7 @@ export default function DashboardPinnedChests({
   const [dragTargetIndex, setDragTargetIndex] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [sharingChestId, setSharingChestId] = useState<number | null>(null);
+  const didDragRef = useRef(false);
 
   useEffect(() => {
     setChests(initialPinnedChests);
@@ -113,7 +113,7 @@ export default function DashboardPinnedChests({
       }
 
       try {
-        const response = await axios.get("/api/lists");
+        const response = await axios.get("/api/lists?pinned=true");
         const latestChests = (response.data as Array<{
           id: number;
           label: string;
@@ -331,10 +331,11 @@ export default function DashboardPinnedChests({
                   <div className="flex min-w-0 items-center gap-2">
                     <button
                       type="button"
-                      aria-label="Drag chest"
-                      className="-m-1 cursor-grab rounded p-1 text-zinc-400 active:cursor-grabbing hover:text-zinc-200"
+                      aria-label={isExpanded ? "Collapse chest" : "Expand chest"}
+                      className="-m-1 cursor-grab rounded p-1 text-zinc-300 hover:text-zinc-100 active:cursor-grabbing"
                       draggable
                       onDragStart={(event) => {
+                        didDragRef.current = true;
                         setIsDragging(true);
                         startDragPreview(index);
                         event.dataTransfer.setData("text/plain", String(index));
@@ -342,18 +343,17 @@ export default function DashboardPinnedChests({
                       }}
                       onDragEnd={() => {
                         clearDragPreview();
-                        setTimeout(() => setIsDragging(false), 0);
+                        setTimeout(() => {
+                          setIsDragging(false);
+                          didDragRef.current = false;
+                        }, 0);
                       }}
-                      onClick={(event) => event.stopPropagation()}
-                    >
-                      <FaGripLines aria-hidden />
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={isExpanded ? "Collapse chest" : "Expand chest"}
-                      className="-m-1 rounded p-1 text-zinc-300 hover:text-zinc-100"
                       onClick={(event) => {
                         event.stopPropagation();
+                        if (didDragRef.current) {
+                          didDragRef.current = false;
+                          return;
+                        }
                         handleExpandToggle(chest.id, !isExpanded);
                       }}
                     >
@@ -361,9 +361,29 @@ export default function DashboardPinnedChests({
                     </button>
                     <button
                       type="button"
-                      className="truncate text-left text-sm font-semibold text-zinc-100 hover:text-zinc-50"
+                      aria-label={isExpanded ? "Collapse chest" : "Expand chest"}
+                      className="truncate cursor-grab text-left text-sm font-semibold text-zinc-100 hover:text-zinc-50 active:cursor-grabbing"
+                      draggable
+                      onDragStart={(event) => {
+                        didDragRef.current = true;
+                        setIsDragging(true);
+                        startDragPreview(index);
+                        event.dataTransfer.setData("text/plain", String(index));
+                        event.dataTransfer.effectAllowed = "move";
+                      }}
+                      onDragEnd={() => {
+                        clearDragPreview();
+                        setTimeout(() => {
+                          setIsDragging(false);
+                          didDragRef.current = false;
+                        }, 0);
+                      }}
                       onClick={(event) => {
                         event.stopPropagation();
+                        if (didDragRef.current) {
+                          didDragRef.current = false;
+                          return;
+                        }
                         handleExpandToggle(chest.id, !isExpanded);
                       }}
                     >
