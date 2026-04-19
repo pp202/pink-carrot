@@ -171,7 +171,6 @@ type ListChest = {
   createdAt: string;
   status: "NEW" | "ARCHIVED";
   pinned: boolean;
-  listRank: string;
   dashRank: string;
 };
 

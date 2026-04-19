@@ -33,7 +33,6 @@ model ChestPad {
   status   Status @default(NEW)
   pinned   Boolean @default(false)
   shared   Shared @default(NO)
-  listRank String @db.VarChar(16)
   dashRank String @db.VarChar(16)
 
   userId Int
@@ -42,7 +41,6 @@ model ChestPad {
   chestId Int
   chest Chest @relation(fields: [chestId], references: [id])
 
-  @@index([userId, listRank])
   @@index([userId, dashRank])
   @@index([chestId])
 }

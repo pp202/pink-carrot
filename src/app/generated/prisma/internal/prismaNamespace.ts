@@ -915,7 +915,6 @@ export const ChestPadScalarFieldEnum = {
   status: 'status',
   pinned: 'pinned',
   shared: 'shared',
-  listRank: 'listRank',
   dashRank: 'dashRank',
   userId: 'userId',
   chestId: 'chestId'

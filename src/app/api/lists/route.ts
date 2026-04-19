@@ -12,32 +12,18 @@ export async function POST(request: NextRequest) {
     if (!validation.success)
         return NextResponse.json(validation.error.issues, { status: 400 })
 
-    const [lastListRankedChestPad, lastDashRankedChestPad] = await Promise.all([
-        prisma.chestPad.findFirst({
-            where: {
-                userId: user.id,
-            },
-            select: {
-                listRank: true,
-            },
-            orderBy: [
-                { listRank: "desc" },
-                { id: "desc" },
-            ],
-        }),
-        prisma.chestPad.findFirst({
-            where: {
-                userId: user.id,
-            },
-            select: {
-                dashRank: true,
-            },
-            orderBy: [
-                { dashRank: "desc" },
-                { id: "desc" },
-            ],
-        }),
-    ]);
+    const lastDashRankedChestPad = await prisma.chestPad.findFirst({
+        where: {
+            userId: user.id,
+        },
+        select: {
+            dashRank: true,
+        },
+        orderBy: [
+            { dashRank: "desc" },
+            { id: "desc" },
+        ],
+    });
 
     const newList = await prisma.chestPad.create({
         data: {
@@ -48,7 +34,6 @@ export async function POST(request: NextRequest) {
             },
             status: "NEW",
             pinned: validation.data.pinned,
-            listRank: nextLexoRank(lastListRankedChestPad?.listRank),
             dashRank: nextLexoRank(lastDashRankedChestPad?.dashRank),
             chest: {
                 create: {
@@ -73,7 +58,6 @@ export async function POST(request: NextRequest) {
       createdAt: newList.chest.createdAt,
       status: newList.status,
       pinned: newList.pinned,
-      listRank: newList.listRank,
       dashRank: newList.dashRank,
     }, { status: 201 })
 }

@@ -19,7 +19,6 @@ type ListChest = {
   createdAt: string;
   status: "NEW" | "ARCHIVED";
   pinned: boolean;
-  listRank: string;
   dashRank: string;
   shared?: "NO" | "SHARED" | "UNSHARED";
   sharedWithAliases?: string[];

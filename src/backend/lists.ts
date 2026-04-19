@@ -7,7 +7,6 @@ function serializeChestPad(chestPad: {
     status: 'NEW' | 'ARCHIVED';
     pinned: boolean;
     shared: 'NO' | 'SHARED' | 'UNSHARED';
-    listRank: string;
     dashRank: string;
     chest: {
         id: number;
@@ -27,7 +26,6 @@ function serializeChestPad(chestPad: {
         createdAt: chestPad.chest.createdAt,
         status: chestPad.status,
         pinned: chestPad.pinned,
-        listRank: chestPad.listRank,
         dashRank: chestPad.dashRank,
         shared: chestPad.shared,
         sharedWithAliases: chestPad.sharedWithAliases ?? [],
@@ -84,11 +82,10 @@ async function rebalanceChestRanks(userId: number) {
         },
         select: {
             id: true,
-            listRank: true,
             dashRank: true,
         },
         orderBy: [
-            { listRank: 'asc' },
+            { dashRank: 'asc' },
             { id: 'asc' },
         ],
     });
@@ -108,7 +105,7 @@ async function rebalanceChestRanks(userId: number) {
                     status: 'NEW',
                 },
                 data: {
-                    listRank: allocatedRanks[index],
+                    dashRank: allocatedRanks[index],
                 },
             }),
         ),
@@ -134,7 +131,7 @@ export async function getChests() {
             },
         },
         orderBy: [
-            { listRank: 'asc' },
+            { dashRank: 'asc' },
             { id: 'asc' },
         ],
     });
@@ -196,7 +193,7 @@ export async function getArchivedChests() {
             },
         },
         orderBy: [
-            { listRank: 'asc' },
+            { dashRank: 'asc' },
             { id: 'asc' },
         ],
     });
@@ -224,7 +221,7 @@ export async function getPinnedChestsWithCarrots() {
             },
         },
         orderBy: [
-            { listRank: 'asc' },
+            { dashRank: 'asc' },
             { id: 'asc' },
         ],
     });
@@ -530,32 +527,18 @@ export async function cloneChest(id: number) {
         return null;
     }
 
-    const [lastListRankedChestPad, lastDashRankedChestPad] = await Promise.all([
-        prisma.chestPad.findFirst({
-            where: {
-                userId: user.id,
-            },
-            select: {
-                listRank: true,
-            },
-            orderBy: [
-                { listRank: 'desc' },
-                { id: 'desc' },
-            ],
-        }),
-        prisma.chestPad.findFirst({
-            where: {
-                userId: user.id,
-            },
-            select: {
-                dashRank: true,
-            },
-            orderBy: [
-                { dashRank: 'desc' },
-                { id: 'desc' },
-            ],
-        }),
-    ]);
+    const lastDashRankedChestPad = await prisma.chestPad.findFirst({
+        where: {
+            userId: user.id,
+        },
+        select: {
+            dashRank: true,
+        },
+        orderBy: [
+            { dashRank: 'desc' },
+            { id: 'desc' },
+        ],
+    });
 
     const cloned = await prisma.chestPad.create({
         data: {
@@ -566,7 +549,6 @@ export async function cloneChest(id: number) {
                     id: user.id,
                 },
             },
-            listRank: nextLexoRank(lastListRankedChestPad?.listRank),
             dashRank: nextLexoRank(lastDashRankedChestPad?.dashRank),
             chest: {
                 create: {
@@ -702,32 +684,18 @@ export async function shareChestWithConnections(id: number, connectionIds: numbe
     const usersToShare = candidateUserIds.filter((userId) => !existingUsers.has(userId));
 
     await Promise.all(usersToShare.map(async (targetUserId) => {
-        const [lastListRankedChestPad, lastDashRankedChestPad] = await Promise.all([
-            prisma.chestPad.findFirst({
-                where: {
-                    userId: targetUserId,
-                },
-                select: {
-                    listRank: true,
-                },
-                orderBy: [
-                    { listRank: 'desc' },
-                    { id: 'desc' },
-                ],
-            }),
-            prisma.chestPad.findFirst({
-                where: {
-                    userId: targetUserId,
-                },
-                select: {
-                    dashRank: true,
-                },
-                orderBy: [
-                    { dashRank: 'desc' },
-                    { id: 'desc' },
-                ],
-            }),
-        ]);
+        const lastDashRankedChestPad = await prisma.chestPad.findFirst({
+            where: {
+                userId: targetUserId,
+            },
+            select: {
+                dashRank: true,
+            },
+            orderBy: [
+                { dashRank: 'desc' },
+                { id: 'desc' },
+            ],
+        });
 
         await prisma.chestPad.create({
             data: {
@@ -736,7 +704,6 @@ export async function shareChestWithConnections(id: number, connectionIds: numbe
                 shared: 'SHARED',
                 userId: targetUserId,
                 chestId: chestPad.chestId,
-                listRank: nextLexoRank(lastListRankedChestPad?.listRank),
                 dashRank: nextLexoRank(lastDashRankedChestPad?.dashRank),
             },
         });
@@ -894,7 +861,6 @@ export async function moveChestBetween(
         },
         select: {
             id: true,
-            listRank: true,
             dashRank: true,
         },
     });
@@ -905,13 +871,9 @@ export async function moveChestBetween(
         return false;
     }
 
-    const previousRank = previousChestId === null
-        ? null
-        : chestById.get(previousChestId)?.listRank;
+    const previousRank = previousChestId === null ? null : chestById.get(previousChestId)?.dashRank;
 
-    const nextRank = nextChestId === null
-        ? null
-        : chestById.get(nextChestId)?.listRank;
+    const nextRank = nextChestId === null ? null : chestById.get(nextChestId)?.dashRank;
 
     if ((previousChestId !== null && !previousRank) || (nextChestId !== null && !nextRank)) {
         return false;
@@ -934,7 +896,6 @@ export async function moveChestBetween(
             },
             select: {
                 id: true,
-                listRank: true,
                 dashRank: true,
             },
         });
@@ -942,10 +903,10 @@ export async function moveChestBetween(
         const refreshedById = new Map(refreshedChests.map((chest) => [chest.id, chest]));
         const refreshedPreviousRank = previousChestId === null
             ? null
-            : refreshedById.get(previousChestId)?.listRank;
+            : refreshedById.get(previousChestId)?.dashRank;
         const refreshedNextRank = nextChestId === null
             ? null
-            : refreshedById.get(nextChestId)?.listRank;
+            : refreshedById.get(nextChestId)?.dashRank;
 
         if ((previousChestId !== null && !refreshedPreviousRank) || (nextChestId !== null && !refreshedNextRank)) {
             return false;
@@ -965,7 +926,7 @@ export async function moveChestBetween(
             status: 'NEW',
         },
         data: {
-            listRank: nextRankValue,
+            dashRank: nextRankValue,
         },
     });
 
