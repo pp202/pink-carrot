@@ -195,13 +195,26 @@ export default function DashboardPinnedChests({
       previous.map((chest) => (chest.id === chestId ? { ...chest, pinned } : chest)),
     );
 
-    axios.patch(`/api/lists/${chestId}`, { pinned }).catch(() => {
-      setChests((previous) =>
-        previous.map((chest) =>
-          chest.id === chestId ? { ...chest, pinned: !pinned } : chest,
-        ),
-      );
-    });
+    fetch(`/api/lists/${chestId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ pinned }),
+      keepalive: true,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Unable to update chest pin state");
+        }
+      })
+      .catch(() => {
+        setChests((previous) =>
+          previous.map((chest) =>
+            chest.id === chestId ? { ...chest, pinned: !pinned } : chest,
+          ),
+        );
+      });
   }
 
   function handleArchive(chestId: number): void {
