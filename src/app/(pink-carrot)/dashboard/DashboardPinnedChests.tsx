@@ -304,9 +304,7 @@ export default function DashboardPinnedChests({
           return (
             <li
               key={chest.id}
-              className={`group relative rounded-xl border border-zinc-600/40 bg-zinc-900/70 ${
-                isExpanded ? "px-5 py-4" : "px-3 py-2.5"
-              }`}
+              className="group relative rounded-xl border border-zinc-600/40 bg-zinc-900/70 px-3 py-2.5"
               data-reorder-index={index}
               style={{
                 opacity: dragSourceIndex === index ? 0.45 : 1,
