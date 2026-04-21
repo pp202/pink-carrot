@@ -28,9 +28,6 @@ export default async function DashboardPage() {
         <div className="flex min-h-full w-full max-w-2xl flex-col rounded-2xl border border-zinc-600/30 bg-zinc-800 px-8 py-10 shadow-2xl shadow-black/40 md:px-10 md:py-12">
           <header className="mb-8 w-full text-center">
             <h1 className="text-2xl font-semibold text-zinc-100">Dashboard</h1>
-            <p className="mt-2 text-sm text-zinc-300">
-              All your chests in one place. Expand to work with carrots, collapse to keep things tidy.
-            </p>
           </header>
 
           <div className="space-y-4">
