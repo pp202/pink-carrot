@@ -11,6 +11,8 @@ import { signOut } from 'next-auth/react'
 const DELETE_WARNING = 'Delete your account? This permanently removes all your chests, carrots, and sign-in access details. This action cannot be undone.'
 type DashboardTab = { id: number; name: string }
 
+const DASHBOARDS_UPDATED_EVENT = 'pink-carrot:dashboards-updated'
+
 const NavBar = () => {
     const path = usePathname()
     const searchParams = useSearchParams()
@@ -35,6 +37,20 @@ const NavBar = () => {
             .then((items: DashboardTab[]) => setDashboards(items))
             .catch(() => setDashboards([]))
     }, [path])
+
+    useEffect(() => {
+        const onDashboardsUpdated = (event: Event) => {
+            const detail = (event as CustomEvent<{ dashboards?: DashboardTab[] }>).detail
+            if (!Array.isArray(detail?.dashboards)) {
+                return
+            }
+
+            setDashboards(detail.dashboards)
+        }
+
+        window.addEventListener(DASHBOARDS_UPDATED_EVENT, onDashboardsUpdated)
+        return () => window.removeEventListener(DASHBOARDS_UPDATED_EVENT, onDashboardsUpdated)
+    }, [])
 
     useEffect(() => {
         const handlePointerDown = (event: MouseEvent) => {
@@ -71,6 +87,11 @@ const NavBar = () => {
         }
         next.splice(targetIndex, 0, dragged)
         setDashboards(next)
+        window.dispatchEvent(
+            new CustomEvent<{ dashboards: DashboardTab[] }>(DASHBOARDS_UPDATED_EVENT, {
+                detail: { dashboards: next },
+            }),
+        )
 
         const moved = next[targetIndex]
         const previousItem = targetIndex > 0 ? next[targetIndex - 1] : null
@@ -87,6 +108,11 @@ const NavBar = () => {
         })
         if (!response.ok) {
             setDashboards(previous)
+            window.dispatchEvent(
+                new CustomEvent<{ dashboards: DashboardTab[] }>(DASHBOARDS_UPDATED_EVENT, {
+                    detail: { dashboards: previous },
+                }),
+            )
         }
     }
 
