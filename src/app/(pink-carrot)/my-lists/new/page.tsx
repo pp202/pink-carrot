@@ -33,7 +33,10 @@ const NewListForm = () => {
     const [isSubmitting, setSubmitting] = useState(false)
 
     const isFromDashboard = searchParams.get('from') === 'dashboard'
-    const returnPath = isFromDashboard ? '/dashboard' : '/my-lists'
+    const dashboardId = searchParams.get('dashboardId')
+    const returnPath = isFromDashboard
+        ? `/dashboard${dashboardId ? `?dashboardId=${dashboardId}` : ''}`
+        : '/my-lists'
     return (
         <section className="min-h-[calc(100vh-5rem)] bg-zinc-950">
             <div className="container mx-auto flex min-h-[calc(100vh-5rem)] items-center justify-center px-6 py-12">
@@ -56,6 +59,7 @@ const NewListForm = () => {
                                 await axios.post('/api/lists', {
                                     ...data,
                                     pinned: isFromDashboard,
+                                    dashboardId: dashboardId ? Number(dashboardId) : undefined,
                                 })
                                 router.push(returnPath)
                             } catch (error) {

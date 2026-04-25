@@ -1,5 +1,6 @@
 import { prisma } from "@/config/prisma";
 import { auth } from "@/";
+import { ensureDefaultDashboard } from "./dashboards";
 
 const CONNECTION_REQUEST_LIFESPAN_MS = 10 * 60 * 1000;
 
@@ -30,6 +31,7 @@ export async function createUserIfNew(username: string) {
         alias: "Chest wizard",
       },
     });
+    await ensureDefaultDashboard(newUser.id);
     console.log("New user registered, ID:", newUser.id);
   }
 }
@@ -70,6 +72,12 @@ export async function deleteUserAccount() {
         chestPads: {
           none: {},
         },
+      },
+    });
+
+    await tx.dashboard.deleteMany({
+      where: {
+        userId: user.id,
       },
     });
 

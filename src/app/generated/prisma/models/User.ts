@@ -201,6 +201,7 @@ export type UserWhereInput = {
   username?: Prisma.StringFilter<"User"> | string
   alias?: Prisma.StringFilter<"User"> | string
   chestPads?: Prisma.ChestPadListRelationFilter
+  dashboards?: Prisma.DashboardListRelationFilter
   connections?: Prisma.ConnectionListRelationFilter
   connectedToMe?: Prisma.ConnectionListRelationFilter
   connectionRequests?: Prisma.ConnectionRequestListRelationFilter
@@ -211,6 +212,7 @@ export type UserOrderByWithRelationInput = {
   username?: Prisma.SortOrder
   alias?: Prisma.SortOrder
   chestPads?: Prisma.ChestPadOrderByRelationAggregateInput
+  dashboards?: Prisma.DashboardOrderByRelationAggregateInput
   connections?: Prisma.ConnectionOrderByRelationAggregateInput
   connectedToMe?: Prisma.ConnectionOrderByRelationAggregateInput
   connectionRequests?: Prisma.ConnectionRequestOrderByRelationAggregateInput
@@ -224,6 +226,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   username?: Prisma.StringFilter<"User"> | string
   alias?: Prisma.StringFilter<"User"> | string
   chestPads?: Prisma.ChestPadListRelationFilter
+  dashboards?: Prisma.DashboardListRelationFilter
   connections?: Prisma.ConnectionListRelationFilter
   connectedToMe?: Prisma.ConnectionListRelationFilter
   connectionRequests?: Prisma.ConnectionRequestListRelationFilter
@@ -253,6 +256,7 @@ export type UserCreateInput = {
   username: string
   alias?: string
   chestPads?: Prisma.ChestPadCreateNestedManyWithoutUserInput
+  dashboards?: Prisma.DashboardCreateNestedManyWithoutUserInput
   connections?: Prisma.ConnectionCreateNestedManyWithoutUserInput
   connectedToMe?: Prisma.ConnectionCreateNestedManyWithoutConnectionUserInput
   connectionRequests?: Prisma.ConnectionRequestCreateNestedManyWithoutUserInput
@@ -263,6 +267,7 @@ export type UserUncheckedCreateInput = {
   username: string
   alias?: string
   chestPads?: Prisma.ChestPadUncheckedCreateNestedManyWithoutUserInput
+  dashboards?: Prisma.DashboardUncheckedCreateNestedManyWithoutUserInput
   connections?: Prisma.ConnectionUncheckedCreateNestedManyWithoutUserInput
   connectedToMe?: Prisma.ConnectionUncheckedCreateNestedManyWithoutConnectionUserInput
   connectionRequests?: Prisma.ConnectionRequestUncheckedCreateNestedManyWithoutUserInput
@@ -272,6 +277,7 @@ export type UserUpdateInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   alias?: Prisma.StringFieldUpdateOperationsInput | string
   chestPads?: Prisma.ChestPadUpdateManyWithoutUserNestedInput
+  dashboards?: Prisma.DashboardUpdateManyWithoutUserNestedInput
   connections?: Prisma.ConnectionUpdateManyWithoutUserNestedInput
   connectedToMe?: Prisma.ConnectionUpdateManyWithoutConnectionUserNestedInput
   connectionRequests?: Prisma.ConnectionRequestUpdateManyWithoutUserNestedInput
@@ -282,6 +288,7 @@ export type UserUncheckedUpdateInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   alias?: Prisma.StringFieldUpdateOperationsInput | string
   chestPads?: Prisma.ChestPadUncheckedUpdateManyWithoutUserNestedInput
+  dashboards?: Prisma.DashboardUncheckedUpdateManyWithoutUserNestedInput
   connections?: Prisma.ConnectionUncheckedUpdateManyWithoutUserNestedInput
   connectedToMe?: Prisma.ConnectionUncheckedUpdateManyWithoutConnectionUserNestedInput
   connectionRequests?: Prisma.ConnectionRequestUncheckedUpdateManyWithoutUserNestedInput
@@ -347,6 +354,20 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type UserCreateNestedOneWithoutDashboardsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDashboardsInput, Prisma.UserUncheckedCreateWithoutDashboardsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDashboardsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutDashboardsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDashboardsInput, Prisma.UserUncheckedCreateWithoutDashboardsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDashboardsInput
+  upsert?: Prisma.UserUpsertWithoutDashboardsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDashboardsInput, Prisma.UserUpdateWithoutDashboardsInput>, Prisma.UserUncheckedUpdateWithoutDashboardsInput>
+}
+
 export type UserCreateNestedOneWithoutChestPadsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutChestPadsInput, Prisma.UserUncheckedCreateWithoutChestPadsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutChestPadsInput
@@ -403,9 +424,64 @@ export type UserUpdateOneRequiredWithoutConnectionRequestsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutConnectionRequestsInput, Prisma.UserUpdateWithoutConnectionRequestsInput>, Prisma.UserUncheckedUpdateWithoutConnectionRequestsInput>
 }
 
+export type UserCreateWithoutDashboardsInput = {
+  username: string
+  alias?: string
+  chestPads?: Prisma.ChestPadCreateNestedManyWithoutUserInput
+  connections?: Prisma.ConnectionCreateNestedManyWithoutUserInput
+  connectedToMe?: Prisma.ConnectionCreateNestedManyWithoutConnectionUserInput
+  connectionRequests?: Prisma.ConnectionRequestCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutDashboardsInput = {
+  id?: number
+  username: string
+  alias?: string
+  chestPads?: Prisma.ChestPadUncheckedCreateNestedManyWithoutUserInput
+  connections?: Prisma.ConnectionUncheckedCreateNestedManyWithoutUserInput
+  connectedToMe?: Prisma.ConnectionUncheckedCreateNestedManyWithoutConnectionUserInput
+  connectionRequests?: Prisma.ConnectionRequestUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutDashboardsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDashboardsInput, Prisma.UserUncheckedCreateWithoutDashboardsInput>
+}
+
+export type UserUpsertWithoutDashboardsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDashboardsInput, Prisma.UserUncheckedUpdateWithoutDashboardsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDashboardsInput, Prisma.UserUncheckedCreateWithoutDashboardsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDashboardsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDashboardsInput, Prisma.UserUncheckedUpdateWithoutDashboardsInput>
+}
+
+export type UserUpdateWithoutDashboardsInput = {
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  alias?: Prisma.StringFieldUpdateOperationsInput | string
+  chestPads?: Prisma.ChestPadUpdateManyWithoutUserNestedInput
+  connections?: Prisma.ConnectionUpdateManyWithoutUserNestedInput
+  connectedToMe?: Prisma.ConnectionUpdateManyWithoutConnectionUserNestedInput
+  connectionRequests?: Prisma.ConnectionRequestUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDashboardsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  alias?: Prisma.StringFieldUpdateOperationsInput | string
+  chestPads?: Prisma.ChestPadUncheckedUpdateManyWithoutUserNestedInput
+  connections?: Prisma.ConnectionUncheckedUpdateManyWithoutUserNestedInput
+  connectedToMe?: Prisma.ConnectionUncheckedUpdateManyWithoutConnectionUserNestedInput
+  connectionRequests?: Prisma.ConnectionRequestUncheckedUpdateManyWithoutUserNestedInput
+}
+
 export type UserCreateWithoutChestPadsInput = {
   username: string
   alias?: string
+  dashboards?: Prisma.DashboardCreateNestedManyWithoutUserInput
   connections?: Prisma.ConnectionCreateNestedManyWithoutUserInput
   connectedToMe?: Prisma.ConnectionCreateNestedManyWithoutConnectionUserInput
   connectionRequests?: Prisma.ConnectionRequestCreateNestedManyWithoutUserInput
@@ -415,6 +491,7 @@ export type UserUncheckedCreateWithoutChestPadsInput = {
   id?: number
   username: string
   alias?: string
+  dashboards?: Prisma.DashboardUncheckedCreateNestedManyWithoutUserInput
   connections?: Prisma.ConnectionUncheckedCreateNestedManyWithoutUserInput
   connectedToMe?: Prisma.ConnectionUncheckedCreateNestedManyWithoutConnectionUserInput
   connectionRequests?: Prisma.ConnectionRequestUncheckedCreateNestedManyWithoutUserInput
@@ -439,6 +516,7 @@ export type UserUpdateToOneWithWhereWithoutChestPadsInput = {
 export type UserUpdateWithoutChestPadsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   alias?: Prisma.StringFieldUpdateOperationsInput | string
+  dashboards?: Prisma.DashboardUpdateManyWithoutUserNestedInput
   connections?: Prisma.ConnectionUpdateManyWithoutUserNestedInput
   connectedToMe?: Prisma.ConnectionUpdateManyWithoutConnectionUserNestedInput
   connectionRequests?: Prisma.ConnectionRequestUpdateManyWithoutUserNestedInput
@@ -448,6 +526,7 @@ export type UserUncheckedUpdateWithoutChestPadsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
   alias?: Prisma.StringFieldUpdateOperationsInput | string
+  dashboards?: Prisma.DashboardUncheckedUpdateManyWithoutUserNestedInput
   connections?: Prisma.ConnectionUncheckedUpdateManyWithoutUserNestedInput
   connectedToMe?: Prisma.ConnectionUncheckedUpdateManyWithoutConnectionUserNestedInput
   connectionRequests?: Prisma.ConnectionRequestUncheckedUpdateManyWithoutUserNestedInput
@@ -457,6 +536,7 @@ export type UserCreateWithoutConnectionsInput = {
   username: string
   alias?: string
   chestPads?: Prisma.ChestPadCreateNestedManyWithoutUserInput
+  dashboards?: Prisma.DashboardCreateNestedManyWithoutUserInput
   connectedToMe?: Prisma.ConnectionCreateNestedManyWithoutConnectionUserInput
   connectionRequests?: Prisma.ConnectionRequestCreateNestedManyWithoutUserInput
 }
@@ -466,6 +546,7 @@ export type UserUncheckedCreateWithoutConnectionsInput = {
   username: string
   alias?: string
   chestPads?: Prisma.ChestPadUncheckedCreateNestedManyWithoutUserInput
+  dashboards?: Prisma.DashboardUncheckedCreateNestedManyWithoutUserInput
   connectedToMe?: Prisma.ConnectionUncheckedCreateNestedManyWithoutConnectionUserInput
   connectionRequests?: Prisma.ConnectionRequestUncheckedCreateNestedManyWithoutUserInput
 }
@@ -479,6 +560,7 @@ export type UserCreateWithoutConnectedToMeInput = {
   username: string
   alias?: string
   chestPads?: Prisma.ChestPadCreateNestedManyWithoutUserInput
+  dashboards?: Prisma.DashboardCreateNestedManyWithoutUserInput
   connections?: Prisma.ConnectionCreateNestedManyWithoutUserInput
   connectionRequests?: Prisma.ConnectionRequestCreateNestedManyWithoutUserInput
 }
@@ -488,6 +570,7 @@ export type UserUncheckedCreateWithoutConnectedToMeInput = {
   username: string
   alias?: string
   chestPads?: Prisma.ChestPadUncheckedCreateNestedManyWithoutUserInput
+  dashboards?: Prisma.DashboardUncheckedCreateNestedManyWithoutUserInput
   connections?: Prisma.ConnectionUncheckedCreateNestedManyWithoutUserInput
   connectionRequests?: Prisma.ConnectionRequestUncheckedCreateNestedManyWithoutUserInput
 }
@@ -512,6 +595,7 @@ export type UserUpdateWithoutConnectionsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   alias?: Prisma.StringFieldUpdateOperationsInput | string
   chestPads?: Prisma.ChestPadUpdateManyWithoutUserNestedInput
+  dashboards?: Prisma.DashboardUpdateManyWithoutUserNestedInput
   connectedToMe?: Prisma.ConnectionUpdateManyWithoutConnectionUserNestedInput
   connectionRequests?: Prisma.ConnectionRequestUpdateManyWithoutUserNestedInput
 }
@@ -521,6 +605,7 @@ export type UserUncheckedUpdateWithoutConnectionsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   alias?: Prisma.StringFieldUpdateOperationsInput | string
   chestPads?: Prisma.ChestPadUncheckedUpdateManyWithoutUserNestedInput
+  dashboards?: Prisma.DashboardUncheckedUpdateManyWithoutUserNestedInput
   connectedToMe?: Prisma.ConnectionUncheckedUpdateManyWithoutConnectionUserNestedInput
   connectionRequests?: Prisma.ConnectionRequestUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -540,6 +625,7 @@ export type UserUpdateWithoutConnectedToMeInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   alias?: Prisma.StringFieldUpdateOperationsInput | string
   chestPads?: Prisma.ChestPadUpdateManyWithoutUserNestedInput
+  dashboards?: Prisma.DashboardUpdateManyWithoutUserNestedInput
   connections?: Prisma.ConnectionUpdateManyWithoutUserNestedInput
   connectionRequests?: Prisma.ConnectionRequestUpdateManyWithoutUserNestedInput
 }
@@ -549,6 +635,7 @@ export type UserUncheckedUpdateWithoutConnectedToMeInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   alias?: Prisma.StringFieldUpdateOperationsInput | string
   chestPads?: Prisma.ChestPadUncheckedUpdateManyWithoutUserNestedInput
+  dashboards?: Prisma.DashboardUncheckedUpdateManyWithoutUserNestedInput
   connections?: Prisma.ConnectionUncheckedUpdateManyWithoutUserNestedInput
   connectionRequests?: Prisma.ConnectionRequestUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -557,6 +644,7 @@ export type UserCreateWithoutConnectionRequestsInput = {
   username: string
   alias?: string
   chestPads?: Prisma.ChestPadCreateNestedManyWithoutUserInput
+  dashboards?: Prisma.DashboardCreateNestedManyWithoutUserInput
   connections?: Prisma.ConnectionCreateNestedManyWithoutUserInput
   connectedToMe?: Prisma.ConnectionCreateNestedManyWithoutConnectionUserInput
 }
@@ -566,6 +654,7 @@ export type UserUncheckedCreateWithoutConnectionRequestsInput = {
   username: string
   alias?: string
   chestPads?: Prisma.ChestPadUncheckedCreateNestedManyWithoutUserInput
+  dashboards?: Prisma.DashboardUncheckedCreateNestedManyWithoutUserInput
   connections?: Prisma.ConnectionUncheckedCreateNestedManyWithoutUserInput
   connectedToMe?: Prisma.ConnectionUncheckedCreateNestedManyWithoutConnectionUserInput
 }
@@ -590,6 +679,7 @@ export type UserUpdateWithoutConnectionRequestsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   alias?: Prisma.StringFieldUpdateOperationsInput | string
   chestPads?: Prisma.ChestPadUpdateManyWithoutUserNestedInput
+  dashboards?: Prisma.DashboardUpdateManyWithoutUserNestedInput
   connections?: Prisma.ConnectionUpdateManyWithoutUserNestedInput
   connectedToMe?: Prisma.ConnectionUpdateManyWithoutConnectionUserNestedInput
 }
@@ -599,6 +689,7 @@ export type UserUncheckedUpdateWithoutConnectionRequestsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   alias?: Prisma.StringFieldUpdateOperationsInput | string
   chestPads?: Prisma.ChestPadUncheckedUpdateManyWithoutUserNestedInput
+  dashboards?: Prisma.DashboardUncheckedUpdateManyWithoutUserNestedInput
   connections?: Prisma.ConnectionUncheckedUpdateManyWithoutUserNestedInput
   connectedToMe?: Prisma.ConnectionUncheckedUpdateManyWithoutConnectionUserNestedInput
 }
@@ -610,6 +701,7 @@ export type UserUncheckedUpdateWithoutConnectionRequestsInput = {
 
 export type UserCountOutputType = {
   chestPads: number
+  dashboards: number
   connections: number
   connectedToMe: number
   connectionRequests: number
@@ -617,6 +709,7 @@ export type UserCountOutputType = {
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   chestPads?: boolean | UserCountOutputTypeCountChestPadsArgs
+  dashboards?: boolean | UserCountOutputTypeCountDashboardsArgs
   connections?: boolean | UserCountOutputTypeCountConnectionsArgs
   connectedToMe?: boolean | UserCountOutputTypeCountConnectedToMeArgs
   connectionRequests?: boolean | UserCountOutputTypeCountConnectionRequestsArgs
@@ -637,6 +730,13 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
  */
 export type UserCountOutputTypeCountChestPadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ChestPadWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDashboardsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DashboardWhereInput
 }
 
 /**
@@ -666,6 +766,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   username?: boolean
   alias?: boolean
   chestPads?: boolean | Prisma.User$chestPadsArgs<ExtArgs>
+  dashboards?: boolean | Prisma.User$dashboardsArgs<ExtArgs>
   connections?: boolean | Prisma.User$connectionsArgs<ExtArgs>
   connectedToMe?: boolean | Prisma.User$connectedToMeArgs<ExtArgs>
   connectionRequests?: boolean | Prisma.User$connectionRequestsArgs<ExtArgs>
@@ -693,6 +794,7 @@ export type UserSelectScalar = {
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "username" | "alias", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   chestPads?: boolean | Prisma.User$chestPadsArgs<ExtArgs>
+  dashboards?: boolean | Prisma.User$dashboardsArgs<ExtArgs>
   connections?: boolean | Prisma.User$connectionsArgs<ExtArgs>
   connectedToMe?: boolean | Prisma.User$connectedToMeArgs<ExtArgs>
   connectionRequests?: boolean | Prisma.User$connectionRequestsArgs<ExtArgs>
@@ -705,6 +807,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     chestPads: Prisma.$ChestPadPayload<ExtArgs>[]
+    dashboards: Prisma.$DashboardPayload<ExtArgs>[]
     connections: Prisma.$ConnectionPayload<ExtArgs>[]
     connectedToMe: Prisma.$ConnectionPayload<ExtArgs>[]
     connectionRequests: Prisma.$ConnectionRequestPayload<ExtArgs>[]
@@ -1108,6 +1211,7 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   chestPads<T extends Prisma.User$chestPadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$chestPadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChestPadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  dashboards<T extends Prisma.User$dashboardsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$dashboardsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DashboardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   connections<T extends Prisma.User$connectionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$connectionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConnectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   connectedToMe<T extends Prisma.User$connectedToMeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$connectedToMeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConnectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   connectionRequests<T extends Prisma.User$connectionRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$connectionRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConnectionRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1552,6 +1656,30 @@ export type User$chestPadsArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.ChestPadScalarFieldEnum | Prisma.ChestPadScalarFieldEnum[]
+}
+
+/**
+ * User.dashboards
+ */
+export type User$dashboardsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Dashboard
+   */
+  select?: Prisma.DashboardSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Dashboard
+   */
+  omit?: Prisma.DashboardOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DashboardInclude<ExtArgs> | null
+  where?: Prisma.DashboardWhereInput
+  orderBy?: Prisma.DashboardOrderByWithRelationInput | Prisma.DashboardOrderByWithRelationInput[]
+  cursor?: Prisma.DashboardWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DashboardScalarFieldEnum | Prisma.DashboardScalarFieldEnum[]
 }
 
 /**

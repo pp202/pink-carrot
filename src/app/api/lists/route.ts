@@ -4,6 +4,7 @@ import { loggedUser } from "@/backend/user"
 import { createListSchema } from "../../schema/createListSchema"
 import { getArchivedChests, getChests, getPinnedChestsWithCarrots, moveChestBetween } from "@/backend/lists"
 import { nextLexoRank } from "@/backend/lexoRank"
+import { resolveDashboardId } from "@/backend/dashboards"
 
 export async function POST(request: NextRequest) {
     const body = await request.json()
@@ -12,9 +13,14 @@ export async function POST(request: NextRequest) {
     if (!validation.success)
         return NextResponse.json(validation.error.issues, { status: 400 })
 
+    const selectedDashboardId = await resolveDashboardId(
+      Number.isInteger(body?.dashboardId) ? body.dashboardId : null,
+    );
+
     const lastDashRankedChestPad = await prisma.chestPad.findFirst({
         where: {
             userId: user.id,
+            dashboardId: selectedDashboardId,
         },
         select: {
             dashRank: true,
@@ -34,6 +40,11 @@ export async function POST(request: NextRequest) {
             },
             status: "NEW",
             pinned: validation.data.pinned,
+            dashboard: {
+                connect: {
+                    id: selectedDashboardId,
+                },
+            },
             dashRank: nextLexoRank(lastDashRankedChestPad?.dashRank),
             chest: {
                 create: {
@@ -99,13 +110,15 @@ export async function PATCH(request: NextRequest) {
 export async function GET(request: NextRequest) {  
   const status = request.nextUrl.searchParams.get('status');
   const pinned = request.nextUrl.searchParams.get('pinned');
+  const dashboardIdParam = request.nextUrl.searchParams.get('dashboardId');
+  const dashboardId = dashboardIdParam ? Number.parseInt(dashboardIdParam, 10) : undefined;
   if (status === 'ARCHIVED') {
-    return NextResponse.json(await getArchivedChests(), { status: 200 })
+    return NextResponse.json(await getArchivedChests(dashboardId), { status: 200 })
   }
 
   if (pinned === 'true') {
-    return NextResponse.json(await getPinnedChestsWithCarrots(), { status: 200 })
+    return NextResponse.json(await getPinnedChestsWithCarrots(dashboardId), { status: 200 })
   }
 
-  return NextResponse.json(await getChests(), { status: 200 })
+  return NextResponse.json(await getChests(dashboardId), { status: 200 })
 }

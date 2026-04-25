@@ -30,12 +30,14 @@ export type ChestPadAvgAggregateOutputType = {
   id: number | null
   userId: number | null
   chestId: number | null
+  dashboardId: number | null
 }
 
 export type ChestPadSumAggregateOutputType = {
   id: number | null
   userId: number | null
   chestId: number | null
+  dashboardId: number | null
 }
 
 export type ChestPadMinAggregateOutputType = {
@@ -46,6 +48,7 @@ export type ChestPadMinAggregateOutputType = {
   dashRank: string | null
   userId: number | null
   chestId: number | null
+  dashboardId: number | null
 }
 
 export type ChestPadMaxAggregateOutputType = {
@@ -56,6 +59,7 @@ export type ChestPadMaxAggregateOutputType = {
   dashRank: string | null
   userId: number | null
   chestId: number | null
+  dashboardId: number | null
 }
 
 export type ChestPadCountAggregateOutputType = {
@@ -66,6 +70,7 @@ export type ChestPadCountAggregateOutputType = {
   dashRank: number
   userId: number
   chestId: number
+  dashboardId: number
   _all: number
 }
 
@@ -74,12 +79,14 @@ export type ChestPadAvgAggregateInputType = {
   id?: true
   userId?: true
   chestId?: true
+  dashboardId?: true
 }
 
 export type ChestPadSumAggregateInputType = {
   id?: true
   userId?: true
   chestId?: true
+  dashboardId?: true
 }
 
 export type ChestPadMinAggregateInputType = {
@@ -90,6 +97,7 @@ export type ChestPadMinAggregateInputType = {
   dashRank?: true
   userId?: true
   chestId?: true
+  dashboardId?: true
 }
 
 export type ChestPadMaxAggregateInputType = {
@@ -100,6 +108,7 @@ export type ChestPadMaxAggregateInputType = {
   dashRank?: true
   userId?: true
   chestId?: true
+  dashboardId?: true
 }
 
 export type ChestPadCountAggregateInputType = {
@@ -110,6 +119,7 @@ export type ChestPadCountAggregateInputType = {
   dashRank?: true
   userId?: true
   chestId?: true
+  dashboardId?: true
   _all?: true
 }
 
@@ -207,6 +217,7 @@ export type ChestPadGroupByOutputType = {
   dashRank: string
   userId: number
   chestId: number
+  dashboardId: number
   _count: ChestPadCountAggregateOutputType | null
   _avg: ChestPadAvgAggregateOutputType | null
   _sum: ChestPadSumAggregateOutputType | null
@@ -240,8 +251,10 @@ export type ChestPadWhereInput = {
   dashRank?: Prisma.StringFilter<"ChestPad"> | string
   userId?: Prisma.IntFilter<"ChestPad"> | number
   chestId?: Prisma.IntFilter<"ChestPad"> | number
+  dashboardId?: Prisma.IntFilter<"ChestPad"> | number
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   chest?: Prisma.XOR<Prisma.ChestScalarRelationFilter, Prisma.ChestWhereInput>
+  dashboard?: Prisma.XOR<Prisma.DashboardScalarRelationFilter, Prisma.DashboardWhereInput>
 }
 
 export type ChestPadOrderByWithRelationInput = {
@@ -252,8 +265,10 @@ export type ChestPadOrderByWithRelationInput = {
   dashRank?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   chestId?: Prisma.SortOrder
+  dashboardId?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   chest?: Prisma.ChestOrderByWithRelationInput
+  dashboard?: Prisma.DashboardOrderByWithRelationInput
 }
 
 export type ChestPadWhereUniqueInput = Prisma.AtLeast<{
@@ -267,8 +282,10 @@ export type ChestPadWhereUniqueInput = Prisma.AtLeast<{
   dashRank?: Prisma.StringFilter<"ChestPad"> | string
   userId?: Prisma.IntFilter<"ChestPad"> | number
   chestId?: Prisma.IntFilter<"ChestPad"> | number
+  dashboardId?: Prisma.IntFilter<"ChestPad"> | number
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   chest?: Prisma.XOR<Prisma.ChestScalarRelationFilter, Prisma.ChestWhereInput>
+  dashboard?: Prisma.XOR<Prisma.DashboardScalarRelationFilter, Prisma.DashboardWhereInput>
 }, "id">
 
 export type ChestPadOrderByWithAggregationInput = {
@@ -279,6 +296,7 @@ export type ChestPadOrderByWithAggregationInput = {
   dashRank?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   chestId?: Prisma.SortOrder
+  dashboardId?: Prisma.SortOrder
   _count?: Prisma.ChestPadCountOrderByAggregateInput
   _avg?: Prisma.ChestPadAvgOrderByAggregateInput
   _max?: Prisma.ChestPadMaxOrderByAggregateInput
@@ -297,6 +315,7 @@ export type ChestPadScalarWhereWithAggregatesInput = {
   dashRank?: Prisma.StringWithAggregatesFilter<"ChestPad"> | string
   userId?: Prisma.IntWithAggregatesFilter<"ChestPad"> | number
   chestId?: Prisma.IntWithAggregatesFilter<"ChestPad"> | number
+  dashboardId?: Prisma.IntWithAggregatesFilter<"ChestPad"> | number
 }
 
 export type ChestPadCreateInput = {
@@ -306,6 +325,7 @@ export type ChestPadCreateInput = {
   dashRank: string
   user: Prisma.UserCreateNestedOneWithoutChestPadsInput
   chest: Prisma.ChestCreateNestedOneWithoutChestPadsInput
+  dashboard: Prisma.DashboardCreateNestedOneWithoutChestPadsInput
 }
 
 export type ChestPadUncheckedCreateInput = {
@@ -316,6 +336,7 @@ export type ChestPadUncheckedCreateInput = {
   dashRank: string
   userId: number
   chestId: number
+  dashboardId: number
 }
 
 export type ChestPadUpdateInput = {
@@ -325,6 +346,7 @@ export type ChestPadUpdateInput = {
   dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   user?: Prisma.UserUpdateOneRequiredWithoutChestPadsNestedInput
   chest?: Prisma.ChestUpdateOneRequiredWithoutChestPadsNestedInput
+  dashboard?: Prisma.DashboardUpdateOneRequiredWithoutChestPadsNestedInput
 }
 
 export type ChestPadUncheckedUpdateInput = {
@@ -335,6 +357,7 @@ export type ChestPadUncheckedUpdateInput = {
   dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.IntFieldUpdateOperationsInput | number
   chestId?: Prisma.IntFieldUpdateOperationsInput | number
+  dashboardId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ChestPadCreateManyInput = {
@@ -345,6 +368,7 @@ export type ChestPadCreateManyInput = {
   dashRank: string
   userId: number
   chestId: number
+  dashboardId: number
 }
 
 export type ChestPadUpdateManyMutationInput = {
@@ -362,6 +386,7 @@ export type ChestPadUncheckedUpdateManyInput = {
   dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.IntFieldUpdateOperationsInput | number
   chestId?: Prisma.IntFieldUpdateOperationsInput | number
+  dashboardId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ChestPadListRelationFilter = {
@@ -382,12 +407,14 @@ export type ChestPadCountOrderByAggregateInput = {
   dashRank?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   chestId?: Prisma.SortOrder
+  dashboardId?: Prisma.SortOrder
 }
 
 export type ChestPadAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   chestId?: Prisma.SortOrder
+  dashboardId?: Prisma.SortOrder
 }
 
 export type ChestPadMaxOrderByAggregateInput = {
@@ -398,6 +425,7 @@ export type ChestPadMaxOrderByAggregateInput = {
   dashRank?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   chestId?: Prisma.SortOrder
+  dashboardId?: Prisma.SortOrder
 }
 
 export type ChestPadMinOrderByAggregateInput = {
@@ -408,12 +436,14 @@ export type ChestPadMinOrderByAggregateInput = {
   dashRank?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   chestId?: Prisma.SortOrder
+  dashboardId?: Prisma.SortOrder
 }
 
 export type ChestPadSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   chestId?: Prisma.SortOrder
+  dashboardId?: Prisma.SortOrder
 }
 
 export type ChestPadCreateNestedManyWithoutUserInput = {
@@ -455,6 +485,48 @@ export type ChestPadUncheckedUpdateManyWithoutUserNestedInput = {
   connect?: Prisma.ChestPadWhereUniqueInput | Prisma.ChestPadWhereUniqueInput[]
   update?: Prisma.ChestPadUpdateWithWhereUniqueWithoutUserInput | Prisma.ChestPadUpdateWithWhereUniqueWithoutUserInput[]
   updateMany?: Prisma.ChestPadUpdateManyWithWhereWithoutUserInput | Prisma.ChestPadUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.ChestPadScalarWhereInput | Prisma.ChestPadScalarWhereInput[]
+}
+
+export type ChestPadCreateNestedManyWithoutDashboardInput = {
+  create?: Prisma.XOR<Prisma.ChestPadCreateWithoutDashboardInput, Prisma.ChestPadUncheckedCreateWithoutDashboardInput> | Prisma.ChestPadCreateWithoutDashboardInput[] | Prisma.ChestPadUncheckedCreateWithoutDashboardInput[]
+  connectOrCreate?: Prisma.ChestPadCreateOrConnectWithoutDashboardInput | Prisma.ChestPadCreateOrConnectWithoutDashboardInput[]
+  createMany?: Prisma.ChestPadCreateManyDashboardInputEnvelope
+  connect?: Prisma.ChestPadWhereUniqueInput | Prisma.ChestPadWhereUniqueInput[]
+}
+
+export type ChestPadUncheckedCreateNestedManyWithoutDashboardInput = {
+  create?: Prisma.XOR<Prisma.ChestPadCreateWithoutDashboardInput, Prisma.ChestPadUncheckedCreateWithoutDashboardInput> | Prisma.ChestPadCreateWithoutDashboardInput[] | Prisma.ChestPadUncheckedCreateWithoutDashboardInput[]
+  connectOrCreate?: Prisma.ChestPadCreateOrConnectWithoutDashboardInput | Prisma.ChestPadCreateOrConnectWithoutDashboardInput[]
+  createMany?: Prisma.ChestPadCreateManyDashboardInputEnvelope
+  connect?: Prisma.ChestPadWhereUniqueInput | Prisma.ChestPadWhereUniqueInput[]
+}
+
+export type ChestPadUpdateManyWithoutDashboardNestedInput = {
+  create?: Prisma.XOR<Prisma.ChestPadCreateWithoutDashboardInput, Prisma.ChestPadUncheckedCreateWithoutDashboardInput> | Prisma.ChestPadCreateWithoutDashboardInput[] | Prisma.ChestPadUncheckedCreateWithoutDashboardInput[]
+  connectOrCreate?: Prisma.ChestPadCreateOrConnectWithoutDashboardInput | Prisma.ChestPadCreateOrConnectWithoutDashboardInput[]
+  upsert?: Prisma.ChestPadUpsertWithWhereUniqueWithoutDashboardInput | Prisma.ChestPadUpsertWithWhereUniqueWithoutDashboardInput[]
+  createMany?: Prisma.ChestPadCreateManyDashboardInputEnvelope
+  set?: Prisma.ChestPadWhereUniqueInput | Prisma.ChestPadWhereUniqueInput[]
+  disconnect?: Prisma.ChestPadWhereUniqueInput | Prisma.ChestPadWhereUniqueInput[]
+  delete?: Prisma.ChestPadWhereUniqueInput | Prisma.ChestPadWhereUniqueInput[]
+  connect?: Prisma.ChestPadWhereUniqueInput | Prisma.ChestPadWhereUniqueInput[]
+  update?: Prisma.ChestPadUpdateWithWhereUniqueWithoutDashboardInput | Prisma.ChestPadUpdateWithWhereUniqueWithoutDashboardInput[]
+  updateMany?: Prisma.ChestPadUpdateManyWithWhereWithoutDashboardInput | Prisma.ChestPadUpdateManyWithWhereWithoutDashboardInput[]
+  deleteMany?: Prisma.ChestPadScalarWhereInput | Prisma.ChestPadScalarWhereInput[]
+}
+
+export type ChestPadUncheckedUpdateManyWithoutDashboardNestedInput = {
+  create?: Prisma.XOR<Prisma.ChestPadCreateWithoutDashboardInput, Prisma.ChestPadUncheckedCreateWithoutDashboardInput> | Prisma.ChestPadCreateWithoutDashboardInput[] | Prisma.ChestPadUncheckedCreateWithoutDashboardInput[]
+  connectOrCreate?: Prisma.ChestPadCreateOrConnectWithoutDashboardInput | Prisma.ChestPadCreateOrConnectWithoutDashboardInput[]
+  upsert?: Prisma.ChestPadUpsertWithWhereUniqueWithoutDashboardInput | Prisma.ChestPadUpsertWithWhereUniqueWithoutDashboardInput[]
+  createMany?: Prisma.ChestPadCreateManyDashboardInputEnvelope
+  set?: Prisma.ChestPadWhereUniqueInput | Prisma.ChestPadWhereUniqueInput[]
+  disconnect?: Prisma.ChestPadWhereUniqueInput | Prisma.ChestPadWhereUniqueInput[]
+  delete?: Prisma.ChestPadWhereUniqueInput | Prisma.ChestPadWhereUniqueInput[]
+  connect?: Prisma.ChestPadWhereUniqueInput | Prisma.ChestPadWhereUniqueInput[]
+  update?: Prisma.ChestPadUpdateWithWhereUniqueWithoutDashboardInput | Prisma.ChestPadUpdateWithWhereUniqueWithoutDashboardInput[]
+  updateMany?: Prisma.ChestPadUpdateManyWithWhereWithoutDashboardInput | Prisma.ChestPadUpdateManyWithWhereWithoutDashboardInput[]
   deleteMany?: Prisma.ChestPadScalarWhereInput | Prisma.ChestPadScalarWhereInput[]
 }
 
@@ -518,6 +590,7 @@ export type ChestPadCreateWithoutUserInput = {
   shared?: $Enums.Shared
   dashRank: string
   chest: Prisma.ChestCreateNestedOneWithoutChestPadsInput
+  dashboard: Prisma.DashboardCreateNestedOneWithoutChestPadsInput
 }
 
 export type ChestPadUncheckedCreateWithoutUserInput = {
@@ -527,6 +600,7 @@ export type ChestPadUncheckedCreateWithoutUserInput = {
   shared?: $Enums.Shared
   dashRank: string
   chestId: number
+  dashboardId: number
 }
 
 export type ChestPadCreateOrConnectWithoutUserInput = {
@@ -566,6 +640,52 @@ export type ChestPadScalarWhereInput = {
   dashRank?: Prisma.StringFilter<"ChestPad"> | string
   userId?: Prisma.IntFilter<"ChestPad"> | number
   chestId?: Prisma.IntFilter<"ChestPad"> | number
+  dashboardId?: Prisma.IntFilter<"ChestPad"> | number
+}
+
+export type ChestPadCreateWithoutDashboardInput = {
+  status?: $Enums.Status
+  pinned?: boolean
+  shared?: $Enums.Shared
+  dashRank: string
+  user: Prisma.UserCreateNestedOneWithoutChestPadsInput
+  chest: Prisma.ChestCreateNestedOneWithoutChestPadsInput
+}
+
+export type ChestPadUncheckedCreateWithoutDashboardInput = {
+  id?: number
+  status?: $Enums.Status
+  pinned?: boolean
+  shared?: $Enums.Shared
+  dashRank: string
+  userId: number
+  chestId: number
+}
+
+export type ChestPadCreateOrConnectWithoutDashboardInput = {
+  where: Prisma.ChestPadWhereUniqueInput
+  create: Prisma.XOR<Prisma.ChestPadCreateWithoutDashboardInput, Prisma.ChestPadUncheckedCreateWithoutDashboardInput>
+}
+
+export type ChestPadCreateManyDashboardInputEnvelope = {
+  data: Prisma.ChestPadCreateManyDashboardInput | Prisma.ChestPadCreateManyDashboardInput[]
+  skipDuplicates?: boolean
+}
+
+export type ChestPadUpsertWithWhereUniqueWithoutDashboardInput = {
+  where: Prisma.ChestPadWhereUniqueInput
+  update: Prisma.XOR<Prisma.ChestPadUpdateWithoutDashboardInput, Prisma.ChestPadUncheckedUpdateWithoutDashboardInput>
+  create: Prisma.XOR<Prisma.ChestPadCreateWithoutDashboardInput, Prisma.ChestPadUncheckedCreateWithoutDashboardInput>
+}
+
+export type ChestPadUpdateWithWhereUniqueWithoutDashboardInput = {
+  where: Prisma.ChestPadWhereUniqueInput
+  data: Prisma.XOR<Prisma.ChestPadUpdateWithoutDashboardInput, Prisma.ChestPadUncheckedUpdateWithoutDashboardInput>
+}
+
+export type ChestPadUpdateManyWithWhereWithoutDashboardInput = {
+  where: Prisma.ChestPadScalarWhereInput
+  data: Prisma.XOR<Prisma.ChestPadUpdateManyMutationInput, Prisma.ChestPadUncheckedUpdateManyWithoutDashboardInput>
 }
 
 export type ChestPadCreateWithoutChestInput = {
@@ -574,6 +694,7 @@ export type ChestPadCreateWithoutChestInput = {
   shared?: $Enums.Shared
   dashRank: string
   user: Prisma.UserCreateNestedOneWithoutChestPadsInput
+  dashboard: Prisma.DashboardCreateNestedOneWithoutChestPadsInput
 }
 
 export type ChestPadUncheckedCreateWithoutChestInput = {
@@ -583,6 +704,7 @@ export type ChestPadUncheckedCreateWithoutChestInput = {
   shared?: $Enums.Shared
   dashRank: string
   userId: number
+  dashboardId: number
 }
 
 export type ChestPadCreateOrConnectWithoutChestInput = {
@@ -618,6 +740,7 @@ export type ChestPadCreateManyUserInput = {
   shared?: $Enums.Shared
   dashRank: string
   chestId: number
+  dashboardId: number
 }
 
 export type ChestPadUpdateWithoutUserInput = {
@@ -626,6 +749,7 @@ export type ChestPadUpdateWithoutUserInput = {
   shared?: Prisma.EnumSharedFieldUpdateOperationsInput | $Enums.Shared
   dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   chest?: Prisma.ChestUpdateOneRequiredWithoutChestPadsNestedInput
+  dashboard?: Prisma.DashboardUpdateOneRequiredWithoutChestPadsNestedInput
 }
 
 export type ChestPadUncheckedUpdateWithoutUserInput = {
@@ -635,6 +759,7 @@ export type ChestPadUncheckedUpdateWithoutUserInput = {
   shared?: Prisma.EnumSharedFieldUpdateOperationsInput | $Enums.Shared
   dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   chestId?: Prisma.IntFieldUpdateOperationsInput | number
+  dashboardId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ChestPadUncheckedUpdateManyWithoutUserInput = {
@@ -643,6 +768,46 @@ export type ChestPadUncheckedUpdateManyWithoutUserInput = {
   pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shared?: Prisma.EnumSharedFieldUpdateOperationsInput | $Enums.Shared
   dashRank?: Prisma.StringFieldUpdateOperationsInput | string
+  chestId?: Prisma.IntFieldUpdateOperationsInput | number
+  dashboardId?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type ChestPadCreateManyDashboardInput = {
+  id?: number
+  status?: $Enums.Status
+  pinned?: boolean
+  shared?: $Enums.Shared
+  dashRank: string
+  userId: number
+  chestId: number
+}
+
+export type ChestPadUpdateWithoutDashboardInput = {
+  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
+  pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shared?: Prisma.EnumSharedFieldUpdateOperationsInput | $Enums.Shared
+  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
+  user?: Prisma.UserUpdateOneRequiredWithoutChestPadsNestedInput
+  chest?: Prisma.ChestUpdateOneRequiredWithoutChestPadsNestedInput
+}
+
+export type ChestPadUncheckedUpdateWithoutDashboardInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
+  pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shared?: Prisma.EnumSharedFieldUpdateOperationsInput | $Enums.Shared
+  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
+  chestId?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type ChestPadUncheckedUpdateManyWithoutDashboardInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
+  pinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shared?: Prisma.EnumSharedFieldUpdateOperationsInput | $Enums.Shared
+  dashRank?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
   chestId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -653,6 +818,7 @@ export type ChestPadCreateManyChestInput = {
   shared?: $Enums.Shared
   dashRank: string
   userId: number
+  dashboardId: number
 }
 
 export type ChestPadUpdateWithoutChestInput = {
@@ -661,6 +827,7 @@ export type ChestPadUpdateWithoutChestInput = {
   shared?: Prisma.EnumSharedFieldUpdateOperationsInput | $Enums.Shared
   dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   user?: Prisma.UserUpdateOneRequiredWithoutChestPadsNestedInput
+  dashboard?: Prisma.DashboardUpdateOneRequiredWithoutChestPadsNestedInput
 }
 
 export type ChestPadUncheckedUpdateWithoutChestInput = {
@@ -670,6 +837,7 @@ export type ChestPadUncheckedUpdateWithoutChestInput = {
   shared?: Prisma.EnumSharedFieldUpdateOperationsInput | $Enums.Shared
   dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.IntFieldUpdateOperationsInput | number
+  dashboardId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ChestPadUncheckedUpdateManyWithoutChestInput = {
@@ -679,6 +847,7 @@ export type ChestPadUncheckedUpdateManyWithoutChestInput = {
   shared?: Prisma.EnumSharedFieldUpdateOperationsInput | $Enums.Shared
   dashRank?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.IntFieldUpdateOperationsInput | number
+  dashboardId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -691,8 +860,10 @@ export type ChestPadSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   dashRank?: boolean
   userId?: boolean
   chestId?: boolean
+  dashboardId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   chest?: boolean | Prisma.ChestDefaultArgs<ExtArgs>
+  dashboard?: boolean | Prisma.DashboardDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["chestPad"]>
 
 export type ChestPadSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -703,8 +874,10 @@ export type ChestPadSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   dashRank?: boolean
   userId?: boolean
   chestId?: boolean
+  dashboardId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   chest?: boolean | Prisma.ChestDefaultArgs<ExtArgs>
+  dashboard?: boolean | Prisma.DashboardDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["chestPad"]>
 
 export type ChestPadSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -715,8 +888,10 @@ export type ChestPadSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   dashRank?: boolean
   userId?: boolean
   chestId?: boolean
+  dashboardId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   chest?: boolean | Prisma.ChestDefaultArgs<ExtArgs>
+  dashboard?: boolean | Prisma.DashboardDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["chestPad"]>
 
 export type ChestPadSelectScalar = {
@@ -727,20 +902,24 @@ export type ChestPadSelectScalar = {
   dashRank?: boolean
   userId?: boolean
   chestId?: boolean
+  dashboardId?: boolean
 }
 
-export type ChestPadOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "status" | "pinned" | "shared" | "dashRank" | "userId" | "chestId", ExtArgs["result"]["chestPad"]>
+export type ChestPadOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "status" | "pinned" | "shared" | "dashRank" | "userId" | "chestId" | "dashboardId", ExtArgs["result"]["chestPad"]>
 export type ChestPadInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   chest?: boolean | Prisma.ChestDefaultArgs<ExtArgs>
+  dashboard?: boolean | Prisma.DashboardDefaultArgs<ExtArgs>
 }
 export type ChestPadIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   chest?: boolean | Prisma.ChestDefaultArgs<ExtArgs>
+  dashboard?: boolean | Prisma.DashboardDefaultArgs<ExtArgs>
 }
 export type ChestPadIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   chest?: boolean | Prisma.ChestDefaultArgs<ExtArgs>
+  dashboard?: boolean | Prisma.DashboardDefaultArgs<ExtArgs>
 }
 
 export type $ChestPadPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -748,6 +927,7 @@ export type $ChestPadPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     chest: Prisma.$ChestPayload<ExtArgs>
+    dashboard: Prisma.$DashboardPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -757,6 +937,7 @@ export type $ChestPadPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     dashRank: string
     userId: number
     chestId: number
+    dashboardId: number
   }, ExtArgs["result"]["chestPad"]>
   composites: {}
 }
@@ -1153,6 +1334,7 @@ export interface Prisma__ChestPadClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   chest<T extends Prisma.ChestDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ChestDefaultArgs<ExtArgs>>): Prisma.Prisma__ChestClient<runtime.Types.Result.GetResult<Prisma.$ChestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  dashboard<T extends Prisma.DashboardDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DashboardDefaultArgs<ExtArgs>>): Prisma.Prisma__DashboardClient<runtime.Types.Result.GetResult<Prisma.$DashboardPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1189,6 +1371,7 @@ export interface ChestPadFieldRefs {
   readonly dashRank: Prisma.FieldRef<"ChestPad", 'String'>
   readonly userId: Prisma.FieldRef<"ChestPad", 'Int'>
   readonly chestId: Prisma.FieldRef<"ChestPad", 'Int'>
+  readonly dashboardId: Prisma.FieldRef<"ChestPad", 'Int'>
 }
     
 
