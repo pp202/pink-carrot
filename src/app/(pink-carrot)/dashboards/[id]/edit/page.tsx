@@ -34,6 +34,7 @@ const EditDashboardPage = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const canDelete = totalDashboards > 1
@@ -104,16 +105,8 @@ const EditDashboardPage = () => {
     }
   }
 
-  const deleteDashboard = async () => {
-    if (!canDelete || isDeleting) {
-      return
-    }
-
-    const warning = needsMoveSelection
-      ? 'Delete this dashboard and move all chests to the selected dashboard?'
-      : 'Delete this dashboard?'
-
-    if (!window.confirm(warning)) {
+  const performDelete = async () => {
+    if (!canDelete || isDeleting || (needsMoveSelection && !selectedMoveTarget)) {
       return
     }
 
@@ -132,6 +125,7 @@ const EditDashboardPage = () => {
         throw new Error(payload?.message ?? 'Unable to delete dashboard.')
       }
 
+      setIsDeleteDialogOpen(false)
       router.push('/dashboards')
       router.refresh()
     } catch (deleteError) {
@@ -140,6 +134,23 @@ const EditDashboardPage = () => {
     } finally {
       setIsDeleting(false)
     }
+  }
+
+  const deleteDashboard = async () => {
+    if (!canDelete || isDeleting) {
+      return
+    }
+
+    if (needsMoveSelection) {
+      setIsDeleteDialogOpen(true)
+      return
+    }
+
+    if (!window.confirm('Delete this dashboard?')) {
+      return
+    }
+
+    await performDelete()
   }
 
   return (
@@ -178,32 +189,12 @@ const EditDashboardPage = () => {
                 </p>
               )}
 
-              {canDelete && needsMoveSelection && (
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-zinc-300" htmlFor="move-target">
-                    Move {chestCount} chest{chestCount === 1 ? '' : 's'} to
-                  </label>
-                  <select
-                    id="move-target"
-                    className="w-full rounded-lg border border-zinc-600 bg-zinc-950 px-3 py-2 text-zinc-100 outline-none focus:border-zinc-400"
-                    value={moveToDashboardId}
-                    onChange={(event) => setMoveToDashboardId(event.target.value)}
-                  >
-                    {moveOptions.map((option) => (
-                      <option key={option.id} value={option.id}>
-                        {option.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
               <div className="flex justify-between gap-3">
                 <button
                   type="button"
                   className="rounded-md border border-red-400/70 bg-red-500/15 px-3 py-2 text-sm font-medium text-red-100 transition hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-60"
                   onClick={() => void deleteDashboard()}
-                  disabled={!canDelete || isSaving || isDeleting || (needsMoveSelection && !selectedMoveTarget)}
+                  disabled={!canDelete || isSaving || isDeleting}
                 >
                   {isDeleting ? 'Deleting…' : 'Delete'}
                 </button>
@@ -225,10 +216,57 @@ const EditDashboardPage = () => {
                   </button>
                 </div>
               </div>
+
             </div>
           )}
         </div>
       </div>
+
+      {isDeleteDialogOpen && needsMoveSelection && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-6">
+          <div className="w-full max-w-md rounded-2xl border border-zinc-600/30 bg-zinc-800 px-6 py-6 shadow-2xl shadow-black/50">
+            <h2 className="text-lg font-semibold text-zinc-100">Delete dashboard</h2>
+            <p className="mt-2 text-sm text-zinc-300">
+              Move {chestCount} chest{chestCount === 1 ? '' : 's'} to another dashboard before deleting.
+            </p>
+
+            <label className="mt-4 block text-sm font-medium text-zinc-300" htmlFor="move-target">
+              Move to
+            </label>
+            <select
+              id="move-target"
+              className="mt-2 w-full rounded-lg border border-zinc-600 bg-zinc-950 px-3 py-2 text-zinc-100 outline-none focus:border-zinc-400"
+              value={moveToDashboardId}
+              onChange={(event) => setMoveToDashboardId(event.target.value)}
+            >
+              {moveOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                className="rounded-md border border-zinc-600 px-3 py-2 text-sm font-medium text-zinc-200 transition hover:bg-zinc-800"
+                onClick={() => setIsDeleteDialogOpen(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="rounded-md border border-red-400/70 bg-red-500/15 px-3 py-2 text-sm font-medium text-red-100 transition hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+                onClick={() => void performDelete()}
+                disabled={isDeleting || !selectedMoveTarget}
+              >
+                {isDeleting ? 'Deleting…' : 'Confirm delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
