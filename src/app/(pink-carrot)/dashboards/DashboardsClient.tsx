@@ -13,6 +13,8 @@ const DashboardsClient = () => {
   const [dashboards, setDashboards] = useState<Dashboard[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isCreating, setIsCreating] = useState(false)
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [nameDraft, setNameDraft] = useState('')
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -33,12 +35,7 @@ const DashboardsClient = () => {
   }, [])
 
   const createDashboard = async () => {
-    if (isCreating) {
-      return
-    }
-
-    const name = window.prompt('Dashboard name', `Dashboard ${dashboards.length + 1}`)
-    if (!name?.trim()) {
+    if (isCreating || !nameDraft.trim()) {
       return
     }
 
@@ -49,7 +46,7 @@ const DashboardsClient = () => {
       const response = await fetch('/api/dashboards', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name: nameDraft.trim() }),
       })
 
       if (!response.ok) {
@@ -58,6 +55,8 @@ const DashboardsClient = () => {
 
       const created = await response.json() as Dashboard
       setDashboards((previous) => [...previous, created])
+      setIsCreateDialogOpen(false)
+      setNameDraft('')
     } catch (createError) {
       const message = createError instanceof Error ? createError.message : 'Unable to create dashboard.'
       setError(message)
@@ -109,13 +108,63 @@ const DashboardsClient = () => {
               type="button"
               className="rounded-lg border border-zinc-300 bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60"
               disabled={isCreating}
-              onClick={() => void createDashboard()}
+              onClick={() => {
+                setNameDraft(`Dashboard ${dashboards.length + 1}`)
+                setIsCreateDialogOpen(true)
+              }}
             >
               {isCreating ? 'Creating…' : 'Create dashboard'}
             </button>
           </div>
         </div>
       </div>
+
+      {isCreateDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-6">
+          <div className="w-full max-w-md rounded-2xl border border-zinc-600/30 bg-zinc-800 px-6 py-6 shadow-2xl shadow-black/50">
+            <h2 className="text-lg font-semibold text-zinc-100">Create dashboard</h2>
+            <p className="mt-2 text-sm text-zinc-300">Choose a name for your new chest board.</p>
+
+            <label className="mt-4 block text-sm font-medium text-zinc-300" htmlFor="dashboard-name">
+              Name
+            </label>
+            <input
+              id="dashboard-name"
+              type="text"
+              value={nameDraft}
+              onChange={(event) => setNameDraft(event.target.value)}
+              className="mt-2 w-full rounded-lg border border-zinc-600 bg-zinc-950 px-3 py-2 text-zinc-100 outline-none focus:border-zinc-400"
+              maxLength={100}
+            />
+
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                className="rounded-md border border-zinc-600 px-3 py-2 text-sm font-medium text-zinc-200 transition hover:bg-zinc-800"
+                onClick={() => {
+                  if (isCreating) {
+                    return
+                  }
+
+                  setIsCreateDialogOpen(false)
+                  setNameDraft('')
+                }}
+                disabled={isCreating}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="rounded-md bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60"
+                onClick={() => void createDashboard()}
+                disabled={isCreating || nameDraft.trim().length === 0}
+              >
+                {isCreating ? 'Creating…' : 'Create'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
