@@ -3,15 +3,17 @@
 import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
 import classNames from 'classnames'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { GiCarrot } from 'react-icons/gi'
-import { IoClose, IoCreateOutline, IoLogOut, IoPeople, IoPersonCircle, IoSettingsSharp, IoTrashOutline } from 'react-icons/io5'
+import { IoAdd, IoClose, IoCreateOutline, IoLogOut, IoPeople, IoPersonCircle, IoSettingsSharp, IoTrashOutline } from 'react-icons/io5'
 import { signOut } from 'next-auth/react'
 
 const DELETE_WARNING = 'Delete your account? This permanently removes all your chests, carrots, and sign-in access details. This action cannot be undone.'
+type DashboardTab = { id: number; name: string }
 
 const NavBar = () => {
     const path = usePathname()
+    const searchParams = useSearchParams()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
     const [isDeletingAccount, setIsDeletingAccount] = useState(false)
@@ -22,13 +24,17 @@ const NavBar = () => {
     const [aliasError, setAliasError] = useState<string | null>(null)
     const [isAliasModalOpen, setIsAliasModalOpen] = useState(false)
     const [aliasDraft, setAliasDraft] = useState('')
+    const [dashboards, setDashboards] = useState<DashboardTab[]>([])
+    const [dragSourceIndex, setDragSourceIndex] = useState<number | null>(null)
     const menuRef = useRef<HTMLDivElement>(null)
+    const selectedDashboardId = searchParams.get('dashboardId')
 
-    const navItems = [
-        { name: 'Dashboard', href: '/dashboard' },
-        { name: 'Chests', href: '/my-lists' },
-        { name: 'Archives', href: '/archives' }
-    ]
+    useEffect(() => {
+        fetch('/api/dashboards', { cache: 'no-cache' })
+            .then((response) => response.json())
+            .then((items: DashboardTab[]) => setDashboards(items))
+            .catch(() => setDashboards([]))
+    }, [path])
 
     useEffect(() => {
         const handlePointerDown = (event: MouseEvent) => {
@@ -52,6 +58,57 @@ const NavBar = () => {
             document.removeEventListener('keydown', handleEscape)
         }
     }, [])
+
+    const createDashboard = async () => {
+        const name = window.prompt('Dashboard name', `Dashboard ${dashboards.length + 1}`)
+        if (!name?.trim()) {
+            return
+        }
+
+        const response = await fetch('/api/dashboards', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name }),
+        })
+
+        if (!response.ok) {
+            return
+        }
+
+        const created = await response.json() as DashboardTab
+        setDashboards((previous) => [...previous, created])
+    }
+
+    const moveDashboard = async (sourceIndex: number, targetIndex: number) => {
+        if (sourceIndex === targetIndex) {
+            return
+        }
+        const previous = [...dashboards]
+        const next = [...dashboards]
+        const [dragged] = next.splice(sourceIndex, 1)
+        if (!dragged) {
+            return
+        }
+        next.splice(targetIndex, 0, dragged)
+        setDashboards(next)
+
+        const moved = next[targetIndex]
+        const previousItem = targetIndex > 0 ? next[targetIndex - 1] : null
+        const nextItem = targetIndex < next.length - 1 ? next[targetIndex + 1] : null
+
+        const response = await fetch('/api/dashboards', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                dashboardId: moved.id,
+                previousDashboardId: previousItem?.id ?? null,
+                nextDashboardId: nextItem?.id ?? null,
+            }),
+        })
+        if (!response.ok) {
+            setDashboards(previous)
+        }
+    }
 
     const openSettings = async () => {
         setDeleteAccountError(null)
@@ -174,7 +231,40 @@ const NavBar = () => {
             <nav className='sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-zinc-700 bg-zinc-950/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-zinc-950/80'>
                 <Link href="/"><GiCarrot className='text-pink-400' /></Link>
                 <ul className='flex grow gap-4'>
-                    {navItems.map(item => navItem(item.href, item.name, path))}
+                    {dashboards.map((dashboard, index) => (
+                        <li key={dashboard.id}>
+                            <Link
+                                href={`/dashboard?dashboardId=${dashboard.id}`}
+                                draggable
+                                onDragStart={() => setDragSourceIndex(index)}
+                                onDragOver={(event) => event.preventDefault()}
+                                onDrop={() => {
+                                    if (dragSourceIndex === null) return
+                                    void moveDashboard(dragSourceIndex, index)
+                                    setDragSourceIndex(null)
+                                }}
+                                onDragEnd={() => setDragSourceIndex(null)}
+                                className={classNames({
+                                    'rounded-md px-3 py-1.5 text-sm font-semibold transition-colors': true,
+                                    'bg-zinc-100 text-zinc-900 shadow-sm': path === '/dashboard' && selectedDashboardId === dashboard.id.toString(),
+                                    'text-zinc-200 hover:bg-zinc-800 hover:text-zinc-100': path !== '/dashboard' || selectedDashboardId !== dashboard.id.toString(),
+                                })}
+                            >
+                                {dashboard.name}
+                            </Link>
+                        </li>
+                    ))}
+                    <li>
+                        <button
+                            type='button'
+                            onClick={() => void createDashboard()}
+                            className='rounded-md px-2 py-1.5 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-100'
+                            aria-label='Create dashboard'
+                        >
+                            <IoAdd />
+                        </button>
+                    </li>
+                    {navItem('/archives', 'Archives', path)}
                 </ul>
 
                 <div className='relative' ref={menuRef}>

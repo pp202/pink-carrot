@@ -89,8 +89,10 @@ function SharedStatusIcon({
 
 export default function DashboardPinnedChests({
   initialPinnedChests,
+  dashboardId,
 }: {
   initialPinnedChests: DashboardChest[];
+  dashboardId?: number;
 }) {
   const router = useRouter();
   const [chests, setChests] = useState(initialPinnedChests);
@@ -113,7 +115,11 @@ export default function DashboardPinnedChests({
       }
 
       try {
-        const response = await axios.get("/api/lists");
+        const response = await axios.get("/api/lists", {
+          params: {
+            dashboardId,
+          },
+        });
         const latestChests = (response.data as Array<{
           id: number;
           label: string;
@@ -158,7 +164,7 @@ export default function DashboardPinnedChests({
       clearInterval(intervalId);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [isDragging]);
+  }, [dashboardId, isDragging]);
 
   function handleHarvestedToggle(chestId: number, carrotId: string, harvested: boolean): void {
     setChests((previous) =>
@@ -429,7 +435,7 @@ export default function DashboardPinnedChests({
                         <DropdownMenu.Item
                           onClick={(event) => {
                             event.stopPropagation();
-                            router.push(`/my-lists/${chest.id}/edit?from=dashboard`);
+                            router.push(`/my-lists/${chest.id}/edit?from=dashboard${dashboardId ? `&dashboardId=${dashboardId}` : ""}`);
                           }}
                           className="!py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
                         >

@@ -1,6 +1,7 @@
 import { prisma } from '@/config/prisma'
 import { loggedUser } from './user';
 import { allocateLexoRanks, lexoRankBetween, nextLexoRank } from './lexoRank';
+import { resolveDashboardId } from './dashboards';
 
 function serializeChestPad(chestPad: {
     id: number;
@@ -74,11 +75,12 @@ async function hydrateSharedAliasesForUser<T extends { chestId: number; userId: 
     );
 }
 
-async function rebalanceChestRanks(userId: number) {
+async function rebalanceChestRanks(userId: number, dashboardId: number) {
     const chestPads = await prisma.chestPad.findMany({
         where: {
             userId,
             status: 'NEW',
+            dashboardId,
         },
         select: {
             id: true,
@@ -112,12 +114,14 @@ async function rebalanceChestRanks(userId: number) {
     );
 }
 
-export async function getChests() {
+export async function getChests(dashboardId?: number) {
     const user = await loggedUser();
+    const selectedDashboardId = await resolveDashboardId(dashboardId);
     const chestPads = await prisma.chestPad.findMany({
         where: {
             userId: user.id,
             status: 'NEW',
+            dashboardId: selectedDashboardId,
         },
         include: {
             chest: {
@@ -179,12 +183,14 @@ export async function getChests() {
     );
 }
 
-export async function getArchivedChests() {
+export async function getArchivedChests(dashboardId?: number) {
     const user = await loggedUser();
+    const selectedDashboardId = await resolveDashboardId(dashboardId);
     const chestPads = await prisma.chestPad.findMany({
         where: {
             userId: user.id,
             status: 'ARCHIVED',
+            dashboardId: selectedDashboardId,
         },
         include: {
             chest: {
@@ -201,13 +207,15 @@ export async function getArchivedChests() {
     return chestPads.map(serializeChestPad);
 }
 
-export async function getPinnedChestsWithCarrots() {
+export async function getPinnedChestsWithCarrots(dashboardId?: number) {
     const user = await loggedUser();
+    const selectedDashboardId = await resolveDashboardId(dashboardId);
     const chestPads = await prisma.chestPad.findMany({
         where: {
             userId: user.id,
             pinned: true,
             status: 'NEW',
+            dashboardId: selectedDashboardId,
         },
         include: {
             chest: {
@@ -549,6 +557,11 @@ export async function cloneChest(id: number) {
                     id: user.id,
                 },
             },
+            dashboard: {
+                connect: {
+                    id: chestPad.dashboardId,
+                },
+            },
             dashRank: nextLexoRank(lastDashRankedChestPad?.dashRank),
             chest: {
                 create: {
@@ -684,9 +697,27 @@ export async function shareChestWithConnections(id: number, connectionIds: numbe
     const usersToShare = candidateUserIds.filter((userId) => !existingUsers.has(userId));
 
     await Promise.all(usersToShare.map(async (targetUserId) => {
+        const targetDashboard = await prisma.dashboard.findFirst({
+            where: {
+                userId: targetUserId,
+            },
+            select: {
+                id: true,
+            },
+            orderBy: [
+                { dashRank: 'asc' },
+                { id: 'asc' },
+            ],
+        });
+
+        if (!targetDashboard) {
+            return;
+        }
+
         const lastDashRankedChestPad = await prisma.chestPad.findFirst({
             where: {
                 userId: targetUserId,
+                dashboardId: targetDashboard.id,
             },
             select: {
                 dashRank: true,
@@ -704,6 +735,7 @@ export async function shareChestWithConnections(id: number, connectionIds: numbe
                 shared: 'SHARED',
                 userId: targetUserId,
                 chestId: chestPad.chestId,
+                dashboardId: targetDashboard.id,
                 dashRank: nextLexoRank(lastDashRankedChestPad?.dashRank),
             },
         });
@@ -847,6 +879,20 @@ export async function moveChestBetween(
     nextChestId: number | null,
 ) {
     const user = await loggedUser();
+    const movedChest = await prisma.chestPad.findFirst({
+        where: {
+            id: chestId,
+            userId: user.id,
+            status: 'NEW',
+        },
+        select: {
+            dashboardId: true,
+        },
+    });
+
+    if (!movedChest) {
+        return false;
+    }
 
     const idsToLoad = [chestId, previousChestId, nextChestId]
         .filter((id): id is number => typeof id === 'number');
@@ -855,6 +901,7 @@ export async function moveChestBetween(
         where: {
             userId: user.id,
             status: 'NEW',
+            dashboardId: movedChest.dashboardId,
             id: {
                 in: idsToLoad,
             },
@@ -884,12 +931,13 @@ export async function moveChestBetween(
     try {
         nextRankValue = lexoRankBetween(previousRank, nextRank);
     } catch {
-        await rebalanceChestRanks(user.id);
+        await rebalanceChestRanks(user.id, movedChest.dashboardId);
 
         const refreshedChests = await prisma.chestPad.findMany({
             where: {
                 userId: user.id,
                 status: 'NEW',
+                dashboardId: movedChest.dashboardId,
                 id: {
                     in: idsToLoad,
                 },

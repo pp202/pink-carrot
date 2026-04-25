@@ -27,7 +27,10 @@ const EditListPage = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setSubmitting] = useState(false)
   const searchParams = useSearchParams()
-  const returnPath = searchParams.get('from') === 'dashboard' ? '/dashboard' : '/my-lists'
+  const dashboardId = searchParams.get('dashboardId')
+  const returnPath = searchParams.get('from') === 'dashboard'
+    ? `/dashboard${dashboardId ? `?dashboardId=${dashboardId}` : ''}`
+    : '/my-lists'
 
   const {
     register,

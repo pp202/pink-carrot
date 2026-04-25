@@ -385,6 +385,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
+  Dashboard: 'Dashboard',
   Chest: 'Chest',
   ChestPad: 'ChestPad',
   Connection: 'Connection',
@@ -405,7 +406,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "chest" | "chestPad" | "connection" | "connectionRequest" | "carrot"
+    modelProps: "user" | "dashboard" | "chest" | "chestPad" | "connection" | "connectionRequest" | "carrot"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -480,6 +481,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
+        }
+      }
+    }
+    Dashboard: {
+      payload: Prisma.$DashboardPayload<ExtArgs>
+      fields: Prisma.DashboardFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DashboardFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DashboardFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardPayload>
+        }
+        findFirst: {
+          args: Prisma.DashboardFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DashboardFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardPayload>
+        }
+        findMany: {
+          args: Prisma.DashboardFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardPayload>[]
+        }
+        create: {
+          args: Prisma.DashboardCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardPayload>
+        }
+        createMany: {
+          args: Prisma.DashboardCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DashboardCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardPayload>[]
+        }
+        delete: {
+          args: Prisma.DashboardDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardPayload>
+        }
+        update: {
+          args: Prisma.DashboardUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardPayload>
+        }
+        deleteMany: {
+          args: Prisma.DashboardDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DashboardUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DashboardUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardPayload>[]
+        }
+        upsert: {
+          args: Prisma.DashboardUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardPayload>
+        }
+        aggregate: {
+          args: Prisma.DashboardAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDashboard>
+        }
+        groupBy: {
+          args: Prisma.DashboardGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DashboardGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DashboardCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DashboardCountAggregateOutputType> | number
         }
       }
     }
@@ -901,6 +976,16 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const DashboardScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  dashRank: 'dashRank',
+  userId: 'userId'
+} as const
+
+export type DashboardScalarFieldEnum = (typeof DashboardScalarFieldEnum)[keyof typeof DashboardScalarFieldEnum]
+
+
 export const ChestScalarFieldEnum = {
   id: 'id',
   label: 'label',
@@ -917,7 +1002,8 @@ export const ChestPadScalarFieldEnum = {
   shared: 'shared',
   dashRank: 'dashRank',
   userId: 'userId',
-  chestId: 'chestId'
+  chestId: 'chestId',
+  dashboardId: 'dashboardId'
 } as const
 
 export type ChestPadScalarFieldEnum = (typeof ChestPadScalarFieldEnum)[keyof typeof ChestPadScalarFieldEnum]
@@ -1161,6 +1247,7 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
+  dashboard?: Prisma.DashboardOmit
   chest?: Prisma.ChestOmit
   chestPad?: Prisma.ChestPadOmit
   connection?: Prisma.ConnectionOmit

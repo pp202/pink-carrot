@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  Dashboard: 'Dashboard',
   Chest: 'Chest',
   ChestPad: 'ChestPad',
   Connection: 'Connection',
@@ -84,6 +85,16 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const DashboardScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  dashRank: 'dashRank',
+  userId: 'userId'
+} as const
+
+export type DashboardScalarFieldEnum = (typeof DashboardScalarFieldEnum)[keyof typeof DashboardScalarFieldEnum]
+
+
 export const ChestScalarFieldEnum = {
   id: 'id',
   label: 'label',
@@ -100,7 +111,8 @@ export const ChestPadScalarFieldEnum = {
   shared: 'shared',
   dashRank: 'dashRank',
   userId: 'userId',
-  chestId: 'chestId'
+  chestId: 'chestId',
+  dashboardId: 'dashboardId'
 } as const
 
 export type ChestPadScalarFieldEnum = (typeof ChestPadScalarFieldEnum)[keyof typeof ChestPadScalarFieldEnum]

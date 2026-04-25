@@ -7,8 +7,14 @@ export const revalidate = 0;
 
 type PinnedChest = Awaited<ReturnType<typeof getChests>>[number];
 
-export default async function DashboardPage() {
-  const pinnedChests: PinnedChest[] = (await getChests()).filter((chest: PinnedChest) => chest.status === 'NEW');
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ dashboardId?: string }>;
+}) {
+  const params = await searchParams;
+  const dashboardId = params.dashboardId ? Number.parseInt(params.dashboardId, 10) : undefined;
+  const pinnedChests: PinnedChest[] = (await getChests(dashboardId)).filter((chest: PinnedChest) => chest.status === 'NEW');
 
   const serializablePinnedChests = pinnedChests.map((chest: PinnedChest) => ({
     id: chest.id,
@@ -31,12 +37,12 @@ export default async function DashboardPage() {
           </header>
 
           <div className="space-y-4">
-            <DashboardPinnedChests initialPinnedChests={serializablePinnedChests} />
+            <DashboardPinnedChests initialPinnedChests={serializablePinnedChests} dashboardId={dashboardId} />
           </div>
 
           <div className="mt-8 flex justify-center">
             <Link
-              href="/my-lists/new?from=dashboard"
+              href={dashboardId ? `/my-lists/new?from=dashboard&dashboardId=${dashboardId}` : "/my-lists/new?from=dashboard"}
               aria-label="Add a new chest"
               className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-zinc-500/60 bg-zinc-900 text-2xl leading-none text-zinc-100 transition hover:border-zinc-400 hover:bg-zinc-800"
             >
