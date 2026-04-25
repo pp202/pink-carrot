@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import classNames from 'classnames'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { GiCarrot } from 'react-icons/gi'
-import { IoAdd, IoArchiveOutline, IoClose, IoCreateOutline, IoLogOut, IoPeople, IoPersonCircle, IoSettingsSharp, IoTrashOutline } from 'react-icons/io5'
+import { IoArchiveOutline, IoClose, IoCreateOutline, IoGridOutline, IoLogOut, IoPeople, IoPersonCircle, IoSettingsSharp, IoTrashOutline } from 'react-icons/io5'
 import { signOut } from 'next-auth/react'
 
 const DELETE_WARNING = 'Delete your account? This permanently removes all your chests, carrots, and sign-in access details. This action cannot be undone.'
@@ -58,26 +58,6 @@ const NavBar = () => {
             document.removeEventListener('keydown', handleEscape)
         }
     }, [])
-
-    const createDashboard = async () => {
-        const name = window.prompt('Dashboard name', `Dashboard ${dashboards.length + 1}`)
-        if (!name?.trim()) {
-            return
-        }
-
-        const response = await fetch('/api/dashboards', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name }),
-        })
-
-        if (!response.ok) {
-            return
-        }
-
-        const created = await response.json() as DashboardTab
-        setDashboards((previous) => [...previous, created])
-    }
 
     const moveDashboard = async (sourceIndex: number, targetIndex: number) => {
         if (sourceIndex === targetIndex) {
@@ -254,16 +234,6 @@ const NavBar = () => {
                             </Link>
                         </li>
                     ))}
-                    <li>
-                        <button
-                            type='button'
-                            onClick={() => void createDashboard()}
-                            className='rounded-md px-2 py-1.5 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-100'
-                            aria-label='Create dashboard'
-                        >
-                            <IoAdd />
-                        </button>
-                    </li>
                 </ul>
 
                 <div className='relative' ref={menuRef}>
@@ -310,6 +280,15 @@ const NavBar = () => {
                             >
                                 <IoArchiveOutline size={18} />
                                 <span>Archives</span>
+                            </Link>
+                            <Link
+                                href='/dashboards'
+                                role='menuitem'
+                                className='mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-zinc-200 transition hover:bg-zinc-800 hover:text-zinc-50'
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                <IoGridOutline size={18} />
+                                <span>Dashboards</span>
                             </Link>
                             <button
                                 type='button'

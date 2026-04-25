@@ -57,6 +57,69 @@ export async function getDashboards() {
   });
 }
 
+export async function getDashboardsForManagement() {
+  const user = await loggedUser();
+  await ensureDefaultDashboard(user.id);
+
+  return prisma.dashboard.findMany({
+    where: { userId: user.id },
+    select: {
+      id: true,
+      name: true,
+      dashRank: true,
+      _count: {
+        select: {
+          chestPads: true,
+        },
+      },
+    },
+    orderBy: [{ dashRank: "asc" }, { id: "asc" }],
+  });
+}
+
+export async function getDashboardForEdit(dashboardId: number) {
+  const user = await loggedUser();
+  await ensureDefaultDashboard(user.id);
+
+  const [dashboard, allDashboards] = await Promise.all([
+    prisma.dashboard.findFirst({
+      where: {
+        id: dashboardId,
+        userId: user.id,
+      },
+      select: {
+        id: true,
+        name: true,
+        _count: {
+          select: {
+            chestPads: true,
+          },
+        },
+      },
+    }),
+    prisma.dashboard.findMany({
+      where: {
+        userId: user.id,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: [{ dashRank: "asc" }, { id: "asc" }],
+    }),
+  ]);
+
+  if (!dashboard) {
+    return null;
+  }
+
+  return {
+    dashboard,
+    totalDashboards: allDashboards.length,
+    moveOptions: allDashboards.filter((item) => item.id !== dashboardId),
+  };
+}
+
 export async function createDashboard(name: string) {
   const user = await loggedUser();
   const trimmedName = name.trim();
@@ -79,6 +142,116 @@ export async function createDashboard(name: string) {
     },
     select: { id: true, name: true, dashRank: true },
   });
+}
+
+export async function renameDashboard(dashboardId: number, name: string) {
+  const user = await loggedUser();
+  const trimmedName = name.trim();
+
+  if (!trimmedName) {
+    return null;
+  }
+
+  const updated = await prisma.dashboard.updateMany({
+    where: {
+      id: dashboardId,
+      userId: user.id,
+    },
+    data: {
+      name: trimmedName,
+    },
+  });
+
+  if (updated.count === 0) {
+    return null;
+  }
+
+  return prisma.dashboard.findFirst({
+    where: {
+      id: dashboardId,
+      userId: user.id,
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+}
+
+export async function deleteDashboard(dashboardId: number, moveToDashboardId: number | null) {
+  const user = await loggedUser();
+
+  await ensureDefaultDashboard(user.id);
+
+  const [dashboard, dashboards] = await Promise.all([
+    prisma.dashboard.findFirst({
+      where: {
+        id: dashboardId,
+        userId: user.id,
+      },
+      select: {
+        id: true,
+        _count: {
+          select: {
+            chestPads: true,
+          },
+        },
+      },
+    }),
+    prisma.dashboard.findMany({
+      where: {
+        userId: user.id,
+      },
+      select: {
+        id: true,
+      },
+    }),
+  ]);
+
+  if (!dashboard) {
+    return { status: "not-found" as const };
+  }
+
+  if (dashboards.length <= 1) {
+    return { status: "last-dashboard" as const };
+  }
+
+  const chestCount = dashboard._count.chestPads;
+  if (chestCount > 0 && !Number.isInteger(moveToDashboardId)) {
+    return { status: "move-required" as const };
+  }
+
+  const moveTargetIsValid =
+    moveToDashboardId === null
+      ? true
+      : dashboards.some((item) => item.id === moveToDashboardId && item.id !== dashboardId);
+
+  if (!moveTargetIsValid) {
+    return { status: "invalid-move-target" as const };
+  }
+
+  await prisma.$transaction(async (tx) => {
+    if (chestCount > 0 && moveToDashboardId !== null) {
+      await tx.chestPad.updateMany({
+        where: {
+          userId: user.id,
+          dashboardId,
+        },
+        data: {
+          dashboardId: moveToDashboardId,
+        },
+      });
+    }
+
+    await tx.dashboard.deleteMany({
+      where: {
+        id: dashboardId,
+        userId: user.id,
+      },
+    });
+  });
+
+  return { status: "deleted" as const };
 }
 
 export async function moveDashboardBetween(
