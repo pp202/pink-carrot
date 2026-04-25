@@ -223,14 +223,15 @@ const DashboardsClient = () => {
           <div className="mt-8 flex justify-center">
             <button
               type="button"
-              className="rounded-lg border border-zinc-300 bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60"
+              aria-label="Create dashboard"
+              className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-zinc-500/60 bg-zinc-900 text-2xl leading-none text-zinc-100 transition hover:border-zinc-400 hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
               disabled={isCreating}
               onClick={() => {
                 setNameDraft(`Dashboard ${dashboards.length + 1}`)
                 setIsCreateDialogOpen(true)
               }}
             >
-              {isCreating ? 'Creating…' : 'Create dashboard'}
+              +
             </button>
           </div>
         </div>
