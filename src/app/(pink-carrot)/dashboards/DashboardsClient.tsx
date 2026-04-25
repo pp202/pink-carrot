@@ -9,6 +9,8 @@ type Dashboard = {
   name: string
 }
 
+const DASHBOARDS_UPDATED_EVENT = 'pink-carrot:dashboards-updated'
+
 const DashboardsClient = () => {
   const [dashboards, setDashboards] = useState<Dashboard[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -16,6 +18,20 @@ const DashboardsClient = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [nameDraft, setNameDraft] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [dragSourceIndex, setDragSourceIndex] = useState<number | null>(null)
+  const [dragTargetIndex, setDragTargetIndex] = useState<number | null>(null)
+
+  const broadcastDashboards = (items: Dashboard[]) => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    window.dispatchEvent(
+      new CustomEvent<{ dashboards: Dashboard[] }>(DASHBOARDS_UPDATED_EVENT, {
+        detail: { dashboards: items },
+      }),
+    )
+  }
 
   useEffect(() => {
     fetch('/api/dashboards', { cache: 'no-cache' })
@@ -26,7 +42,10 @@ const DashboardsClient = () => {
 
         return response.json() as Promise<Dashboard[]>
       })
-      .then((items) => setDashboards(items))
+      .then((items) => {
+        setDashboards(items)
+        broadcastDashboards(items)
+      })
       .catch((loadError) => {
         const message = loadError instanceof Error ? loadError.message : 'Unable to load dashboards.'
         setError(message)
@@ -54,7 +73,11 @@ const DashboardsClient = () => {
       }
 
       const created = await response.json() as Dashboard
-      setDashboards((previous) => [...previous, created])
+      setDashboards((previous) => {
+        const next = [...previous, created]
+        broadcastDashboards(next)
+        return next
+      })
       setIsCreateDialogOpen(false)
       setNameDraft('')
     } catch (createError) {
@@ -62,6 +85,54 @@ const DashboardsClient = () => {
       setError(message)
     } finally {
       setIsCreating(false)
+    }
+  }
+
+  const clearDragPreview = () => {
+    setDragSourceIndex(null)
+    setDragTargetIndex(null)
+  }
+
+  const reorderDashboards = async (sourceIndex: number, targetIndex: number) => {
+    if (sourceIndex === targetIndex || targetIndex < 0 || targetIndex >= dashboards.length) {
+      return
+    }
+
+    const previous = [...dashboards]
+    const next = [...dashboards]
+    const [dragged] = next.splice(sourceIndex, 1)
+
+    if (!dragged) {
+      return
+    }
+
+    next.splice(targetIndex, 0, dragged)
+    setDashboards(next)
+    broadcastDashboards(next)
+    setError(null)
+
+    const moved = next[targetIndex]
+    const previousItem = targetIndex > 0 ? next[targetIndex - 1] : null
+    const nextItem = targetIndex < next.length - 1 ? next[targetIndex + 1] : null
+
+    try {
+      const response = await fetch('/api/dashboards', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dashboardId: moved.id,
+          previousDashboardId: previousItem?.id ?? null,
+          nextDashboardId: nextItem?.id ?? null,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Unable to reorder dashboard.')
+      }
+    } catch {
+      setDashboards(previous)
+      broadcastDashboards(previous)
+      setError('Unable to reorder dashboard.')
     }
   }
 
@@ -82,25 +153,71 @@ const DashboardsClient = () => {
           {isLoading ? (
             <p className="rounded-xl border border-zinc-700 bg-zinc-900/70 px-4 py-3 text-sm text-zinc-300">Loading dashboards…</p>
           ) : (
-            <div className="space-y-3">
-              {dashboards.map((dashboard) => (
-                <div
-                  key={dashboard.id}
-                  className="rounded-xl border border-zinc-700 bg-zinc-900/70 px-4 py-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="min-w-0 flex-1 truncate text-zinc-100">{dashboard.name}</span>
-                    <Link
-                      href={`/dashboards/${dashboard.id}/edit`}
-                      className="rounded-md p-1 text-zinc-300 transition hover:bg-zinc-800 hover:text-zinc-100"
-                      aria-label={`Edit ${dashboard.name}`}
-                    >
-                      <IoCreateOutline size={18} />
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ul className="space-y-3">
+              {dashboards.map((dashboard, index) => {
+                const isDraggingRow = dragSourceIndex === index
+                const shouldShowDropIndicator = dragTargetIndex === index && dragSourceIndex !== index
+                const isDraggingDown = shouldShowDropIndicator && dragSourceIndex !== null && dragSourceIndex < index
+
+                return (
+                  <li
+                    key={dashboard.id}
+                    className="group relative rounded-xl border border-zinc-700 bg-zinc-900/70 px-4 py-3"
+                    style={{ opacity: isDraggingRow ? 0.45 : 1 }}
+                    onDragEnter={(event) => {
+                      event.preventDefault()
+                      if (dragSourceIndex !== null) {
+                        setDragTargetIndex(index)
+                      }
+                    }}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={(event) => {
+                      event.preventDefault()
+                      const sourceIndex = Number(event.dataTransfer.getData('text/plain'))
+                      if (!Number.isNaN(sourceIndex)) {
+                        void reorderDashboards(sourceIndex, index)
+                      }
+                      clearDragPreview()
+                    }}
+                  >
+                    {shouldShowDropIndicator ? (
+                      <div
+                        className={`pointer-events-none absolute inset-x-4 h-1 rounded-full bg-amber-400/80 ${
+                          isDraggingDown ? '-bottom-1' : '-top-1'
+                        }`}
+                      />
+                    ) : null}
+
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        draggable
+                        onDragStart={(event) => {
+                          setDragSourceIndex(index)
+                          setDragTargetIndex(index)
+                          event.dataTransfer.setData('text/plain', String(index))
+                          event.dataTransfer.effectAllowed = 'move'
+                        }}
+                        onDragEnd={clearDragPreview}
+                        className="cursor-grab rounded-md px-1 text-lg leading-none text-zinc-500 transition hover:bg-zinc-800 hover:text-zinc-200 active:cursor-grabbing"
+                        aria-label={`Move ${dashboard.name}`}
+                      >
+                        ⋮⋮
+                      </button>
+
+                      <span className="min-w-0 flex-1 truncate text-zinc-100">{dashboard.name}</span>
+                      <Link
+                        href={`/dashboards/${dashboard.id}/edit`}
+                        className="rounded-md p-1 text-zinc-300 transition hover:bg-zinc-800 hover:text-zinc-100"
+                        aria-label={`Edit ${dashboard.name}`}
+                      >
+                        <IoCreateOutline size={18} />
+                      </Link>
+                    </div>
+                  </li>
+                )
+              })}
+            </ul>
           )}
 
           <div className="mt-8 flex justify-center">
