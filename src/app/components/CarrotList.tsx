@@ -2,11 +2,12 @@
 
 import Spinner from "@/app/components/Spinner";
 import ChestShareDialog from "@/app/components/ChestShareDialog";
+import SwitchDashboardDialog from "@/app/components/SwitchDashboardDialog";
 import { Box, DropdownMenu, Flex, IconButton, Tooltip } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FaBars, FaClone, FaEdit, FaGripLines, FaMinus, FaThumbtack, FaUsers } from "react-icons/fa";
+import { FaBars, FaClone, FaEdit, FaExchangeAlt, FaGripLines, FaMinus, FaThumbtack, FaUsers } from "react-icons/fa";
 import { GiChest } from "react-icons/gi";
 
 const SWIPE_DELETE_THRESHOLD = 90;
@@ -31,6 +32,7 @@ type RecentlyArchived = {
 const CarrotList = () => {
   const [state, setState] = useState<ListChest[]>([]);
   const [sharingChestId, setSharingChestId] = useState<number | null>(null);
+  const [switchingChestId, setSwitchingChestId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [recentlyArchived, setRecentlyArchived] =
     useState<RecentlyArchived | null>(null);
@@ -181,6 +183,7 @@ const CarrotList = () => {
         onDragPreviewUpdate={updateDragPreview}
         onDragPreviewClear={clearDragPreview}
         onShare={setSharingChestId}
+        onSwitchDashboard={setSwitchingChestId}
       />
       <ChestShareDialog
         chestId={sharingChestId ?? 0}
@@ -201,6 +204,18 @@ const CarrotList = () => {
                 : item,
             ),
           );
+        }}
+      />
+      <SwitchDashboardDialog
+        chestId={switchingChestId ?? 0}
+        open={switchingChestId !== null}
+        onClose={() => setSwitchingChestId(null)}
+        onSwitched={() => {
+          if (!switchingChestId) {
+            return;
+          }
+
+          setState((previous) => previous.filter((item) => item.id !== switchingChestId));
         }}
       />
       {recentlyArchived ? (
@@ -234,6 +249,7 @@ const Carrots = ({
   onDragPreviewUpdate,
   onDragPreviewClear,
   onShare,
+  onSwitchDashboard,
 }: {
   carrotList: ListChest[];
   isLoading: boolean;
@@ -247,6 +263,7 @@ const Carrots = ({
   onDragPreviewUpdate: (targetIndex: number) => void;
   onDragPreviewClear: () => void;
   onShare: (id: number) => void;
+  onSwitchDashboard: (id: number) => void;
 }) => {
   if (isLoading) {
     return (
@@ -278,6 +295,7 @@ const Carrots = ({
           onDragPreviewUpdate={onDragPreviewUpdate}
           onDragPreviewClear={onDragPreviewClear}
           onShare={onShare}
+          onSwitchDashboard={onSwitchDashboard}
         />
       ))}
     </ul>
@@ -297,6 +315,7 @@ const CarrotListItem = ({
   onDragPreviewUpdate,
   onDragPreviewClear,
   onShare,
+  onSwitchDashboard,
 }: {
   item: ListChest;
   onRemove: (id: number) => void;
@@ -310,6 +329,7 @@ const CarrotListItem = ({
   onDragPreviewUpdate: (targetIndex: number) => void;
   onDragPreviewClear: () => void;
   onShare: (id: number) => void;
+  onSwitchDashboard: (id: number) => void;
 }) => {
   const router = useRouter();
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
@@ -661,6 +681,16 @@ const CarrotListItem = ({
               >
                 <FaUsers />
                 Share
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onSwitchDashboard(item.id);
+                }}
+                className="mt-3 !py-2.5 !text-[1.05rem] sm:!text-sm [&_svg]:!h-[1.15rem] [&_svg]:!w-[1.15rem] sm:[&_svg]:!h-4 sm:[&_svg]:!w-4"
+              >
+                <FaExchangeAlt />
+                Switch dashboard
               </DropdownMenu.Item>
               <DropdownMenu.Item
                 onClick={(event) => {
