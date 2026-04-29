@@ -980,3 +980,67 @@ export async function moveChestBetween(
 
     return true;
 }
+
+export async function moveChestToDashboard(id: number, dashboardId: number) {
+    const user = await loggedUser();
+
+    const [chestPad, targetDashboard] = await Promise.all([
+        prisma.chestPad.findFirst({
+            where: {
+                id,
+                userId: user.id,
+                status: 'NEW',
+            },
+            select: {
+                id: true,
+                dashboardId: true,
+            },
+        }),
+        prisma.dashboard.findFirst({
+            where: {
+                id: dashboardId,
+                userId: user.id,
+            },
+            select: {
+                id: true,
+            },
+        }),
+    ]);
+
+    if (!chestPad || !targetDashboard) {
+        return false;
+    }
+
+    if (chestPad.dashboardId === dashboardId) {
+        return true;
+    }
+
+    const lastDashRankedChestPad = await prisma.chestPad.findFirst({
+        where: {
+            userId: user.id,
+            status: 'NEW',
+            dashboardId,
+        },
+        select: {
+            dashRank: true,
+        },
+        orderBy: [
+            { dashRank: 'desc' },
+            { id: 'desc' },
+        ],
+    });
+
+    await prisma.chestPad.updateMany({
+        where: {
+            id,
+            userId: user.id,
+            status: 'NEW',
+        },
+        data: {
+            dashboardId,
+            dashRank: nextLexoRank(lastDashRankedChestPad?.dashRank),
+        },
+    });
+
+    return true;
+}

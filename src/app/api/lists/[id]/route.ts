@@ -4,6 +4,7 @@ import {
   deleteArchivedList,
   getChest,
   getChestShareTargets,
+  moveChestToDashboard,
   setPinned,
   shareChestWithConnections,
   unarchiveList,
@@ -107,6 +108,19 @@ export async function PATCH(
     }
 
     return NextResponse.json(unshared, { status: 200 });
+  }
+
+  if (body?.action === "switch-dashboard") {
+    if (!Number.isInteger(body?.dashboardId)) {
+      return NextResponse.json({ message: "Invalid dashboard id" }, { status: 400 });
+    }
+
+    const switched = await moveChestToDashboard(parseInt(id), body.dashboardId);
+    if (!switched) {
+      return NextResponse.json({ message: "List not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "List moved to dashboard" }, { status: 200 });
   }
 
   const validation = createListSchema.safeParse(body);
