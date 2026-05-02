@@ -1,3 +1,4 @@
+import { getDashboards } from '@/backend/dashboards';
 import { getChests } from '@/backend/lists';
 import Link from 'next/link';
 import DashboardPinnedChests from './DashboardPinnedChests';
@@ -14,7 +15,17 @@ export default async function DashboardPage({
 }) {
   const params = await searchParams;
   const dashboardId = params.dashboardId ? Number.parseInt(params.dashboardId, 10) : undefined;
-  const pinnedChests: PinnedChest[] = (await getChests(dashboardId)).filter((chest: PinnedChest) => chest.status === 'NEW');
+  const [pinnedChestsRaw, dashboards] = await Promise.all([
+    getChests(dashboardId),
+    getDashboards(),
+  ]);
+
+  const selectedDashboard = dashboardId
+    ? dashboards.find((dashboard) => dashboard.id === dashboardId)
+    : dashboards[0];
+  const dashboardTitle = selectedDashboard?.name ?? 'Dashboard';
+
+  const pinnedChests: PinnedChest[] = pinnedChestsRaw.filter((chest: PinnedChest) => chest.status === 'NEW');
 
   const serializablePinnedChests = pinnedChests.map((chest: PinnedChest) => ({
     id: chest.id,
@@ -33,7 +44,7 @@ export default async function DashboardPage({
       <div className="container mx-auto flex min-h-[calc(100vh-5rem)] items-stretch justify-center px-6 py-12">
         <div className="flex min-h-full w-full max-w-2xl flex-col rounded-2xl border border-zinc-600/30 bg-zinc-800 px-8 py-10 shadow-2xl shadow-black/40 md:px-10 md:py-12">
           <header className="mb-8 w-full text-center">
-            <h1 className="text-2xl font-semibold text-zinc-100">Dashboard</h1>
+            <h1 className="text-xl font-semibold text-zinc-100">{dashboardTitle}</h1>
           </header>
 
           <div className="space-y-4">
